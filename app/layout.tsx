@@ -7,7 +7,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body className="bg-white text-slate-900 overflow-x-hidden">
         <LeadFlowProvider>
-          <div className="min-h-screen pb-[120px]">{children}</div>
+          <div className="min-h-screen pb-[88px]">{children}</div>
           <FixedCtaButton />
         </LeadFlowProvider>
       </body>

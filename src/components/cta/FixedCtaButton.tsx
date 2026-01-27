@@ -11,13 +11,15 @@ export default function FixedCtaButton() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 h-[88px] bg-white border-t border-black/10 pointer-events-auto">
-      <div className="flex h-full items-center">
+    <div 
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-black/10"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <div className="max-w-[640px] mx-auto px-4 py-3">
         <button
           type="button"
           onClick={handleClick}
-          className="mx-4 flex h-14 w-full items-center justify-center rounded-[12px] bg-[#ff7a00] text-base font-bold text-white hover:bg-[#ff8c1a] transition-colors cursor-pointer active:scale-[0.98]"
-          style={{ pointerEvents: "auto" }}
+          className="w-full h-14 flex items-center justify-center rounded-[12px] bg-[#ff7a00] text-base font-bold text-white hover:bg-[#ff8c1a] transition-colors active:scale-[0.98]"
         >
           창업 문의하기
         </button>

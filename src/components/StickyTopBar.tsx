@@ -28,7 +28,7 @@ export default function StickyTopBar() {
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 transition-all duration-200 ${
+      className={`fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 transition-all duration-200 lg:flex lg:justify-center lg:border-gray-100 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
       }`}
       style={{
@@ -36,7 +36,7 @@ export default function StickyTopBar() {
         height: "calc(56px + env(safe-area-inset-top))",
       }}
     >
-      <div className="flex items-center h-14 px-4">
+      <div className="flex items-center h-14 px-4 w-full lg:max-w-[1100px] lg:px-12">
         <button
           onClick={handleBack}
           className="flex items-center justify-center w-8 h-8"

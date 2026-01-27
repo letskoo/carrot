@@ -193,10 +193,11 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
 
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
-      <StepHeader currentStep={headerStep} onBack={onClose} />
+      <div className="w-full lg:max-w-[1100px] lg:mx-auto lg:px-12">
+        <StepHeader currentStep={headerStep} onBack={onClose} />
 
-      {/* 메인 콘텐츠 (상단 padding으로 헤더 아래 배치) */}
-      <div className="pt-[112px] pb-[100px] px-4">
+        {/* 메인 콘텐츠 (상단 padding으로 헤더 아래 배치) */}
+        <div className="pt-[112px] pb-[100px] px-4 lg:px-6 lg:pb-10">
         {/* [DISABLED_STEP1] 2-step 입력 1페이지(지역/문의내용). 나중에 다시 사용할 수 있음. */}
         {false && (
           <div className="max-w-lg mx-auto">
@@ -244,8 +245,8 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
         )}
 
         {/* 단일 페이지 입력 (기존 Step2 확장) */}
-        <div className="max-w-lg mx-auto">
-          <h1 className="text-[28px] font-bold text-gray-900 mb-6">
+        <div className="max-w-[640px] mx-auto">
+          <h1 className="text-[28px] md:text-[26px] font-bold text-gray-900 mb-6 md:mb-5">
             신청 정보를 확인해 주세요
           </h1>
 
@@ -290,7 +291,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
               value={formData.region}
               onChange={handleFormChange}
               placeholder="지역 입력"
-              className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#ff7a00] focus:ring-1 focus:ring-[#ff7a00] transition-colors bg-gray-50"
+              className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#ff7a00] focus:ring-1 focus:ring-[#ff7a00] transition-colors bg-white"
             />
           </div>
 
@@ -318,19 +319,23 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
         </div>
       </div>
 
-      {/* 하단 고정 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-4 z-40">
-        <button
-          onClick={handleSubmitClick}
-          disabled={!isStep2Valid}
-          className={`w-full h-12 rounded-xl font-bold text-[15px] transition-colors ${
-            isStep2Valid
-              ? "bg-[#ff7a00] text-white hover:bg-[#ff8c1a] active:scale-[0.98] cursor-pointer"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
-          }`}
-        >
-          신청 완료하기
-        </button>
+        {/* 하단 버튼 - 진짜 fixed로 고정 */}
+        <div className="fixed bottom-0 left-0 right-0 z-40">
+          <div className="max-w-[640px] mx-auto bg-white border-t border-gray-200 px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <button
+              onClick={handleSubmitClick}
+              disabled={!isStep2Valid}
+              className={`w-full h-12 rounded-xl font-bold text-[15px] transition-colors ${
+                isStep2Valid
+                  ? "bg-[#ff7a00] text-white hover:bg-[#ff8c1a] active:scale-[0.98] cursor-pointer"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              신청 완료하기
+            </button>
+          </div>
+        </div>
+
       </div>
 
       {/* 약관 동의 바텀시트 */}

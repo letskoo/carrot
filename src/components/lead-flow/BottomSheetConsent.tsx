@@ -25,18 +25,32 @@ export default function BottomSheetConsent({
   const [isVisible, setIsVisible] = useState(false);
 
   // 애니메이션 시간(ms)
-  const transitionDuration = 280;
+  const transitionDuration = 300;
 
   useEffect(() => {
+    let rafId1: number | null = null;
+    let rafId2: number | null = null;
+
     if (isOpen) {
       setIsMounted(true);
-      // 다음 렌더 사이클에서 보이게 설정해 슬라이드 업
-      requestAnimationFrame(() => setIsVisible(true));
+      // 두 프레임에 걸쳐 마운트 후 가시화하여 첫 translateY(100%) 페인트를 보장
+      rafId1 = requestAnimationFrame(() => {
+        rafId2 = requestAnimationFrame(() => setIsVisible(true));
+      });
     } else {
       setIsVisible(false);
       const timeout = setTimeout(() => setIsMounted(false), transitionDuration);
-      return () => clearTimeout(timeout);
+      return () => {
+        clearTimeout(timeout);
+        if (rafId1 !== null) cancelAnimationFrame(rafId1);
+        if (rafId2 !== null) cancelAnimationFrame(rafId2);
+      };
     }
+
+    return () => {
+      if (rafId1 !== null) cancelAnimationFrame(rafId1);
+      if (rafId2 !== null) cancelAnimationFrame(rafId2);
+    };
   }, [isOpen, transitionDuration]);
 
   if (!isMounted) return null;
@@ -61,24 +75,27 @@ export default function BottomSheetConsent({
     <>
       {/* 반투명 배경 */}
       <div
-        className={`${styles.overlay} ${isVisible ? styles.visible : ""}`}
+        className={`${styles.overlay} ${isVisible ? styles.overlayVisible : ""}`}
         onClick={onClose}
       />
 
       {/* 바텀시트 */}
       <div
-        className={`${styles.sheet} ${isVisible ? styles.visible : ""}`}
+        className={`${styles.sheet} ${isVisible ? styles.sheetVisible : ""}`}
       >
-        <div className="bg-white rounded-t-2xl shadow-lg max-h-[80vh] overflow-y-auto">
+        <div className="bg-white rounded-t-2xl shadow-lg max-h-[80vh] overflow-y-auto max-w-[640px] mx-auto">
           {/* 헤더 */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-4 rounded-t-2xl">
-            <h2 className="text-[18px] font-bold text-gray-900">
-              신청을 위해 정보 동의를 해주세요
-            </h2>
+            <div className="max-w-[640px] mx-auto">
+              <h2 className="text-[18px] font-bold text-gray-900 text-center">
+                신청을 위해 정보 동의를 해주세요
+              </h2>
+            </div>
           </div>
 
           {/* 콘텐츠 */}
           <div className="px-4 py-4 space-y-4">
+            <div className="max-w-[640px] mx-auto">
             {/* 모두 동의 */}
             <div className="border-b border-gray-200 pb-4">
               <label className="flex items-center gap-3 cursor-pointer select-none">
@@ -213,21 +230,24 @@ export default function BottomSheetConsent({
                 </span>
               </label>
             </div>
+            </div>
           </div>
 
           {/* 하단 버튼 */}
           <div className="sticky bottom-0 bg-white border-t border-gray-200 px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-            <button
-              onClick={onConfirm}
-              disabled={!allChecked || isLoading}
-              className={`w-full h-12 rounded-xl font-bold text-[15px] transition-colors ${
-                allChecked && !isLoading
-                  ? "bg-[#ff7a00] text-white hover:bg-[#ff8c1a] active:scale-[0.98]"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              {isLoading ? "처리 중…" : "동의하고 신청 완료하기"}
-            </button>
+            <div className="max-w-[360px] md:max-w-full mx-auto">
+              <button
+                onClick={onConfirm}
+                disabled={!allChecked || isLoading}
+                className={`w-full h-12 rounded-xl font-bold text-[15px] transition-colors ${
+                  allChecked && !isLoading
+                    ? "bg-[#ff7a00] text-white hover:bg-[#ff8c1a] active:scale-[0.98]"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                {isLoading ? "처리 중…" : "동의하고 신청 완료하기"}
+              </button>
+            </div>
           </div>
         </div>
       </div>

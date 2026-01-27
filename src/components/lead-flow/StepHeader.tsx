@@ -13,6 +13,7 @@ export default function StepHeader({ currentStep, onBack }: StepHeaderProps) {
   return (
     <div className="fixed top-0 left-0 right-0 z-40 bg-white">
       <div className="px-4 pt-3 pb-3 border-b border-gray-200">
+        <div className="max-w-[640px] mx-auto">
         {/* 뒤로가기 + 진행 상태 (텍스트는 화면에서 숨김 처리) */}
         <div className="flex items-center justify-between">
           <button
@@ -46,6 +47,7 @@ export default function StepHeader({ currentStep, onBack }: StepHeaderProps) {
             className="h-full bg-[#ff7a00] transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
+        </div>
         </div>
       </div>
     </div>

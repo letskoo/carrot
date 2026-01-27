@@ -18,26 +18,26 @@ export default function InfoCard() {
 
   return (
     <>
-      <div className="mx-4 mb-0.5 p-4 bg-gray-50 rounded-xl">
+      <div className="px-4 mb-0.5">
+        <div className="max-w-[640px] mx-auto p-4 bg-gray-50 rounded-xl">
         <div className="grid gap-y-2.5 gap-x-3" style={{ gridTemplateColumns: '70px 1fr' }}>
           {/* Row 1: 신청항목 */}
-          <span className="text-[12px] text-gray-500">신청항목</span>
-          <span className="text-[13px] font-semibold text-gray-900">바나타이거 창업상담</span>
+          <span className="text-[12px] text-gray-500 lg:text-sm">신청항목</span>
+          <span className="text-[13px] font-semibold text-gray-900 lg:text-base">바나타이거 창업상담</span>
 
           {/* Row 2: 상호명 */}
-          <span className="text-[12px] text-gray-500">상호명</span>
-          <span className="text-[13px] font-semibold text-gray-900">주식회사맥스원이링크</span>
+          <span className="text-[12px] text-gray-500 lg:text-sm">상호명</span>
+          <span className="text-[13px] font-semibold text-gray-900 lg:text-base">주식회사맥스원이링크</span>
 
           {/* Row 3: 사업자등록증 보기 (라벨 컬럼 비움, 간격 50% 축소) */}
           <span className="-mt-1.5"></span>
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="text-[13px] text-gray-500 underline text-left -mt-1.5"
+            className="text-[13px] text-gray-500 underline text-left -mt-1.5 lg:text-base"
           >
             사업자등록증 보기
           </button>
-        </div>
-      </div>
+        </div>        </div>      </div>
 
       {isModalOpen && (
         <div 

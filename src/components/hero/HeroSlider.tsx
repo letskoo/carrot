@@ -124,10 +124,11 @@ export default function HeroSlider() {
 
   return (
     <div className="relative w-full overflow-hidden">
+      <div className="max-w-[640px] mx-auto">
       <div
         ref={containerRef}
-        className="relative w-full overflow-hidden"
-        style={{ touchAction: "pan-y", width: "100%", height: "100vw" }}
+        className="relative w-full overflow-hidden aspect-square"
+        style={{ touchAction: "pan-y", width: "100%" }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
@@ -166,6 +167,7 @@ export default function HeroSlider() {
         <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
           {displayIndex} / {slides.length}
         </div>
+      </div>
       </div>
 
       {showModal && (

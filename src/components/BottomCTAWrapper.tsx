@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import BottomCTA from "./BottomCTA";
@@ -9,7 +9,7 @@ export default function BottomCTAWrapper() {
 
   return (
     <>
-      <BottomCTA onOpenLeadFlow={() => setIsLeadFlowOpen(true)} />
+      <BottomCTA />
       <LeadFlow isOpen={isLeadFlowOpen} onClose={() => setIsLeadFlowOpen(false)} />
     </>
   );

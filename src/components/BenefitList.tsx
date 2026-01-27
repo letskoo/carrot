@@ -19,17 +19,19 @@ export default function BenefitList() {
 
   return (
     <div className="space-y-5 px-4 py-5 mb-12">
+      <div className="max-w-[640px] mx-auto space-y-5">
       {benefits.map((benefit) => (
         <div key={benefit.number} className="flex gap-2.5">
-          <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-[11px] font-semibold mt-0.5">
+          <div className="flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-gray-200 text-gray-600 text-[11px] font-semibold mt-0.5 md:w-5 md:h-5 md:text-[11px]">
             {benefit.number}
           </div>
           <div className="flex-1">
-            <h3 className="text-[15px] font-bold text-gray-900 mb-1 leading-tight">{benefit.title}</h3>
-            <p className="text-[13px] text-gray-500 leading-relaxed">{benefit.description}</p>
+            <h3 className="text-[15px] font-bold text-gray-900 mb-1 leading-tight md:text-base md:mb-1">{benefit.title}</h3>
+            <p className="text-[13px] text-gray-500 leading-relaxed md:text-[13px]">{benefit.description}</p>
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 }
