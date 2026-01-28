@@ -158,7 +158,7 @@ export default function BottomSheetConsent({
                   <span className="font-semibold">(필수)</span> 개인정보 수집 및
                   이용 동의
                   <br />
-                  <span className="text-[12px] text-gray-500">(당근마켓)</span>
+                  <span className="text-[12px] text-gray-500">(확인 연락에 사용됩니다. 마케팅에 사용되지 않습니다)</span>
                 </span>
               </label>
 
@@ -188,11 +188,10 @@ export default function BottomSheetConsent({
                   </svg>
                 </span>
                 <span className="text-[14px] text-gray-700 leading-relaxed">
-                  <span className="font-semibold">(필수)</span> 개인정보 제3자
-                  제공 동의
+                  <span className="font-semibold">(필수)</span> 개인정보 보관하지 않습니다
                   <br />
                   <span className="text-[12px] text-gray-500">
-                    (당근마켓 → 주식회사 큰집컴퍼니)
+                    (연락 후 즉시 폐기하며, 제 3자에게 제공하지 않습니다)
                   </span>
                 </span>
               </label>
@@ -221,11 +220,10 @@ export default function BottomSheetConsent({
                   </svg>
                 </span>
                 <span className="text-[14px] text-gray-700 leading-relaxed">
-                  <span className="font-semibold">(필수)</span> 개인정보 수집 및
-                  이용 동의
+                  <span className="font-semibold">(필수)</span> 개인정보법 준수 동의
                   <br />
                   <span className="text-[12px] text-gray-500">
-                    (주식회사 큰집컴퍼니)
+                    (표기된 사항 외 규정은 개인정보법에 따릅니다)
                   </span>
                 </span>
               </label>

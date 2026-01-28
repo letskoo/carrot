@@ -2,18 +2,28 @@ export default function BenefitList() {
   const benefits = [
     {
       number: 1,
-      title: "인테리어 비용 100% 무상 지원",
-      description: "역대 창업 비용 그만! 창업비 부담 ZERO",
+      title: "렌탈 실비 20만원 (4H)",
+      description: "선입금 금지, 행사 종료 후 정산",
     },
     {
       number: 2,
-      title: "동네 1호점, 10평 인테리어무료",
-      description: "단, 1월 30일까지 점포개발의뢰자에 한함",
+      title: "운송비 등 추가비용 X",
+      description: "인화지 500장 지원, 전문 인력 현장 배치",
     },
     {
       number: 3,
-      title: "단순 지원이 아닌 창업전문가 매칭",
-      description: "창업전문가가 성공적인 창업을 위해 꼼꼼하게 체크 해드려요",
+      title: "원하는 문구로 사진 출력",
+      description: "사진 프레임에 원하는 로고, 문구 추가 가능",
+    },
+    {
+      number: 4,
+      title: "AI 보정 기능",
+      description: "인물 포토샵, 라이트룸 필터 제공",
+    },
+    {
+      number: 5,
+      title: "결혼식 뿐 아니라 어디든 렌탈 대상",
+      description: "돌잔치, 학교/유치원, 대학교 축제, 스포츠경기 또는 기업행사",
     },
   ];
 

@@ -14,7 +14,7 @@ export default function BrandHeader() {
           className="object-cover"
         />
       </div>
-      <span className="text-[13px] font-medium text-gray-900 lg:text-base">주식회사맥스원이링크</span>
+      <span className="text-[13px] font-medium text-gray-900 lg:text-base">포토그루브</span>
       </div>
     </div>
   );
