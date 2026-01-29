@@ -22,8 +22,8 @@ export default function BenefitList() {
     },
     {
       number: 5,
-      title: "걸혼식, 돌잔치 뿐 아니라 학교에서도!",
-      description: "포토존이 필요한 곳이라면 경기장, 대학교 축제/선거 등 어디든 OK!",
+      title: "인기 최고 네컷사진 포토존",
+      description: "결혼식, 돌잔치부터 학교, 선거, 행사까지!",
     },
   ];
 
