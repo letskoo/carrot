@@ -22,8 +22,8 @@ export default function BenefitList() {
     },
     {
       number: 5,
-      title: "어디에서 쓰이나요?",
-      description: "결혼식, 돌잔치, 학교/유치원, 대학교 축제/선거 행사, 연극/극장 SNS 유도 이벤트, 기업행사 ",
+      title: "걸혼식, 돌잔치 뿐 아니라 학교에서도!",
+      description: "포토존이 필요한 곳이라면 경기장, 대학교 축제/선거 등 어디든 OK!",
     },
   ];
 
