@@ -22,8 +22,8 @@ export default function BenefitList() {
     },
     {
       number: 5,
-      title: "결혼식 뿐 아니라 어디든 렌탈 대상",
-      description: "돌잔치, 학교/유치원, 대학교 축제, 스포츠경기 또는 기업행사",
+      title: "어디에서 쓰이나요?",
+      description: "결혼식, 돌잔치, 학교/유치원, 대학교 축제/선거 행사, 연극/극장 SNS 유도 이벤트, 기업행사 ",
     },
   ];
 
