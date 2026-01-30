@@ -26,7 +26,7 @@ export default function BenefitList() {
       description: "결혼식, 돌잔치부터 학교, 선거, 행사까지!",
     },
     {
-      number: 5
+      number: 6
       title: "인화지 선택 출력",
       description: "네컷사진, 엽서카드, 신문 - 행사에 맞는 결과지 선택",
     },
