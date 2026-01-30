@@ -115,14 +115,11 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload): Prom
       return { success: false, error: "RESEND_API_KEY not configured" };
     }
 
-    // 수신자 이메일 설정 (회사 수신 이메일, 쉼표로 구분)
-    const recipientEmails = process.env.COMPANY_RECEIVER_EMAIL
-      ?.split(',')
-      .map(email => email.trim())
-      .filter(email => email.length > 0) || [];
+    // 수신자 이메일 설정 (회사 수신 이메일)
+    const recipientEmail = process.env.COMPANY_RECEIVER_EMAIL;
 
-    if (recipientEmails.length === 0) {
-      console.error("[Email] No recipient emails configured in COMPANY_RECEIVER_EMAIL");
+    if (!recipientEmail) {
+      console.error("[Email] No recipient email configured in COMPANY_RECEIVER_EMAIL");
       return { success: false, error: "COMPANY_RECEIVER_EMAIL not configured" };
     }
     
@@ -132,13 +129,13 @@ export async function sendLeadNotificationEmail(payload: LeadEmailPayload): Prom
     const subject = buildSubject();
     const text = buildTextBody(payload);
 
-    console.log(`[Email] Sending to: ${recipientEmails.join(', ')} at ${new Date().toISOString()}`);
+    console.log(`[Email] Sending to: ${recipientEmail} at ${new Date().toISOString()}`);
 
     const resend = new Resend(apiKey);
 
     const result = await resend.emails.send({
       from: `${fromName} <${emailFrom}>`,
-      to: recipientEmails,
+      to: [recipientEmail],
       subject,
       text,
     });
