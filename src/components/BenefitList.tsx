@@ -17,18 +17,13 @@ export default function BenefitList() {
     },
     {
       number: 4,
-      title: "AI 보정 기능",
-      description: "인물 포토샵, 라이트룸 필터 제공",
+      title: "AI 보정 기능 + 인화지 선택 기능",
+      description: "포토샵급 인물 보정과 라이트룸 필터, 거기에 네컷사진/엽서카드/신문 등 행사에 맞는 결과지 선택 제공",
     },
     {
       number: 5,
       title: "인기 최고 네컷사진 포토존",
       description: "결혼식, 돌잔치부터 학교, 선거, 행사까지!",
-    },
-    {
-      number: 6
-      title: "인화지 선택 출력",
-      description: "네컷사진, 엽서카드, 신문 - 행사에 맞는 결과지 선택",
     },
   ];
 
