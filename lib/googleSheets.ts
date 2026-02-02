@@ -357,14 +357,16 @@ export async function getAvailableTimeSlots(
     });
 
     const availableRows = availableResponse.data.values || [];
-    const dateRow = availableRows.find((row) => row[0] === date);
+    // 같은 날짜를 가진 모든 행 찾기
+    const dateRows = availableRows.filter((row) => row[0] === date);
 
-    if (!dateRow || !dateRow[1]) {
+    if (!dateRows || dateRows.length === 0) {
       return { success: true, availableSlots: [] };
     }
 
-    const allSlots = dateRow[1].split(",").map((s: string) => s.trim());
-    const capacity = parseInt(dateRow[2] || "1", 10) || 1;
+    // 각 행의 B열(시간)과 C열(용량) 추출
+    const allSlots = dateRows.map((row) => row[1]).filter((slot) => slot);
+    const capacity = parseInt(dateRows[0][2] || "1", 10) || 1;
 
     // 2. 리드 시트에서 해당 날짜의 예약 현황 확인
     const leadSheetName = process.env.GOOGLE_SHEET_NAME || "시트1";
@@ -433,18 +435,28 @@ export async function getAvailableDates(
     // 1. "예약가능시간" 시트에서 해당 월의 날짜들 가져오기
     const availableResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "예약가능시간!A:B",
+      range: "예약가능시간!A:C",
     });
 
     const availableRows = availableResponse.data.values || [];
-    const datesInMonth = availableRows
+    // 같은 날짜를 가진 모든 시간과 용량 수집
+    const dateInfo = new Map<string, { times: Set<string>; capacity: number }>();
+    availableRows
       .filter((row) => row[0] && row[0].startsWith(yearMonth))
-      .map((row) => ({
-        date: row[0],
-        slots: row[1] ? row[1].split(",").map((s: string) => s.trim()) : [],
-      }));
+      .forEach((row) => {
+        const date = row[0];
+        const time = row[1];
+        const capacity = parseInt(row[2] || "1", 10) || 1;
+        
+        if (!dateInfo.has(date)) {
+          dateInfo.set(date, { times: new Set(), capacity });
+        }
+        if (time) {
+          dateInfo.get(date)!.times.add(time);
+        }
+      });
 
-    if (datesInMonth.length === 0) {
+    if (dateInfo.size === 0) {
       return { success: true, dates: [] };
     }
 
@@ -478,12 +490,17 @@ export async function getAvailableDates(
     }
 
     // 3. 각 날짜의 상태 계산
-    const dates = datesInMonth.map(({ date, slots }) => {
-      const bookedSlots = bookingsByDate.get(date);
-      if (!bookedSlots || bookedSlots.size === 0) {
+    const dates = Array.from(dateInfo.entries()).map(([date, { times, capacity }]) => {
+      const slotCount = times.size;
+      // 시간 슬롯이 없으면 선택 불가
+      if (slotCount === 0) {
+        return { date, status: "full" as const };
+      }
+      const bookedCount = bookingsByDate.get(date)?.size || 0;
+      if (bookedCount === 0) {
         return { date, status: "available" as const };
       }
-      if (bookedSlots.size >= slots.length) {
+      if (bookedCount >= slotCount * capacity) {
         return { date, status: "full" as const };
       }
       return { date, status: "partial" as const };
