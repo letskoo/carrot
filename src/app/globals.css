@@ -33,3 +33,16 @@ body {
     padding-right: 1rem;
   }
 }
+
+@keyframes blink {
+  0%, 100% {
+    color: #7c3aed;
+  }
+  50% {
+    color: #eab308;
+  }
+}
+
+.blink-animation {
+  animation: blink 0.8s ease-in-out infinite;
+}
