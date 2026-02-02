@@ -321,7 +321,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
               name="region"
               value={formData.region}
               onChange={handleFormChange}
-              placeholder="대전, 세종 지역만 가능합니다"
+              placeholder="대전, 세종, 충남북 일부 지역만 가능합니다"
               className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors bg-white"
             />
           </div>
