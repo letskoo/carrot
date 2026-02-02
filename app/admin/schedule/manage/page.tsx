@@ -596,11 +596,6 @@ export default function ScheduleManagePage() {
                       const hasSlots = groupedSlots[day.date];
                       const hasBookings = datesWithBookings[day.date];
                       
-                      // 오늘 날짜 체크
-                      const today = new Date();
-                      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-                      const isToday = day.date === todayStr;
-                      
                       return (
                         <button
                           key={idx}
@@ -608,11 +603,9 @@ export default function ScheduleManagePage() {
                           disabled={!hasSlots}
                           className={`aspect-square rounded-lg border-2 transition-all text-sm font-semibold ${
                             hasBookings
-                              ? "border-purple-600 bg-purple-600 text-white hover:bg-purple-700"
-                              : isToday
-                              ? "border-purple-600 bg-white text-purple-700 hover:border-purple-700"
+                              ? "border-purple-600 bg-white text-purple-700 hover:bg-purple-50"
                               : hasSlots
-                              ? "border-none bg-purple-100 text-white cursor-pointer hover:bg-purple-200"
+                              ? "border-purple-600 bg-white text-purple-700 hover:bg-purple-50"
                               : "border-gray-200 text-gray-300 cursor-default"
                           }`}
                         >
