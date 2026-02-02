@@ -1016,29 +1016,223 @@ export async function getAllTimeSlots(): Promise<{
     if (!spreadsheetId) throw new Error("Missing GOOGLE_SHEET_ID");
 
     const sheets = getSheetsClient();
-    const sheetName = "예약시간표";
+    const sheetName = "예약가능시간";
 
+    // 1. 예약가능시간 시트에서 모든 일정 가져오기
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!A:D`,
+      range: `${sheetName}!A:C`,
     });
 
     const rows = response.data.values || [];
-    const slots = rows.slice(1).map((row) => {
-      const [date, time, capacity, bookedCount] = row;
-      return {
-        date: date || "",
-        time: time || "",
-        capacity: Number(capacity) || 0,
-        bookedCount: Number(bookedCount) || 0,
-      };
-    }).filter((slot) => slot.date && slot.time);
+    
+    // 2. 리드 시트에서 예약 현황 확인
+    const leadSheetName = process.env.GOOGLE_SHEET_NAME || "시트1";
+    const leadsResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${leadSheetName}!A:K`,
+    });
+
+    const leadsRows = leadsResponse.data.values || [];
+    const bookingCount = new Map<string, number>();
+
+    // 예약 건수 집계 (날짜_시간 키)
+    for (let i = 1; i < leadsRows.length; i++) {
+      const row = leadsRows[i];
+      const bookingDate = row[4];
+      const bookingTime = row[5];
+      const status = row[9];
+
+      if (
+        bookingDate &&
+        bookingTime &&
+        (status === "대기" || status === "확정")
+      ) {
+        const key = `${bookingDate}_${bookingTime}`;
+        bookingCount.set(key, (bookingCount.get(key) || 0) + 1);
+      }
+    }
+
+    // 3. 슬롯 정보 생성
+    const slots = rows
+      .filter((row) => row[0] && row[1]) // 날짜와 시간이 있는 행만
+      .map((row) => {
+        const date = row[0];
+        const time = row[1];
+        const capacity = Number(row[2]) || 1;
+        const key = `${date}_${time}`;
+        const bookedCount = bookingCount.get(key) || 0;
+
+        return {
+          date,
+          time,
+          capacity,
+          bookedCount,
+        };
+      });
 
     return { success: true, slots };
   } catch (error: any) {
     const errorMessage =
       error instanceof Error ? error.message : String(error);
     console.error("[getAllTimeSlots] Error:", errorMessage);
+    return { success: false, error: errorMessage };
+  }
+}
+
+/**
+ * 특정 날짜/시간의 예약 목록 조회
+ */
+export async function getLeadsByDateTime(
+  date: string,
+  time: string
+): Promise<{
+  success: boolean;
+  records?: Array<{
+    rowIndex: number;
+    createdAt: string;
+    name: string;
+    phone: string;
+    region?: string;
+    bookingDate: string;
+    bookingTime: string;
+    memo?: string;
+    status: string;
+  }>;
+  error?: string;
+}> {
+  try {
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    if (!spreadsheetId) throw new Error("Missing GOOGLE_SHEET_ID");
+
+    const sheets = getSheetsClient();
+    const leadSheetName = process.env.GOOGLE_SHEET_NAME || "시트1";
+
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${leadSheetName}!A:K`,
+    });
+
+    const rows = response.data.values || [];
+    const records = [];
+
+    // 헤더 제외하고 데이터 행만 확인
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      const bookingDate = row[4];
+      const bookingTime = row[5];
+      const status = row[9];
+
+      if (
+        bookingDate === date &&
+        bookingTime === time &&
+        (status === "대기" || status === "확정" || status === "취소")
+      ) {
+        records.push({
+          rowIndex: i + 1, // 시트는 1-based
+          createdAt: row[0] || "",
+          name: row[1] || "",
+          phone: row[2] || "",
+          region: row[3] || "",
+          bookingDate: row[4] || "",
+          bookingTime: row[5] || "",
+          memo: row[6] || "",
+          status: row[9] || "대기",
+        });
+      }
+    }
+
+    return { success: true, records };
+  } catch (error: any) {
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
+    console.error("[getLeadsByDateTime] Error:", errorMessage);
+    return { success: false, error: errorMessage };
+  }
+}
+
+/**
+ * 예약 상태 변경
+ */
+export async function updateLeadStatus(
+  rowIndex: number,
+  status: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    if (!spreadsheetId) throw new Error("Missing GOOGLE_SHEET_ID");
+
+    const sheets = getSheetsClient();
+    const leadSheetName = process.env.GOOGLE_SHEET_NAME || "시트1";
+
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `${leadSheetName}!J${rowIndex}`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [[status]],
+      },
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
+    console.error("[updateLeadStatus] Error:", errorMessage);
+    return { success: false, error: errorMessage };
+  }
+}
+
+/**
+ * 예약 삭제 (행 전체 삭제)
+ */
+export async function deleteLead(
+  rowIndex: number
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    if (!spreadsheetId) throw new Error("Missing GOOGLE_SHEET_ID");
+
+    const sheets = getSheetsClient();
+    const leadSheetName = process.env.GOOGLE_SHEET_NAME || "시트1";
+
+    // 시트 ID 가져오기
+    const sheetMetadata = await sheets.spreadsheets.get({
+      spreadsheetId,
+    });
+
+    const sheet = sheetMetadata.data.sheets?.find(
+      (s) => s.properties?.title === leadSheetName
+    );
+
+    if (!sheet || !sheet.properties?.sheetId) {
+      throw new Error("Sheet not found");
+    }
+
+    // 행 삭제 (0-based index, rowIndex는 1-based이므로 -1)
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          {
+            deleteDimension: {
+              range: {
+                sheetId: sheet.properties.sheetId,
+                dimension: "ROWS",
+                startIndex: rowIndex - 1,
+                endIndex: rowIndex,
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    const errorMessage =
+      error instanceof Error ? error.message : String(error);
+    console.error("[deleteLead] Error:", errorMessage);
     return { success: false, error: errorMessage };
   }
 }

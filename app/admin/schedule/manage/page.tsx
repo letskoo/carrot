@@ -139,6 +139,51 @@ export default function ScheduleManagePage() {
     return acc;
   }, {} as Record<string, TimeSlot[]>);
 
+  // 달력용 데이터: 날짜별로 예약이 있는지 확인
+  const datesWithBookings = Object.keys(groupedSlots).reduce((acc, date) => {
+    const hasBookings = groupedSlots[date].some(slot => slot.bookedCount > 0);
+    acc[date] = hasBookings;
+    return acc;
+  }, {} as Record<string, boolean>);
+
+  const handleDateClick = (date: string) => {
+    router.push(`/admin/schedule/manage/${date}`);
+  };
+
+  // 현재 달력에 표시할 달의 날짜들 생성
+  const generateCalendarDays = () => {
+    const allDates = Object.keys(groupedSlots).sort();
+    if (allDates.length === 0) return [];
+
+    const firstDate = new Date(allDates[0]);
+    const lastDate = new Date(allDates[allDates.length - 1]);
+    
+    const year = firstDate.getFullYear();
+    const month = firstDate.getMonth();
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDayOfWeek = firstDay.getDay();
+    
+    const days = [];
+    
+    // 이전 달 빈칸
+    for (let i = 0; i < startDayOfWeek; i++) {
+      days.push({ date: null, dayOfMonth: null });
+    }
+    
+    // 이번 달 날짜들
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      const date = new Date(year, month, day);
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      days.push({ date: dateStr, dayOfMonth: day });
+    }
+    
+    return days;
+  };
+
+  const calendarDays = generateCalendarDays();
+
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
       {/* 헤더 */}
@@ -163,7 +208,7 @@ export default function ScheduleManagePage() {
               />
             </svg>
           </button>
-          <h1 className="text-lg font-bold text-gray-900">예약 일정 관리</h1>
+          <h1 className="text-lg font-bold text-gray-900">예약 일정 설정</h1>
         </div>
       </div>
 
@@ -274,41 +319,49 @@ export default function ScheduleManagePage() {
                 생성된 일정이 없습니다
               </div>
             ) : (
-              <div className="space-y-6">
-                {Object.entries(groupedSlots)
-                  .sort(([a], [b]) => a.localeCompare(b))
-                  .map(([date, dateSlots]) => (
-                    <div key={date} className="border border-gray-200 rounded-lg p-4">
-                      <h3 className="text-[16px] font-semibold text-gray-900 mb-3">{date}</h3>
-                      <div className="grid grid-cols-3 gap-2">
-                        {dateSlots.map((slot) => {
-                          const key = `${slot.date}_${slot.time}`;
-                          const isSelected = selectedSlots.has(key);
-                          const isBooked = slot.bookedCount > 0;
-
-                          return (
-                            <button
-                              key={key}
-                              onClick={() => !isBooked && handleSelectSlot(slot.date, slot.time)}
-                              disabled={isBooked}
-                              className={`px-3 py-3 text-sm rounded-lg border transition-colors ${
-                                isBooked
-                                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                  : isSelected
-                                  ? "bg-purple-100 border-purple-600 text-purple-700 font-semibold"
-                                  : "border-gray-300 hover:border-purple-600"
-                              }`}
-                            >
-                              <div className="font-semibold">{slot.time}</div>
-                              <div className="text-xs mt-1">
-                                {slot.bookedCount}/{slot.capacity}
-                              </div>
-                            </button>
-                          );
-                        })}
+              <div>
+                {/* 달력 */}
+                <div className="mb-6">
+                  <div className="grid grid-cols-7 gap-2 mb-3">
+                    {["일", "월", "화", "수", "목", "금", "토"].map((day, idx) => (
+                      <div key={idx} className="text-center text-sm font-semibold text-gray-600 py-2">
+                        {day}
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-2">
+                    {calendarDays.map((day, idx) => {
+                      if (!day.date) {
+                        return <div key={idx} className="aspect-square" />;
+                      }
+                      
+                      const hasSlots = groupedSlots[day.date];
+                      const hasBookings = datesWithBookings[day.date];
+                      
+                      // 오늘 날짜 체크
+                      const today = new Date();
+                      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                      const isToday = day.date === todayStr;
+                      
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => hasSlots && handleDateClick(day.date!)}
+                          disabled={!hasSlots}
+                          className={`aspect-square rounded-lg border-2 transition-all text-sm font-semibold ${
+                            hasBookings
+                              ? "border-purple-600 bg-purple-600 text-white hover:bg-purple-700"
+                              : isToday
+                              ? "border-purple-600 bg-white text-purple-700 hover:border-purple-700"
+                              : "border-gray-200 text-gray-300 cursor-default"
+                          }`}
+                        >
+                          {day.dayOfMonth}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             )}
           </div>
