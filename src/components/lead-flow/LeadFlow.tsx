@@ -283,7 +283,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
           {/* 이름 */}
           <div className="mb-5">
             <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-              이름 <span className="text-[#ff7a00]">*</span>
+              이름 <span className="text-[#7c3aed]">*</span>
             </label>
             <input
               type="text"
@@ -291,14 +291,14 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
               placeholder="예: 김철수"
               value={formData.name}
               onChange={handleFormChange}
-              className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#ff7a00] focus:ring-1 focus:ring-[#ff7a00] transition-colors"
+              className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors"
             />
           </div>
 
           {/* 연락처 */}
           <div className="mb-5">
             <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-              연락처 <span className="text-[#ff7a00]">*</span>
+              연락처 <span className="text-[#7c3aed]">*</span>
             </label>
             <input
               type="tel"
@@ -307,7 +307,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
               value={formData.phone}
               onChange={handleFormChange}
               maxLength={13}
-              className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#ff7a00] focus:ring-1 focus:ring-[#ff7a00] transition-colors"
+              className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors"
             />
           </div>
 
@@ -322,7 +322,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
               value={formData.region}
               onChange={handleFormChange}
               placeholder="대전, 세종 지역만 가능합니다"
-              className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#ff7a00] focus:ring-1 focus:ring-[#ff7a00] transition-colors bg-white"
+              className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors bg-white"
             />
           </div>
 
@@ -337,7 +337,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
               rows={5}
               value={formData.memo}
               onChange={handleFormChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#ff7a00] focus:ring-1 focus:ring-[#ff7a00] resize-none transition-colors"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] resize-none transition-colors"
             />
           </div>
 
@@ -361,7 +361,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
                 disabled={!isStep2Valid}
                 className={`w-full h-14 flex items-center justify-center rounded-[12px] font-bold text-base transition-colors ${
                   isStep2Valid
-                    ? "bg-[#ff7a00] text-white hover:bg-[#ff8c1a] active:scale-[0.98] cursor-pointer"
+                    ? "bg-[#7c3aed] text-white hover:bg-[#6d28d9] active:scale-[0.98] cursor-pointer"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >

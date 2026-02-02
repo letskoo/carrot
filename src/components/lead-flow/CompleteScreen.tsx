@@ -12,7 +12,7 @@ export default function CompleteScreen({ onConfirm }: CompleteScreenProps) {
       <div className="w-full max-w-[640px] flex flex-col items-center">
         {/* 성공 아이콘 */}
         <div className="mb-5 relative">
-          <div className="w-16 h-16 rounded-full bg-[#ff7a00] flex items-center justify-center animate-in scale-in duration-500">
+          <div className="w-16 h-16 rounded-full bg-[#7c3aed] flex items-center justify-center animate-in scale-in duration-500">
             <svg
               className="w-5 h-5 text-white"
               fill="none"
@@ -41,7 +41,7 @@ export default function CompleteScreen({ onConfirm }: CompleteScreenProps) {
         <div className="w-full max-w-[320px]">
           <button
             onClick={onConfirm}
-            className="w-full h-12 rounded-xl bg-[#ff7a00] text-white font-bold text-[15px] hover:bg-[#ff8c1a] transition-colors active:scale-[0.98]"
+            className="w-full h-12 rounded-xl bg-[#7c3aed] text-white font-bold text-[15px] hover:bg-[#6d28d9] transition-colors active:scale-[0.98]"
           >
             확인
           </button>

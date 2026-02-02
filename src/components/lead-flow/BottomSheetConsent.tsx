@@ -262,7 +262,7 @@ export default function BottomSheetConsent({
                   disabled={!allChecked || isLoading}
                   className={`w-full h-14 flex items-center justify-center rounded-[12px] font-bold text-base transition-colors ${
                     allChecked && !isLoading
-                      ? "bg-[#ff7a00] text-white hover:bg-[#ff8c1a] active:scale-[0.98]"
+                      ? "bg-[#7c3aed] text-white hover:bg-[#6d28d9] active:scale-[0.98]"
                       : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
                 >

@@ -37,7 +37,7 @@ export default function StepHeader({ currentStep, onBack }: StepHeaderProps) {
       {/* 진행바 (단일 페이지 전환으로 숨김 처리) */}
       <div className="hidden w-full h-1 bg-gray-200 rounded-full overflow-hidden">
         <div
-          className="h-full bg-[#ff7a00] transition-all duration-300"
+          className="h-full bg-[#7c3aed] transition-all duration-300"
           style={{ width: `${progress}%` }}
         />
       </div>
