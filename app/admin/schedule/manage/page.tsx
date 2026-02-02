@@ -25,6 +25,66 @@ export default function ScheduleManagePage() {
   const [weekendCapacity, setWeekendCapacity] = useState(2);
   const [weekendTimes, setWeekendTimes] = useState("14:00,16:00,18:00,20:00");
   const [generating, setGenerating] = useState(false);
+  const [openPicker, setOpenPicker] = useState<"start" | "end" | null>(null);
+  const [startPickerMonth, setStartPickerMonth] = useState(new Date());
+  const [endPickerMonth, setEndPickerMonth] = useState(new Date());
+
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const parseDateString = (value: string) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const [y, m, d] = value.split("-").map((v) => Number(v));
+    const date = new Date(y, m - 1, d);
+    if (
+      date.getFullYear() !== y ||
+      date.getMonth() !== m - 1 ||
+      date.getDate() !== d
+    ) {
+      return null;
+    }
+    return date;
+  };
+
+  const buildCalendarDays = (monthDate: Date) => {
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDayOfWeek = firstDay.getDay();
+
+    const days: Array<Date | null> = [];
+    for (let i = 0; i < startDayOfWeek; i++) {
+      days.push(null);
+    }
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      days.push(new Date(year, month, day));
+    }
+    return days;
+  };
+
+  const togglePicker = (type: "start" | "end") => {
+    if (openPicker === type) {
+      setOpenPicker(null);
+      return;
+    }
+
+    const baseValue = type === "start" ? startDate : endDate;
+    const parsed = parseDateString(baseValue) || new Date();
+    const monthDate = new Date(parsed.getFullYear(), parsed.getMonth(), 1);
+
+    if (type === "start") {
+      setStartPickerMonth(monthDate);
+    } else {
+      setEndPickerMonth(monthDate);
+    }
+
+    setOpenPicker(type);
+  };
 
   useEffect(() => {
     fetchSlots();
@@ -217,28 +277,230 @@ export default function ScheduleManagePage() {
             <h2 className="text-[20px] font-bold text-gray-900 mb-6">대량 일정 생성</h2>
             
             <div className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="relative">
                   <label className="block text-[14px] font-semibold text-gray-900 mb-2">
                     시작일 <span className="text-[#7c3aed]">*</span>
                   </label>
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="YYYY-MM-DD"
+                      value={startDate}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setStartDate(value);
+                        const parsed = parseDateString(value);
+                        if (parsed) {
+                          setStartPickerMonth(
+                            new Date(parsed.getFullYear(), parsed.getMonth(), 1)
+                          );
+                        }
+                      }}
+                      className="w-full h-12 px-4 pr-12 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePicker("start")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      aria-label="시작일 달력 열기"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {openPicker === "start" && (
+                    <div className="absolute z-20 mt-2 w-full rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setStartPickerMonth(
+                              new Date(
+                                startPickerMonth.getFullYear(),
+                                startPickerMonth.getMonth() - 1,
+                                1
+                              )
+                            )
+                          }
+                          className="px-2 py-1 text-sm text-gray-600 hover:text-gray-900"
+                        >
+                          이전
+                        </button>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {startPickerMonth.getFullYear()}년 {startPickerMonth.getMonth() + 1}월
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setStartPickerMonth(
+                              new Date(
+                                startPickerMonth.getFullYear(),
+                                startPickerMonth.getMonth() + 1,
+                                1
+                              )
+                            )
+                          }
+                          className="px-2 py-1 text-sm text-gray-600 hover:text-gray-900"
+                        >
+                          다음
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1 text-xs text-gray-500 mb-1">
+                        {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
+                          <div key={d} className="text-center py-1">
+                            {d}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {buildCalendarDays(startPickerMonth).map((date, idx) => {
+                          if (!date) {
+                            return <div key={`start-empty-${idx}`} className="py-2" />;
+                          }
+                          const value = formatDate(date);
+                          const isSelected = value === startDate;
+                          return (
+                            <button
+                              key={`start-${value}`}
+                              type="button"
+                              onClick={() => {
+                                setStartDate(value);
+                                setOpenPicker(null);
+                              }}
+                              className={`h-9 rounded-md text-sm transition-colors ${
+                                isSelected
+                                  ? "bg-purple-600 text-white"
+                                  : "hover:bg-purple-100 text-gray-900"
+                              }`}
+                            >
+                              {date.getDate()}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div>
+                <div className="relative">
                   <label className="block text-[14px] font-semibold text-gray-900 mb-2">
                     종료일 <span className="text-[#7c3aed]">*</span>
                   </label>
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="YYYY-MM-DD"
+                      value={endDate}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setEndDate(value);
+                        const parsed = parseDateString(value);
+                        if (parsed) {
+                          setEndPickerMonth(
+                            new Date(parsed.getFullYear(), parsed.getMonth(), 1)
+                          );
+                        }
+                      }}
+                      className="w-full h-12 px-4 pr-12 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePicker("end")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      aria-label="종료일 달력 열기"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {openPicker === "end" && (
+                    <div className="absolute z-20 mt-2 w-full rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEndPickerMonth(
+                              new Date(
+                                endPickerMonth.getFullYear(),
+                                endPickerMonth.getMonth() - 1,
+                                1
+                              )
+                            )
+                          }
+                          className="px-2 py-1 text-sm text-gray-600 hover:text-gray-900"
+                        >
+                          이전
+                        </button>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {endPickerMonth.getFullYear()}년 {endPickerMonth.getMonth() + 1}월
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEndPickerMonth(
+                              new Date(
+                                endPickerMonth.getFullYear(),
+                                endPickerMonth.getMonth() + 1,
+                                1
+                              )
+                            )
+                          }
+                          className="px-2 py-1 text-sm text-gray-600 hover:text-gray-900"
+                        >
+                          다음
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1 text-xs text-gray-500 mb-1">
+                        {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
+                          <div key={d} className="text-center py-1">
+                            {d}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {buildCalendarDays(endPickerMonth).map((date, idx) => {
+                          if (!date) {
+                            return <div key={`end-empty-${idx}`} className="py-2" />;
+                          }
+                          const value = formatDate(date);
+                          const isSelected = value === endDate;
+                          return (
+                            <button
+                              key={`end-${value}`}
+                              type="button"
+                              onClick={() => {
+                                setEndDate(value);
+                                setOpenPicker(null);
+                              }}
+                              className={`h-9 rounded-md text-sm transition-colors ${
+                                isSelected
+                                  ? "bg-purple-600 text-white"
+                                  : "hover:bg-purple-100 text-gray-900"
+                              }`}
+                            >
+                              {date.getDate()}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
