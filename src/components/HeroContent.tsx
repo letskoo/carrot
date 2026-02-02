@@ -3,38 +3,56 @@
 import { useEffect, useState } from "react";
 import { useLeadFlow } from "@/components/lead-flow/leadFlowContext";
 
+interface AdminSettings {
+  mainTitle?: string;
+  mainSubtitle?: string;
+}
+
 export default function HeroContent() {
   const { statsVersion } = useLeadFlow();
   const [stats, setStats] = useState<{
     totalCount: number;
     last30DaysCount: number;
   } | null>(null);
+  const [settings, setSettings] = useState<AdminSettings>({
+    mainTitle: "포토부스 체험단 모집",
+    mainSubtitle: "뜨거운 반응, 네컷사진 포토부스 실비렌탈",
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchData() {
       try {
-        console.log("fetch stats", { statsVersion });
-        const response = await fetch("/api/stats");
-        const data = await response.json();
+        // 통계 데이터 조회
+        const statsResponse = await fetch("/api/stats");
+        const statsData = await statsResponse.json();
         
-        if (data.ok) {
-          console.log("Stats loaded:", data);
+        if (statsData.ok) {
           setStats({
-            totalCount: data.totalCount || 0,
-            last30DaysCount: data.last30DaysCount || 0,
+            totalCount: statsData.totalCount || 0,
+            last30DaysCount: statsData.last30DaysCount || 0,
           });
-        } else {
-          console.error("Stats load failed:", data.message);
+        }
+
+        // 관리자 설정 조회
+        const settingsResponse = await fetch("/api/admin/settings");
+        const settingsData = await settingsResponse.json();
+        
+        if (settingsData.ok && settingsData.settings) {
+          setSettings((prev) => ({
+            ...prev,
+            mainTitle: settingsData.settings.mainTitle || prev.mainTitle,
+            mainSubtitle: settingsData.settings.mainSubtitle || prev.mainSubtitle,
+          }));
         }
       } catch (error) {
-        console.error("Stats load failed:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchStats();
+    fetchData();
   }, [statsVersion]);
 
   const statsText = loading
@@ -47,10 +65,10 @@ export default function HeroContent() {
     <div className="pt-2 pb-5">
       <div>
       <h1 className="text-[22px] font-bold text-gray-900 mb-2 leading-snug md:text-2xl md:mb-3">
-        포토부스 체험단 모집
+        {settings.mainTitle}
       </h1>
       <p className="text-[14px] text-gray-600 mb-1 leading-relaxed md:text-base md:mb-1.5">
-        뜨거운 반응, 네컷사진 포토부스 실비렌탈
+        {settings.mainSubtitle}
       </p>
       <div className="flex items-center gap-1 text-[#7c3aed] text-[13px] md:text-sm">
         <svg className="w-4 h-4 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 24 24">

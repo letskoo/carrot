@@ -253,7 +253,7 @@ export default function HeroSlider() {
       <div className="max-w-[640px] mx-auto">
         <div
           ref={containerRef}
-          className="relative w-full overflow-hidden aspect-square"
+          className="relative w-full overflow-hidden aspect-square cursor-pointer"
           style={{
             touchAction: "pan-y",
             width: "100%",
@@ -305,7 +305,7 @@ export default function HeroSlider() {
 
       {showModal && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center overflow-hidden cursor-pointer"
           onClick={() => setShowModal(false)}
         >
           <button
@@ -313,7 +313,7 @@ export default function HeroSlider() {
               e.stopPropagation();
               setShowModal(false);
             }}
-            className="absolute top-4 right-4 z-[10000] flex items-center justify-center w-10 h-10 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+            className="absolute top-4 right-4 z-[10000] flex items-center justify-center w-10 h-10 bg-white/20 rounded-full hover:bg-white/30 transition-colors cursor-pointer"
             aria-label="닫기"
           >
             <svg
@@ -344,7 +344,7 @@ export default function HeroSlider() {
                 e.stopPropagation();
                 handleModalPrev();
               }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-[10001] flex items-center justify-center w-12 h-12 bg-black/45 rounded-full hover:bg-black/60 active:bg-black/70 transition-colors shadow-lg"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-[10001] flex items-center justify-center w-12 h-12 bg-black/45 rounded-full hover:bg-black/60 active:bg-black/70 transition-colors shadow-lg cursor-pointer"
               aria-label="이전"
             >
               <svg
@@ -375,7 +375,7 @@ export default function HeroSlider() {
                 e.stopPropagation();
                 handleModalNext();
               }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-[10001] flex items-center justify-center w-12 h-12 bg-black/45 rounded-full hover:bg-black/60 active:bg-black/70 transition-colors shadow-lg"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-[10001] flex items-center justify-center w-12 h-12 bg-black/45 rounded-full hover:bg-black/60 active:bg-black/70 transition-colors shadow-lg cursor-pointer"
               aria-label="다음"
             >
               <svg

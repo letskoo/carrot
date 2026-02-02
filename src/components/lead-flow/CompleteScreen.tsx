@@ -8,11 +8,11 @@ interface CompleteScreenProps {
 
 export default function CompleteScreen({ onConfirm }: CompleteScreenProps) {
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-4 animate-in fade-in duration-300">
+    <div className="complete-screen fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-[640px] flex flex-col items-center">
         {/* 성공 아이콘 */}
         <div className="mb-5 relative">
-          <div className="w-16 h-16 rounded-full bg-[#7c3aed] flex items-center justify-center animate-in scale-in duration-500">
+          <div className="complete-icon w-16 h-16 rounded-full bg-[#7c3aed] flex items-center justify-center">
             <svg
               className="w-5 h-5 text-white"
               fill="none"
@@ -47,6 +47,33 @@ export default function CompleteScreen({ onConfirm }: CompleteScreenProps) {
           </button>
         </div>
       </div>
+
+      <style jsx>{`
+        .complete-screen {
+          animation: fadeIn 0.3s ease-out;
+        }
+        .complete-icon {
+          animation: scaleIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        @keyframes scaleIn {
+          from {
+            transform: scale(0);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }

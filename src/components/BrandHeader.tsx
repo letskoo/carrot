@@ -2,9 +2,18 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function BrandHeader() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
+
+  const languageNames = {
+    ko: "🇰🇷 한국어",
+    en: "🇬🇧 EN",
+    ja: "🇯🇵 日本語",
+    zh: "🇨🇳 中文",
+  };
 
   useEffect(() => {
     if (isModalOpen) {
@@ -20,25 +29,41 @@ export default function BrandHeader() {
   return (
     <>
       <div className="pt-5 pb-3">
-        <div className="flex items-center gap-2">
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="relative w-6 h-6 rounded-full overflow-hidden flex-shrink-0 lg:w-8 lg:h-8 hover:opacity-80 transition-opacity"
-        >
-          <Image
-            src="/images/icons/logo.jpg"
-            alt="바나타이거 로고"
-            fill
-            className="object-cover"
-          />
-        </button>
-        <span className="text-[13px] font-medium text-gray-900 lg:text-base">포토그루브</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="relative w-6 h-6 rounded-full overflow-hidden flex-shrink-0 lg:w-8 lg:h-8 hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              <Image
+                src="/images/icons/logo.jpg"
+                alt="바나타이거 로고"
+                fill
+                className="object-cover"
+              />
+            </button>
+            <span className="text-[13px] font-medium text-gray-900 lg:text-base">포토그루브</span>
+          </div>
+
+          {availableLanguages.length > 1 && (
+            <select
+              value={currentLanguage}
+              onChange={(e) => setLanguage(e.target.value as any)}
+              className="text-[12px] font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-purple-600 cursor-pointer"
+            >
+              {availableLanguages.map((lang) => (
+                <option key={lang} value={lang}>
+                  {languageNames[lang]}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
       {isModalOpen && (
         <div 
-          className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center overflow-hidden cursor-pointer"
           onClick={() => setIsModalOpen(false)}
         >
           <button
@@ -46,7 +71,7 @@ export default function BrandHeader() {
               e.stopPropagation();
               setIsModalOpen(false);
             }}
-            className="absolute top-4 right-4 z-[10000] flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-colors"
+            className="absolute top-4 right-4 z-[10000] flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-colors cursor-pointer"
             aria-label="닫기"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

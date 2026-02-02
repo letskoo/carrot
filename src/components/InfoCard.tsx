@@ -2,8 +2,38 @@
 
 import { useState, useEffect } from "react";
 
+interface AdminSettings {
+  applicationItem?: string;
+  companyName?: string;
+}
+
 export default function InfoCard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [settings, setSettings] = useState<AdminSettings>({
+    applicationItem: "포토부스 렌탈",
+    companyName: "포토그루브",
+  });
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const response = await fetch("/api/admin/settings");
+        const data = await response.json();
+        
+        if (data.ok && data.settings) {
+          setSettings((prev) => ({
+            ...prev,
+            applicationItem: data.settings.applicationItem || prev.applicationItem,
+            companyName: data.settings.companyName || prev.companyName,
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch settings:", error);
+      }
+    }
+
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -23,17 +53,17 @@ export default function InfoCard() {
         <div className="grid gap-y-2.5 gap-x-3" style={{ gridTemplateColumns: '70px 1fr' }}>
           {/* Row 1: 신청항목 */}
           <span className="text-[12px] text-gray-500 lg:text-sm">신청항목</span>
-          <span className="text-[13px] font-semibold text-gray-900 lg:text-base">포토부스 렌탈</span>
+          <span className="text-[13px] font-semibold text-gray-900 lg:text-base">{settings.applicationItem}</span>
 
           {/* Row 2: 상호명 */}
           <span className="text-[12px] text-gray-500 lg:text-sm">상호명</span>
-          <span className="text-[13px] font-semibold text-gray-900 lg:text-base">포토그루브</span>
+          <span className="text-[13px] font-semibold text-gray-900 lg:text-base">{settings.companyName}</span>
 
           {/* Row 3: 사업자등록증 보기 (라벨 컬럼 비움, 간격 50% 축소) */}
           <span className="-mt-1.5"></span>
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="text-[13px] text-gray-500 underline text-left -mt-1.5 lg:text-base"
+            className="text-[13px] text-gray-500 underline text-left -mt-1.5 lg:text-base cursor-pointer"
           >
             사업자등록증 보기
           </button>
@@ -49,7 +79,7 @@ export default function InfoCard() {
               e.stopPropagation();
               setIsModalOpen(false);
             }}
-            className="absolute top-4 right-4 z-[10000] flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-colors"
+            className="absolute top-4 right-4 z-[10000] flex items-center justify-center w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 transition-colors cursor-pointer"
             aria-label="닫기"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

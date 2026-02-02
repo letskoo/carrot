@@ -3,12 +3,12 @@
 import React from "react";
 
 interface StepHeaderProps {
-  currentStep: 1 | 2;
+  currentStep: 1 | 2 | 3;
   onBack: () => void;
 }
 
 export default function StepHeader({ currentStep, onBack }: StepHeaderProps) {
-  const progress = (currentStep / 2) * 100;
+  const progress = (currentStep / 3) * 100;
 
   return (
     <div 
@@ -23,7 +23,7 @@ export default function StepHeader({ currentStep, onBack }: StepHeaderProps) {
           <div className="max-w-[640px] mx-auto">
             <button
               onClick={onBack}
-              className="flex items-center justify-center w-8 h-8"
+              className="flex items-center justify-center w-8 h-8 cursor-pointer"
               aria-label="뒤로가기"
             >
               <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">

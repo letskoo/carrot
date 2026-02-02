@@ -85,7 +85,7 @@ export default function BottomSheetConsent({
       <div
         className={`${styles.sheet} ${isVisible ? styles.sheetVisible : ""}`}
       >
-        <div className="bg-white rounded-t-2xl shadow-lg max-h-[80vh] overflow-y-auto max-w-[640px] mx-auto">
+        <div className="bg-white rounded-t-2xl shadow-lg max-h-[80vh] overflow-y-auto max-w-[640px] mx-auto md:rounded-t-[24px]">
           {/* 헤더 */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-4 rounded-t-2xl">
             <div className="max-w-[640px] mx-auto">
@@ -159,7 +159,7 @@ export default function BottomSheetConsent({
                 <button
                   type="button"
                   onClick={() => setDetailModal("personalDataCollection")}
-                  className="text-left flex-1 hover:opacity-70 transition-opacity"
+                  className="text-left flex-1 hover:opacity-70 transition-opacity cursor-pointer"
                 >
                   <span className="text-[14px] text-gray-700 leading-relaxed block">
                     <span className="font-semibold">(필수)</span> 개인정보 수집 및
@@ -198,7 +198,7 @@ export default function BottomSheetConsent({
                 <button
                   type="button"
                   onClick={() => setDetailModal("personalDataThirdParty")}
-                  className="text-left flex-1 hover:opacity-70 transition-opacity"
+                  className="text-left flex-1 hover:opacity-70 transition-opacity cursor-pointer"
                 >
                   <span className="text-[14px] text-gray-700 leading-relaxed block">
                     <span className="font-semibold">(필수)</span> 개인정보 제3자 제공 없음 확인
@@ -236,7 +236,7 @@ export default function BottomSheetConsent({
                 <button
                   type="button"
                   onClick={() => setDetailModal("personalDataCompany")}
-                  className="text-left flex-1 hover:opacity-70 transition-opacity"
+                  className="text-left flex-1 hover:opacity-70 transition-opacity cursor-pointer"
                 >
                   <span className="text-[14px] text-gray-700 leading-relaxed block">
                     <span className="font-semibold">(필수)</span> 개인정보 처리방침 확인

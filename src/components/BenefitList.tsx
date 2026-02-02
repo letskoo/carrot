@@ -1,5 +1,15 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+interface Benefit {
+  number: number;
+  title: string;
+  description: string;
+}
+
 export default function BenefitList() {
-  const benefits = [
+  const [benefits, setBenefits] = useState<Benefit[]>([
     {
       number: 1,
       title: "렌탈 실비 20만원 (4H)",
@@ -25,7 +35,37 @@ export default function BenefitList() {
       title: "인기 최고 네컷사진 포토존",
       description: "결혼식, 돌잔치부터 학교, 선거, 행사까지!",
     },
-  ];
+  ]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const response = await fetch("/api/admin/settings");
+        const data = await response.json();
+        
+        if (data.ok && data.settings && Array.isArray(data.settings.benefits)) {
+          setBenefits(data.settings.benefits);
+        }
+      } catch (error) {
+        console.error("Failed to fetch benefits:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchSettings();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-5 py-5 mb-12 animate-pulse">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-20 bg-gray-200 rounded-lg"></div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5 py-5 mb-12">

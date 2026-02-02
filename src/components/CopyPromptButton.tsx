@@ -26,7 +26,7 @@ export default function CopyPromptButton({
   return (
     <button
       onClick={handleCopy}
-      className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98]"
+      className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 active:scale-[0.98] cursor-pointer"
     >
       {isCopied ? "Copied!" : label}
     </button>

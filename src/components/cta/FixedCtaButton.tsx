@@ -1,14 +1,44 @@
 "use client";
 
 import { useLeadFlow } from "@/components/lead-flow/leadFlowContext";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+
+interface AdminSettings {
+  ctaButtonText?: string;
+}
 
 export default function FixedCtaButton() {
   const { openLeadFlow } = useLeadFlow();
+  const [buttonText, setButtonText] = useState("지금 신청하기");
+  const pathname = usePathname();
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const response = await fetch("/api/admin/settings");
+        const data = await response.json();
+        
+        if (data.ok && data.settings?.ctaButtonText) {
+          setButtonText(data.settings.ctaButtonText);
+        }
+      } catch (error) {
+        console.error("Failed to fetch button text:", error);
+      }
+    }
+
+    fetchSettings();
+  }, []);
 
   const handleClick = () => {
     console.log("CTA click - opening lead flow");
     openLeadFlow();
   };
+
+  // 관리자 페이지에서는 버튼 숨김
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <div 
@@ -20,9 +50,9 @@ export default function FixedCtaButton() {
           <button
             type="button"
             onClick={handleClick}
-            className="w-full h-14 flex items-center justify-center rounded-[12px] bg-[#7c3aed] text-base font-bold text-white hover:bg-[#6d28d9] transition-colors active:scale-[0.98]"
+            className="w-full h-14 flex items-center justify-center rounded-[12px] bg-[#7c3aed] text-base font-bold text-white hover:bg-[#6d28d9] transition-colors active:scale-[0.98] cursor-pointer"
           >
-            렌탈 신청하기
+            {buttonText}
           </button>
         </div>
       </div>

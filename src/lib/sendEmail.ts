@@ -3,13 +3,13 @@
  * - 제목/본문/링크를 이 파일에서만 생성하여 일관성 유지
  */
 
-import { Resend } from "resend";
-
 type LeadEmailPayload = {
   name: string;
   phone: string;
   region?: string;
   message?: string;
+  bookingDate?: string;
+  bookingTime?: string;
   createdAt?: string | Date;
 };
 
@@ -34,121 +34,90 @@ function formatKSTDateTime(date: Date): string {
   return `${result.year}-${result.month}-${result.day} (${result.weekday}) ${result.hour}:${result.minute}`;
 }
 
-function buildSubject(): string {
-  const companyName = process.env.EMAIL_FROM_NAME || process.env.NEXT_PUBLIC_COMPANY_NAME || process.env.COMPANY_NAME || "메타페이";
-  return `[${companyName}] 새 문의가 도착했어요`;
-}
 
-function buildTextBody(payload: LeadEmailPayload): string {
-  const createdDate = payload.createdAt ? new Date(payload.createdAt) : new Date();
-  const formattedTime = formatKSTDateTime(createdDate);
-  const companyName = process.env.EMAIL_FROM_NAME || process.env.NEXT_PUBLIC_COMPANY_NAME || process.env.COMPANY_NAME || "메타페이";
+/**
+ * 관리자용 예약 확정 이메일
+ * - 예약 내용 요약
+ * - 바로 확정 버튼 (클릭 시 POST /api/booking/confirm 호출)
+ * - 문자 발송 템플릿 (복사 가능)
+ */
+export function buildAdminConfirmEmail(payload: LeadEmailPayload & { rowIndex: number }): {
+  subject: string;
+  text: string;
+  html: string;
+} {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const confirmLink = `${appUrl}/api/booking/confirm?rowIndex=${payload.rowIndex}&secret=${process.env.BOOKING_CONFIRM_SECRET || "carrot-booking-secret"}`;
   const kakaoLink = process.env.KAKAO_CHAT_URL || "http://pf.kakao.com/_zRMZj/chat";
   const sheetId = process.env.GOOGLE_SHEET_ID || process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID || "";
-
   const sheetViewUrl = sheetId ? `https://docs.google.com/spreadsheets/d/${sheetId}/edit` : "";
   const sheetCsvUrl = sheetId ? `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv` : "";
-
-  // 본문 구성
-  let text = "";
   
-  // 1. 헤더 구분선
-  text += `-----------------------------------------\n`;
-  text += `접수 일시: ${formattedTime}\n`;
-  text += `-----------------------------------------\n`;
-  text += "\n";
+  const smsTemplate = `[포토부스 렌탈]
+안녕하세요! 예약이 확정되었습니다.
+• 예약자: ${payload.name}
+• 날짜: ${payload.bookingDate}
+• 시간: ${payload.bookingTime}
+• 확인: ${appUrl}/booking`;
 
-  // 2. 문의 정보 블록
-  text += `▶ 이름: ${payload.name || "-"}\n`;
-  text += "\n";
+  const smsLink = `sms:${payload.phone}?body=${encodeURIComponent(smsTemplate)}`;
 
-  text += `▶ 연락처: ${payload.phone || "-"}\n`;
-  text += "\n";
+  const text = `📅 포토부스 렌탈 예약 확정 안내\n\n` +
+    `예약자: ${payload.name}\n` +
+    `연락처: ${payload.phone}\n` +
+    `예약일시: ${payload.bookingDate} ${payload.bookingTime}\n` +
+    `${payload.region ? `지역: ${payload.region}\n` : ""}` +
+    `${payload.message ? `요청사항: ${payload.message}\n` : ""}` +
+    `\n✅ 빠른 확정 방법\n` +
+    `메일 내 버튼을 눌러 예약 확정 및 문자 발송을 진행해주세요.\n` +
+    `\n📌 관리자 참고 링크는 HTML 메일에서 확인 가능합니다.`;
 
-  text += `▶ 지역: ${payload.region || "-"}\n`;
-  text += "\n";
+  const html = `
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>예약 확정 안내</title>
+</head>
+<body style="margin:0; padding:24px; background:#ffffff; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,sans-serif; color:#111827;">
+  <div style="max-width:640px; margin:0 auto;">
+    <h2 style="font-size:18px; margin:0 0 16px 0; font-weight:700;">📅 포토부스 렌탈 예약 확정 안내</h2>
+    <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:16px;">
+      <div style="margin-bottom:8px;"><strong>예약자:</strong> ${payload.name}</div>
+      <div style="margin-bottom:8px;"><strong>연락처:</strong> ${payload.phone}</div>
+      <div style="margin-bottom:8px;"><strong>예약일시:</strong> ${payload.bookingDate} ${payload.bookingTime}</div>
+      ${payload.region ? `<div style=\"margin-bottom:8px;\"><strong>지역:</strong> ${payload.region}</div>` : ""}
+      ${payload.message ? `<div style=\"margin-bottom:0;\"><strong>요청사항:</strong> ${payload.message}</div>` : ""}
+    </div>
 
-  text += `▶ 문의 내용:\n`;
-  text += `${payload.message || "-"}\n`;
-  text += "\n";
+    <h3 style="font-size:16px; margin:24px 0 12px 0; font-weight:700;">✅ 빠른 확정 방법</h3>
+    <div style="margin-bottom:16px;">
+      <div style="margin-bottom:12px;">
+        <a href="${confirmLink}" style="display:block; padding:12px 18px; background:#7c3aed; color:#ffffff; text-decoration:none; border-radius:10px; font-weight:700; text-align:center;">예약 확정하기</a>
+      </div>
+      <div>
+        <a href="${smsLink}" style="display:block; padding:12px 18px; background:#111827; color:#ffffff; text-decoration:none; border-radius:10px; font-weight:700; text-align:center;">문자 앱 열기</a>
+      </div>
+    </div>
+    <p style="margin:0 0 20px 0; color:#6b7280; font-size:13px; line-height:1.5;">
+      문자 앱 열기를 누르면 스마트폰 문자 앱에 내용이 자동 입력됩니다.
+    </p>
 
-  // 3. 구분선
-  text += `-----------------------------------------\n`;
+    <h3 style="font-size:16px; margin:24px 0 12px 0; font-weight:700;">📌 관리자 참고 링크</h3>
+    <ul style="padding-left:18px; margin:0; color:#374151;">
+      ${kakaoLink ? `<li style=\"margin-bottom:8px;\"><a href=\"${kakaoLink}\" style=\"color:#2563eb; text-decoration:none;\">개발회사와 상담하기</a></li>` : ""}
+      ${sheetViewUrl ? `<li style=\"margin-bottom:8px;\"><a href=\"${sheetViewUrl}\" style=\"color:#2563eb; text-decoration:none;\">구글시트 바로가기</a></li>` : ""}
+      ${sheetCsvUrl ? `<li style=\"margin-bottom:8px;\"><a href=\"${sheetCsvUrl}\" style=\"color:#2563eb; text-decoration:none;\">구글시트 다운로드 (CSV)</a></li>` : ""}
+    </ul>
+  </div>
+</body>
+</html>
+  `.trim();
 
-  // 4. 바로 처리하기 섹션
-  text += `📌 바로 처리하기\n`;
-
-  // 5. 구분선
-  text += `-----------------------------------------\n`;
-  text += "\n";
-
-  // 6. 링크 섹션
-  if (kakaoLink) {
-    text += `▶ 카카오톡 상담하기\n`;
-    text += `${kakaoLink}\n`;
-    text += "\n";
-  }
-
-  if (sheetViewUrl) {
-    text += `▶ 구글시트 바로가기\n`;
-    text += `보기: ${sheetViewUrl}\n`;
-    text += "\n";
-  }
-
-  if (sheetCsvUrl) {
-    text += `▶ 구글시트 다운로드 (CSV)\n`;
-    text += `${sheetCsvUrl}\n`;
-    text += "\n";
-    text += `-----------------------------------------\n`;
-
-  }
-
-  return text;
-}
-
-export async function sendLeadNotificationEmail(payload: LeadEmailPayload): Promise<{ success: boolean; error?: string }> {
-  const startTime = Date.now();
-  try {
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      console.warn("[Email] RESEND_API_KEY not set, skipping email");
-      return { success: false, error: "RESEND_API_KEY not configured" };
-    }
-
-    // 수신자 이메일 설정 (회사 수신 이메일)
-    const recipientEmail = process.env.COMPANY_RECEIVER_EMAIL;
-
-    if (!recipientEmail) {
-      console.error("[Email] No recipient email configured in COMPANY_RECEIVER_EMAIL");
-      return { success: false, error: "COMPANY_RECEIVER_EMAIL not configured" };
-    }
-    
-    const emailFrom = process.env.EMAIL_FROM || "noreply@resend.dev";
-    const fromName = process.env.EMAIL_FROM_NAME || process.env.NEXT_PUBLIC_COMPANY_NAME || process.env.COMPANY_NAME || "메타페이";
-
-    const subject = buildSubject();
-    const text = buildTextBody(payload);
-
-    console.log(`[Email] Sending to: ${recipientEmail} at ${new Date().toISOString()}`);
-
-    const resend = new Resend(apiKey);
-
-    const result = await resend.emails.send({
-      from: `${fromName} <${emailFrom}>`,
-      to: [recipientEmail],
-      subject,
-      text,
-    });
-
-    const endTime = Date.now();
-    console.log(`[Email] Subject: ${subject}`);
-    console.log(`[Email] Preview (200 chars): ${text.slice(0, 200)}`);
-    console.log(`[Email] Sent successfully in ${endTime - startTime}ms`);
-    console.log(`[Email] Resend response:`, result);
-    return { success: true };
-  } catch (error) {
-    const endTime = Date.now();
-    console.error(`[Email] Failed after ${endTime - startTime}ms:`, error);
-    return { success: false, error: String(error) };
-  }
+  return {
+    subject: `[확정필요] 포토부스 예약 신청 - ${payload.name} (${payload.bookingDate} ${payload.bookingTime})`,
+    text,
+    html,
+  };
 }

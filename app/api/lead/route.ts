@@ -1,5 +1,6 @@
 ﻿import { NextResponse } from "next/server";
-import { sendLeadNotificationEmail } from "@/lib/sendEmail";
+import { buildAdminConfirmEmail } from "../../../src/lib/sendEmail";
+import { getLastRowIndex, appendLeadToSheet } from "../../../lib/googleSheets";
 
 // 선택적 기능 플래그 (환경변수 기반)
 const ENABLE_LOCAL_RECORDS = false; // 로컬 저장 비활성화 (우선순위 낮음)
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
     console.log("[API/POST] Form submission received");
     
     const body = await req.json();
-    const { name, phone, region, memo, message } = body || {};
+    const { name, phone, region, memo, message, bookingDate, bookingTime } = body || {};
 
     console.log("[API/POST] Incoming form data:", body);
     console.log("[API/POST] Request payload keys:", Object.keys(body || {}));
@@ -60,24 +61,41 @@ export async function POST(req: Request) {
 
     console.log("[API/POST]  Validation passed: name and phone present");
 
-    //  Get Google Apps Script URL from environment
-    // Prefer GOOGLE_SCRIPT_URL (server-only), fallback to NEXT_PUBLIC_GOOGLE_SCRIPT_URL
-    const scriptUrl = process.env.GOOGLE_SCRIPT_URL || process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL;
-
-    if (!scriptUrl) {
-      console.error("[API/POST]  CRITICAL: Neither GOOGLE_SCRIPT_URL nor NEXT_PUBLIC_GOOGLE_SCRIPT_URL is set");
-      return NextResponse.json(
-        { ok: false, message: "Server misconfigured: Missing Google Apps Script URL" },
-        { status: 500 }
-      );
+    // 예약 정보가 있으면 용량 확인
+    if (bookingDate && bookingTime) {
+      try {
+        const { getAvailableTimeSlots } = await import("../../../lib/googleSheets");
+        const slotResult = await getAvailableTimeSlots(bookingDate);
+        
+        if (slotResult.success && slotResult.availableSlots) {
+          const selectedSlot = slotResult.availableSlots.find(
+            (s: any) => s.time === bookingTime
+          );
+          
+          if (!selectedSlot || !selectedSlot.available) {
+            console.warn("[API/POST] Booking failed: Slot capacity exceeded");
+            return NextResponse.json(
+              { 
+                ok: false, 
+                message: "죄송합니다. 해당 시간이 마감되었습니다. 다른 시간을 선택해주세요." 
+              },
+              { status: 409 }
+            );
+          }
+        }
+      } catch (err) {
+        console.warn("[API/POST] Failed to check slot availability:", err);
+        // 계속 진행 (구글 시트 확인 실패 시 진행)
+      }
     }
 
-    console.log("[API/POST]  Script URL configured (length: " + scriptUrl.length + ")");
+    console.log("[API/POST]  Slot availability check passed");
 
-    //  Prepare payload for Google Sheets
-    const sheetId = process.env.GOOGLE_SHEET_ID;
-    const sheetName = process.env.GOOGLE_SHEET_TAB || "carrot";
-
+    // ============================================
+    // 데이터를 Google Sheets에 직접 저장
+    // ============================================
+    const sheetName = process.env.GOOGLE_SHEET_NAME || "carrot";
+    
     // 전화번호 포맷 안전장치: 숫자만 11자리면 010-xxxx-xxxx 형식으로 변환
     let formattedPhone = phone;
     if (/^\d{11}$/.test(phone)) {
@@ -89,144 +107,79 @@ export async function POST(req: Request) {
       console.warn("[API/POST] Phone format unexpected:", phone);
     }
 
-    const payload = {
+    const leadData = {
+      createdAt: new Date().toISOString(),
       name,
       phone: formattedPhone,
       region: region || "",
-      message: message || memo || "",
-      createdAt: new Date().toISOString(),
+      memo: message || memo || "",
       userAgent: req.headers.get("user-agent") || "",
-      sheetId,
-      sheetName,
+      referer: req.headers.get("referer") || "",
+      bookingDate: bookingDate || "",
+      bookingTime: bookingTime || "",
+      status: "대기",
     };
 
-    if (!sheetId) {
-      console.error("[API/POST]  Missing GOOGLE_SHEET_ID env var");
+    console.log("[API/POST] Saving lead data to Google Sheets:", {
+      name: leadData.name,
+      phone: leadData.phone,
+      bookingDate: leadData.bookingDate,
+      bookingTime: leadData.bookingTime,
+    });
+
+    const saveResult = await appendLeadToSheet(leadData);
+    if (!saveResult.success) {
+      console.error("[API/POST] Failed to save to Google Sheets:", saveResult.error);
       return NextResponse.json(
-        { ok: false, message: "GOOGLE_SHEET_ID not configured" },
+        { ok: false, message: "Failed to save booking data" },
         { status: 500 }
       );
     }
 
-    console.log(
-      "[API/POST] Target sheet:",
-      { sheetIdLength: sheetId.length, sheetName }
-    );
-
-    console.log("[API/POST] Sending to Apps Script:", payload);
-    console.log("[API/POST] Payload keys:", Object.keys(payload));
-
-    //  Send to Google Apps Script
-    const res = await fetch(scriptUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      cache: "no-store",
-    });
-
-    console.log("[API/POST] Google Apps Script response status:", res.status);
-    
-    //  Check HTTP status code
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      console.error("[API/POST]  Google Apps Script returned error status:", res.status);
-      console.error("[API/POST] Response body (first 300 chars):", text.substring(0, 300));
-      
-      return NextResponse.json(
-        { ok: false, message: `Google Apps Script error (${res.status})`, detail: text.substring(0, 500) },
-        { status: 502 }
-      );
-    }
-
-    //  Check content-type
-    const contentType = res.headers.get("content-type") || "";
-    console.log("[API/POST] Response content-type:", contentType);
-    
-    if (!contentType.includes("application/json")) {
-      const text = await res.text().catch(() => "");
-      console.error("[API/POST]  Google Apps Script returned non-JSON:", contentType);
-      console.error("[API/POST] Response body (first 300 chars):", text.substring(0, 300));
-      
-      return NextResponse.json(
-        { ok: false, message: "Google Apps Script returned invalid response format", detail: contentType },
-        { status: 502 }
-      );
-    }
-
-    //  Parse JSON response
-    let data: any;
-    try {
-      data = await res.json();
-    } catch (parseErr) {
-      console.error("[API/POST]  Failed to parse Google Apps Script JSON response");
-      const text = await res.text().catch(() => "");
-      console.error("[API/POST] Raw body:", text.substring(0, 300));
-      
-      return NextResponse.json(
-        { ok: false, message: "Google Apps Script returned invalid JSON", detail: text.substring(0, 500) },
-        { status: 502 }
-      );
-    }
-
-    console.log("[API/POST] Parsed response data keys:", Object.keys(data || {}));
-
-    //  Validate success flag in response
-    const isSuccess = data?.ok === true || data?.success === true;
-    
-    if (!isSuccess) {
-      console.error("[API/POST]  Google Apps Script did not return success flag");
-      console.error("[API/POST] Response was:", JSON.stringify(data).substring(0, 300));
-      
-      const errorMsg = data?.message || data?.error || "Unknown error from Google Apps Script";
-      return NextResponse.json(
-        { ok: false, message: `Google Apps Script error: ${errorMsg}`, detail: data },
-        { status: 502 }
-      );
-    }
-
-    console.log("[API/POST]  SUCCESS: Data saved to Google Sheets");
+    console.log("[API/POST] ✅ Data saved to Google Sheets successfully");
 
     // ============================================
-    // 선택적 기능 (우선순위 낮음)
+    // 선택적 기능 (이메일 발송)
     // ============================================
 
-    // 1. 로컬 레코드 저장 (선택사항)
-    if (ENABLE_LOCAL_RECORDS) {
+    // 예약 확정 이메일 발송 (관리자용)
+    if (ENABLE_EMAIL_NOTIFICATIONS && bookingDate && bookingTime) {
       try {
-        console.info("[API/POST] Saving local record...");
-        // 나중에 구현: const record = await saveRecord({...})
-        console.info("[API/POST]  Local record saved");
-      } catch (err) {
-        console.error("[API/POST]  Failed to save local record:", err);
-        // 계속 진행 (Google Sheets는 저장됨)
-      }
-    }
+        console.info("[API/POST] Sending admin confirmation email...");
 
-    // 2. 관리자 이메일 발송 (선택사항)
-    if (ENABLE_EMAIL_NOTIFICATIONS) {
-      try {
-        console.info("[API/POST] Sending admin email...");
+        // 마지막 행 인덱스 조회
+        const rowIndexResult = await getLastRowIndex();
+        const rowIndex = rowIndexResult.rowIndex || 0;
 
-        const emailResult = await sendLeadNotificationEmail({
+        const { Resend } = await import("resend");
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        
+        const confirmEmail = buildAdminConfirmEmail({
           name,
-          phone,
+          phone: formattedPhone,
           region: region || "",
           message: message || memo || "",
+          bookingDate,
+          bookingTime,
           createdAt: new Date(),
+          rowIndex,
         });
 
-        if (emailResult.success) {
-          console.info("[API/POST] ✅ Admin email sent");
-        } else {
-          console.warn("[API/POST] ⚠️ Email send failed:", emailResult.error);
-        }
+        const result = await resend.emails.send({
+          from: `${process.env.EMAIL_FROM_NAME || "포토부스"} <${process.env.EMAIL_FROM || "noreply@resend.dev"}>`,
+          to: [process.env.COMPANY_RECEIVER_EMAIL || ""],
+          subject: confirmEmail.subject,
+          text: confirmEmail.text,
+          html: confirmEmail.html,
+        });
+
+        console.info("[API/POST] ✅ Admin confirmation email sent");
       } catch (err) {
-        console.error("[API/POST] ❌ Failed to send admin email:", err);
-        // 계속 진행 (Google Sheets는 저장됨)
+        console.warn("[API/POST] ⚠️ Admin confirmation email send failed:", err);
       }
     }
 
-    return NextResponse.json({ ok: true, data }, { status: 200 });
+    return NextResponse.json({ ok: true }, { status: 200 });
 
   } catch (e: any) {
     console.error("[API/POST]  EXCEPTION:", e?.message || String(e));

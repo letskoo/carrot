@@ -1,10 +1,12 @@
-export type LeadFlowStep = 1 | 2;
+export type LeadFlowStep = 1 | 2 | 3;
 
 export interface FormDataType {
   name: string;
   phone: string;
   region: string;
   memo: string;
+  bookingDate: string;
+  bookingTime: string;
 }
 
 export interface ConsentCheckboxes {
@@ -13,4 +15,4 @@ export interface ConsentCheckboxes {
   personalDataCompany: boolean;
 }
 
-export type LeadFlowState = "idle" | "step1" | "step2" | "consent" | "loading" | "complete" | "error";
+export type LeadFlowState = "idle" | "step1" | "step2" | "step3" | "consent" | "loading" | "complete" | "error";
