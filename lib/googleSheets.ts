@@ -548,11 +548,16 @@ export async function generateBookingTimesFromSettings(settings: {
       return { success: false, error: "시작일이 종료일보다 뒤에 있습니다" };
     }
 
-    // 기존 데이터 삭제 (헤더 제외)
-    await sheets.spreadsheets.values.clear({
+    // 기존 데이터 조회 (중복 방지)
+    const existingDataResponse = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: `${sheetName}!A2:C1000`,
     });
+
+    const existingData = existingDataResponse.data.values || [];
+    const existingKeys = new Set(
+      existingData.map((row) => `${row[0]}_${row[1]}`)
+    );
 
     // 새로운 데이터 생성
     const newData: string[][] = [];
@@ -574,7 +579,11 @@ export async function generateBookingTimesFromSettings(settings: {
       // 각 시간마다 행 생성
       const timeList = times.split(",").map((t) => t.trim());
       for (const time of timeList) {
-        newData.push([dateStr, time, String(capacity)]);
+        const key = `${dateStr}_${time}`;
+        // 이미 존재하는 날짜-시간 조합은 건너뛰기
+        if (!existingKeys.has(key)) {
+          newData.push([dateStr, time, String(capacity)]);
+        }
       }
 
       // 다음 날짜로

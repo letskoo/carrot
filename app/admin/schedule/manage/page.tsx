@@ -103,21 +103,17 @@ export default function ScheduleManagePage() {
         body: JSON.stringify({
           startDate,
           endDate,
-          weekday: {
-            capacity: weekdayCapacity,
-            times: weekdayTimes.split(",").map((t) => t.trim()),
-          },
-          weekend: {
-            capacity: weekendCapacity,
-            times: weekendTimes.split(",").map((t) => t.trim()),
-          },
+          weekdayCapacity,
+          weekdayTimes,
+          weekendCapacity,
+          weekendTimes,
         }),
       });
 
       const data = await response.json();
 
       if (data.ok) {
-        setMessage(`✅ ${data.created}개의 일정이 생성되었습니다`);
+        setMessage(`✅ ${data.message || "일정이 생성되었습니다"}`);
         fetchSlots();
         setTimeout(() => setMessage(""), 3000);
       } else {
@@ -353,6 +349,8 @@ export default function ScheduleManagePage() {
                               ? "border-purple-600 bg-purple-600 text-white hover:bg-purple-700"
                               : isToday
                               ? "border-purple-600 bg-white text-purple-700 hover:border-purple-700"
+                              : hasSlots
+                              ? "border-none bg-purple-100 text-white cursor-pointer hover:bg-purple-200"
                               : "border-gray-200 text-gray-300 cursor-default"
                           }`}
                         >

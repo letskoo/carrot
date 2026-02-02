@@ -43,7 +43,9 @@ export default function DateDetailPage() {
       const data = await response.json();
       
       if (data.ok && data.slots) {
-        const dateSlots = data.slots.filter((slot: TimeSlot) => slot.date === date);
+        const dateSlots = data.slots
+          .filter((slot: TimeSlot) => slot.date === date)
+          .sort((a: TimeSlot, b: TimeSlot) => a.time.localeCompare(b.time));
         setSlots(dateSlots);
       }
     } catch (error) {
