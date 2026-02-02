@@ -339,7 +339,7 @@ export async function getAvailableTimeSlots(
   date: string
 ): Promise<{
   success: boolean;
-  availableSlots?: Array<{ time: string; booked: number; capacity: number }>;
+  availableSlots?: Array<{ time: string; booked: number; capacity: number; available: boolean }>;
   error?: string;
 }> {
   try {
