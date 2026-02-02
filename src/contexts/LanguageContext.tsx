@@ -4,6 +4,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 type Language = "ko" | "en" | "ja" | "zh";
 
+type LanguageSettingsMap = Record<string, { enabled?: boolean }>;
+
 interface LanguageContextType {
   currentLanguage: Language;
   setLanguage: (lang: Language) => void;
@@ -28,10 +30,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         const data = await response.json();
 
         if (data.ok && data.settings?.languages) {
-          const savedLanguages =
+          const savedLanguages: LanguageSettingsMap =
             typeof data.settings.languages === "string"
-              ? JSON.parse(data.settings.languages)
-              : data.settings.languages;
+              ? (JSON.parse(data.settings.languages) as LanguageSettingsMap)
+              : (data.settings.languages as LanguageSettingsMap);
 
           const enabled = Object.entries(savedLanguages || {})
             .filter(([, value]) => value?.enabled)
