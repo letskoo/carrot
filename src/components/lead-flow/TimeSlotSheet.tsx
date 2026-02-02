@@ -128,11 +128,6 @@ export default function TimeSlotSheet({
             </div>
           </div>
 
-          {/* 드래그 핸들 (모바일만) */}
-          <div className="flex justify-center pt-3 pb-2 md:hidden">
-            <div className="w-10 h-1 bg-gray-300 rounded-full" />
-          </div>
-
           {/* 시간 슬롯 목록 (스크롤 가능) */}
           <div className="py-4 space-y-3">
             <div className="max-w-[640px] mx-auto px-4">
