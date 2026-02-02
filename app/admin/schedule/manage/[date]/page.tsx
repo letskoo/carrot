@@ -176,13 +176,18 @@ export default function DateDetailPage() {
                   {slots.map((slot) => {
                     const isSelected = selectedTime === slot.time;
                     const isBooked = slot.bookedCount > 0;
+                    const isFull = slot.bookedCount >= slot.capacity;
 
                     return (
                       <button
                         key={slot.time}
                         onClick={() => handleTimeClick(slot.time, slot.bookedCount)}
                         className={`px-4 py-4 text-sm rounded-lg border-2 transition-colors ${
-                          isBooked
+                          isFull
+                            ? isSelected
+                              ? "bg-purple-600 border-purple-600 text-white font-semibold"
+                              : "bg-purple-600 border-purple-600 text-white hover:bg-purple-700"
+                            : isBooked
                             ? isSelected
                               ? "bg-purple-600 border-purple-600 text-white font-semibold"
                               : "bg-white border-purple-600 text-purple-700 hover:bg-purple-50"

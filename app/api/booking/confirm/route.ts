@@ -135,15 +135,8 @@ export async function GET(request: NextRequest) {
             .subtitle {
               color: #6b7280;
               font-size: 0.9375rem;
-              margin: 0;
-              margin-top: 3rem;
+              margin: 0.5rem 0 0 0;
               line-height: 1.5;
-            }
-            .text-small {
-              color: #9ca3af;
-              font-size: 0.875rem;
-              margin-top: 0.5rem;
-              margin-bottom: 0;
             }
             @keyframes fadeIn {
               from {
@@ -172,9 +165,8 @@ export async function GET(request: NextRequest) {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            <h1>예약이 확정 되었어요</h1>
-            <p class="subtitle">고객에게 문자로 알림을 발송해주세요.</p>
-            <p class="text-small">이 페이지는 닫아도 됩니다.</p>
+            <h1>예약이 확정되었습니다!</h1>
+            <p class="subtitle">고객에게 문자로 알림을 발송해주세요</p>
           </div>
         </body>
         </html>

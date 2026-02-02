@@ -257,7 +257,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
         <StepHeader currentStep={headerStep} onBack={handleBackClick} />
 
         {/* 메인 콘텐츠 (상단 padding으로 헤더 아래 배치) */}
-        <div className="pt-[112px] pb-[100px] px-4 lg:px-6 lg:pb-10">
+        <div className="pt-[112px] pb-[100px] px-4 lg:px-6">
           
           {/* Step 1: 기본 정보 입력 */}
           {step === 1 && (
