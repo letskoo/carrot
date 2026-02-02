@@ -292,15 +292,14 @@ export async function setupBookingSheets(): Promise<{
               setDataValidation: {
                 range: {
                   sheetId: existingSheets.find((s) => s.properties?.title === leadSheetName)?.properties?.sheetId || 0,
-                  dimension: "ROWS",
-                  startIndex: 1, // 헤더 제외 (2행부터)
-                  endIndex: 1000, // 1000행까지
+                  startRowIndex: 1, // 헤더 제외 (2행부터)
+                  endRowIndex: 1000, // 1000행까지
                   startColumnIndex: 9, // J 컬럼 (0부터 시작하므로 9)
                   endColumnIndex: 10,
                 },
                 rule: {
-                  type: "LIST",
-                  listCondition: {
+                  condition: {
+                    type: "ONE_OF_LIST",
                     values: [
                       { userEnteredValue: "대기" },
                       { userEnteredValue: "확정" },
