@@ -37,9 +37,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
           const enabled = Object.entries(savedLanguages || {})
             .filter(([, value]) => value?.enabled)
-            .map(([key]) => key) as Language[];
+            .map(([key]) => key)
+            .filter((key): key is Language =>
+              ["ko", "en", "ja", "zh"].includes(key)
+            );
 
-          const unique = Array.from(new Set(["ko", ...enabled]));
+          const unique: Language[] = Array.from(
+            new Set<Language>(["ko", ...enabled])
+          );
           setAvailableLanguages(unique);
           return;
         }
