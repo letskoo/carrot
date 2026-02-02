@@ -58,7 +58,7 @@ export function buildAdminConfirmEmail(payload: LeadEmailPayload & { rowIndex: n
 • 예약자: ${payload.name}
 • 날짜: ${payload.bookingDate}
 • 시간: ${payload.bookingTime}
-• 확인: ${appUrl}/booking`;
+• 확인: ${confirmLink}`;
 
   const smsLink = `sms:${payload.phone}?body=${encodeURIComponent(smsTemplate)}`;
 
