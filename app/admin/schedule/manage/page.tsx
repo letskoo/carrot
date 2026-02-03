@@ -202,6 +202,13 @@ export default function ScheduleManagePage() {
     return acc;
   }, {} as Record<string, boolean>);
 
+  // 날짜별로 모든 일정이 마감인지 확인
+  const datesAllFull = Object.keys(groupedSlots).reduce((acc, date) => {
+    const allFull = groupedSlots[date].every(slot => slot.bookedCount >= slot.capacity);
+    acc[date] = allFull;
+    return acc;
+  }, {} as Record<string, boolean>);
+
   const handleDateClick = (date: string) => {
     router.push(`/admin/schedule/manage/${date}`);
   };
@@ -367,23 +374,13 @@ export default function ScheduleManagePage() {
                             return <div key={`start-empty-${idx}`} className="py-2" />;
                           }
                           const value = formatDate(date);
-                          const isSelected = value === startDate;
                           return (
-                            <button
+                            <div
                               key={`start-${value}`}
-                              type="button"
-                              onClick={() => {
-                                setStartDate(value);
-                                setOpenPicker(null);
-                              }}
-                              className={`h-9 rounded-md text-sm transition-colors ${
-                                isSelected
-                                  ? "bg-purple-600 text-white"
-                                  : "hover:bg-purple-100 text-gray-900"
-                              }`}
+                              className="h-9 rounded-md text-sm text-gray-900 flex items-center justify-center"
                             >
                               {date.getDate()}
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -479,23 +476,13 @@ export default function ScheduleManagePage() {
                             return <div key={`end-empty-${idx}`} className="py-2" />;
                           }
                           const value = formatDate(date);
-                          const isSelected = value === endDate;
                           return (
-                            <button
+                            <div
                               key={`end-${value}`}
-                              type="button"
-                              onClick={() => {
-                                setEndDate(value);
-                                setOpenPicker(null);
-                              }}
-                              className={`h-9 rounded-md text-sm transition-colors ${
-                                isSelected
-                                  ? "bg-purple-600 text-white"
-                                  : "hover:bg-purple-100 text-gray-900"
-                              }`}
+                              className="h-9 rounded-md text-sm text-gray-900 flex items-center justify-center"
                             >
                               {date.getDate()}
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -595,6 +582,7 @@ export default function ScheduleManagePage() {
                       
                       const hasSlots = groupedSlots[day.date];
                       const hasBookings = datesWithBookings[day.date];
+                      const allFull = datesAllFull[day.date];
                       
                       // 오늘 날짜 체크
                       const today = new Date();
@@ -607,7 +595,7 @@ export default function ScheduleManagePage() {
                           onClick={() => hasSlots && handleDateClick(day.date!)}
                           disabled={!hasSlots}
                           className={`aspect-square rounded-lg border-2 transition-all text-sm font-semibold ${
-                            hasBookings
+                            allFull
                               ? "border-purple-600 bg-purple-600 text-white hover:bg-purple-700"
                               : isToday
                               ? "border-purple-600 bg-white text-purple-700 hover:border-purple-700"

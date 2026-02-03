@@ -71,9 +71,36 @@ export default function DateDetailPage() {
     }
   };
 
-  const handleTimeClick = (time: string, bookedCount: number) => {
-    if (bookedCount === 0) return;
-    
+  const handleTimeClick = async (time: string, bookedCount: number, capacity: number) => {
+    // capacity가 0이면 취소된 슬롯이므로 재활성화
+    if (capacity === 0) {
+      if (!confirm(`${time} 시간대를 다시 활성화하시겠습니까?`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/booking/enable-slot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, time, capacity: 1 }),
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+          alert("✅ 시간대가 활성화되었습니다");
+          fetchSlots();
+        } else {
+          alert(`❌ ${data.message}`);
+        }
+      } catch (error) {
+        console.error("Failed to enable slot:", error);
+        alert("❌ 시간대 활성화 중 오류가 발생했습니다");
+      }
+      return;
+    }
+
+    // 일반 시간대 선택/해제
     if (selectedTime === time) {
       setSelectedTime(null);
       setBookings([]);
@@ -81,6 +108,76 @@ export default function DateDetailPage() {
       setSelectedTime(time);
       fetchBookings(time);
     }
+  };
+
+  const handleDisableSlot = async (time: string) => {
+    if (!confirm(`${time} 시간대를 비활성화하시겠습니까?\n\n비활성화하면 더 이상 예약을 받을 수 없습니다.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/booking/disable-slot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date, time }),
+      });
+
+      const data = await response.json();
+
+      if (data.ok) {
+        alert("✅ 시간대가 비활성화되었습니다");
+        setSelectedTime(null);
+        setBookings([]);
+        fetchSlots();
+      } else {
+        alert(`❌ ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Failed to disable slot:", error);
+      alert("❌ 시간대 비활성화 중 오류가 발생했습니다");
+    }
+  };
+
+  const handleDisableAllSlots = async () => {
+    if (!confirm(`${date}의 모든 시간대를 비활성화하시겠습니까?\n\n확정/대기 예약이 있는 시간대는 건너뜁니다.`)) {
+      return;
+    }
+
+    let disabledCount = 0;
+    let skippedCount = 0;
+    let errors: string[] = [];
+
+    for (const slot of slots) {
+      try {
+        const response = await fetch("/api/booking/disable-slot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, time: slot.time }),
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+          disabledCount++;
+        } else {
+          skippedCount++;
+        }
+      } catch (error) {
+        errors.push(slot.time);
+        console.error(`Failed to disable slot ${slot.time}:`, error);
+      }
+    }
+
+    const message = [
+      `✅ ${disabledCount}개 시간대가 비활성화되었습니다`,
+      skippedCount > 0 ? `⚠️ ${skippedCount}개 시간대는 예약이 있어 건너뛰었습니다` : null,
+      errors.length > 0 ? `❌ ${errors.length}개 시간대 처리 중 오류 발생` : null,
+    ].filter(Boolean).join("\n\n");
+
+    alert(message);
+    setSelectedTime(null);
+    setBookings([]);
+    fetchSlots();
   };
 
   const handleStatusChange = async (rowIndex: number, newStatus: string) => {
@@ -171,32 +268,56 @@ export default function DateDetailPage() {
           ) : (
             <>
               {/* 시간 슬롯 그리드 */}
-              <div className="mb-8">
+              <div className="mb-4">
                 <div className="grid grid-cols-3 gap-3">
                   {slots.map((slot) => {
                     const isSelected = selectedTime === slot.time;
                     const isBooked = slot.bookedCount > 0;
+                    const isDisabled = slot.capacity === 0;
 
                     return (
                       <button
                         key={slot.time}
-                        onClick={() => handleTimeClick(slot.time, slot.bookedCount)}
-                        className={`px-4 py-4 text-sm rounded-lg border-2 transition-colors ${
-                          isSelected
-                            ? "bg-purple-600 border-purple-600 text-white font-semibold"
+                        onClick={() => handleTimeClick(slot.time, slot.bookedCount, slot.capacity)}
+                        className={`px-4 py-4 text-sm rounded-lg transition-colors cursor-pointer ${
+                          isDisabled
+                            ? "bg-gray-200 text-gray-500 hover:bg-gray-300"
+                            : isSelected
+                            ? "bg-purple-600 border-2 border-purple-600 text-white font-semibold"
                             : isBooked
-                            ? "bg-white border-purple-600 text-purple-700 hover:bg-purple-50"
-                            : "border-gray-300 text-gray-400 cursor-default"
+                            ? "bg-white border-2 border-purple-600 text-purple-700 hover:bg-purple-50"
+                            : "border-2 border-gray-300 text-gray-400 hover:bg-gray-50"
                         }`}
                       >
                         <div className="font-semibold text-base">{slot.time}</div>
                         <div className="text-xs mt-1">
-                          {slot.bookedCount}/{slot.capacity}
+                          {isDisabled ? "취소됨" : `${slot.bookedCount}/${slot.capacity}`}
                         </div>
                       </button>
                     );
                   })}
                 </div>
+              </div>
+
+              {/* 비활성화 버튼들 */}
+              <div className="flex justify-end gap-2 mb-6">
+                <button
+                  onClick={handleDisableAllSlots}
+                  className="px-3 py-1 text-xs font-semibold bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  전체 취소
+                </button>
+                <button
+                  onClick={() => selectedTime && handleDisableSlot(selectedTime)}
+                  disabled={!selectedTime}
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors ${
+                    selectedTime
+                      ? "text-red-600 border-2 border-red-600 hover:bg-red-50"
+                      : "text-gray-400 border-2 border-gray-300 cursor-not-allowed"
+                  }`}
+                >
+                  선택 취소
+                </button>
               </div>
 
               {/* 예약자 현황 */}

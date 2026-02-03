@@ -356,8 +356,29 @@ export async function getAvailableTimeSlots(
     });
 
     const availableRows = availableResponse.data.values || [];
-    // 같은 날짜를 가진 모든 행 찾기
-    const dateRows = availableRows.filter((row) => row[0] === date);
+    // 같은 날짜를 가진 모든 행 찾기 (날짜와 시간이 모두 있고, capacity가 0 이상인 것만)
+    const dateRows = availableRows.filter((row, idx) => {
+      // 헤더 행은 스킵
+      if (idx === 0) return false;
+      
+      // 날짜와 시간이 모두 있어야 함
+      if (!row[0] || !row[1]) return false;
+      
+      // 해당 날짜인지 확인
+      if (row[0] !== date) return false;
+      
+      // capacity 파싱 (기본값 1)
+      let capacity = 1;
+      if (row[2]) {
+        const parsed = parseInt(row[2], 10);
+        if (!isNaN(parsed)) {
+          capacity = parsed;
+        }
+      }
+      
+      // capacity가 0이면 비활성화된 슬롯이므로 제외
+      return capacity > 0;
+    });
 
     if (!dateRows || dateRows.length === 0) {
       return { success: true, availableSlots: [] };
@@ -365,7 +386,15 @@ export async function getAvailableTimeSlots(
 
     // 각 행의 B열(시간)과 C열(용량) 추출
     const allSlots = dateRows.map((row) => row[1]).filter((slot) => slot);
-    const capacity = parseInt(dateRows[0][2] || "1", 10) || 1;
+    
+    // 첫 번째 행에서 용량 추출 (모든 시간대가 같은 용량을 가정)
+    let capacity = 1;
+    if (dateRows[0][2]) {
+      const parsed = parseInt(dateRows[0][2], 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        capacity = parsed;
+      }
+    }
 
     // 2. 리드 시트에서 해당 날짜의 예약 현황 확인
     const leadSheetName = process.env.GOOGLE_SHEET_NAME || "시트1";
@@ -404,6 +433,9 @@ export async function getAvailableTimeSlots(
       };
     });
 
+    // 디버그 로깅
+    console.log(`[getAvailableTimeSlots] date=${date}, slots=${allSlots.length}, capacity=${capacity}`);
+
     return { success: true, availableSlots };
   } catch (error: any) {
     const errorMessage =
@@ -440,20 +472,52 @@ export async function getAvailableDates(
     const availableRows = availableResponse.data.values || [];
     // 같은 날짜를 가진 모든 시간과 용량 수집
     const dateInfo = new Map<string, { times: Set<string>; capacity: number }>();
-    availableRows
-      .filter((row) => row[0] && row[0].startsWith(yearMonth))
-      .forEach((row) => {
-        const date = row[0];
-        const time = row[1];
-        const capacity = parseInt(row[2] || "1", 10) || 1;
-        
-        if (!dateInfo.has(date)) {
-          dateInfo.set(date, { times: new Set(), capacity });
+    
+    // 디버그: 첫 3개 행 확인
+    console.log(`[getAvailableDates] First 3 rows:`, availableRows.slice(0, 3));
+    
+    availableRows.forEach((row, idx) => {
+      // 헤더 행은 스킵 (첫 행이 "날짜", "시간", "용량" 같은 텍스트인 경우)
+      if (idx === 0 && row[0] && typeof row[0] === 'string' && !row[0].match(/^\d{4}-\d{2}-\d{2}$/)) {
+        console.log(`[getAvailableDates] Skipping header row:`, row);
+        return;
+      }
+      
+      const date = row[0];
+      const time = row[1];
+      let capacity = 1; // 기본값
+      
+      // 데이터 검증: 날짜와 시간이 모두 있어야 함
+      if (!date || !time) {
+        return; // 불완전한 행은 건너뜀
+      }
+      
+      // 해당 월의 날짜만 처리
+      if (!date.startsWith(yearMonth)) {
+        return;
+      }
+      
+      // capacity 안전하게 파싱
+      if (row[2]) {
+        const parsed = parseInt(row[2], 10);
+        if (!isNaN(parsed)) {
+          capacity = parsed;
         }
-        if (time) {
-          dateInfo.get(date)!.times.add(time);
-        }
-      });
+      }
+      
+      // capacity가 0이면 비활성화된 슬롯이므로 제외
+      if (capacity <= 0) {
+        return;
+      }
+      
+      // 날짜 정보 추가
+      if (!dateInfo.has(date)) {
+        dateInfo.set(date, { times: new Set(), capacity });
+      }
+      
+      // 시간대 추가
+      dateInfo.get(date)!.times.add(time);
+    });
 
     if (dateInfo.size === 0) {
       return { success: true, dates: [] };
@@ -467,9 +531,10 @@ export async function getAvailableDates(
     });
 
     const leadsRows = leadsResponse.data.values || [];
-    const bookingsByDate = new Map<string, Set<string>>();
+    // 날짜+시간별 예약 수 집계
+    const bookingCount = new Map<string, number>();
 
-    // 날짜별 예약된 시간 수집
+    // 날짜+시간별 예약 수집
     for (let i = 1; i < leadsRows.length; i++) {
       const row = leadsRows[i];
       const bookingDate = row[4];
@@ -481,28 +546,51 @@ export async function getAvailableDates(
         bookingTime &&
         (status === "대기" || status === "확정")
       ) {
-        if (!bookingsByDate.has(bookingDate)) {
-          bookingsByDate.set(bookingDate, new Set());
-        }
-        bookingsByDate.get(bookingDate)!.add(bookingTime);
+        const key = `${bookingDate}_${bookingTime}`;
+        bookingCount.set(key, (bookingCount.get(key) || 0) + 1);
       }
     }
 
+    // 디버그 로깅
+    console.log(`[getAvailableDates] yearMonth=${yearMonth}, foundDates=${dateInfo.size}, bookings=${bookingCount.size}`);
+    
+    // 디버그: 발견된 모든 날짜 출력
+    const foundDatesList = Array.from(dateInfo.keys()).sort();
+    console.log(`[getAvailableDates] Found dates:`, foundDatesList);
+    
     // 3. 각 날짜의 상태 계산
     const dates = Array.from(dateInfo.entries()).map(([date, { times, capacity }]) => {
-      const slotCount = times.size;
-      // 시간 슬롯이 없으면 선택 불가
-      if (slotCount === 0) {
+      if (times.size === 0) {
         return { date, status: "full" as const };
       }
-      const bookedCount = bookingsByDate.get(date)?.size || 0;
-      if (bookedCount === 0) {
-        return { date, status: "available" as const };
-      }
-      if (bookedCount >= slotCount * capacity) {
+
+      // 각 시간대별로 마감 여부 확인
+      let availableCount = 0;
+      let fullCount = 0;
+
+      times.forEach((time) => {
+        const key = `${date}_${time}`;
+        const booked = bookingCount.get(key) || 0;
+        if (booked >= capacity) {
+          fullCount++;
+        } else {
+          availableCount++;
+        }
+      });
+
+      // 모든 시간대가 마감이면 full
+      if (fullCount === times.size) {
         return { date, status: "full" as const };
       }
-      return { date, status: "partial" as const };
+      // 예약이 하나라도 있으면 partial
+      if (fullCount > 0 || Array.from(times).some(time => {
+        const key = `${date}_${time}`;
+        return (bookingCount.get(key) || 0) > 0;
+      })) {
+        return { date, status: "partial" as const };
+      }
+      // 예약이 없으면 available
+      return { date, status: "available" as const };
     });
 
     return { success: true, dates };

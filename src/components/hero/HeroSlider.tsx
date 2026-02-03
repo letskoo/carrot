@@ -51,9 +51,18 @@ export default function HeroSlider() {
     const timer = window.setTimeout(() => {
       setIsAnimating(false);
       setIndex((current) => {
-        if (current === 0) return total;
-        if (current === total + 1) return 1;
-        return current;
+        // 음수나 범위를 벗어난 인덱스를 안전하게 처리
+        let normalized = current;
+        while (normalized <= 0) {
+          normalized += total;
+        }
+        while (normalized > total + 1) {
+          normalized -= total;
+        }
+        
+        if (normalized === 0) return total;
+        if (normalized === total + 1) return 1;
+        return normalized;
       });
     }, TRANSITION_MS);
 
@@ -67,6 +76,12 @@ export default function HeroSlider() {
     setIsDragging(false);
 
     if (direction === 0) {
+      setDragOffset(0);
+      return;
+    }
+
+    // isAnimating 중이면 추가 드래그 방지
+    if (isAnimating) {
       setDragOffset(0);
       return;
     }
@@ -269,6 +284,8 @@ export default function HeroSlider() {
           onClick={handleImageClick}
         >
           {renderSlides.map((slide, slideIndex) => {
+            // slideIndex는 0~5이지만, 실제 위치는 index를 기준으로 계산
+            // index = 1일 때 slideIndex = 1이 중앙에 오도록 함
             const position = (slideIndex - index) * 100 + percentOffset;
             const transition =
               isDragging || !isAnimating
@@ -277,7 +294,7 @@ export default function HeroSlider() {
 
             return (
               <div
-                key={`${slide.src}-${slideIndex}`}
+                key={slideIndex}
                 className="absolute inset-0"
                 style={{
                   transform: `translateX(${position}%)`,

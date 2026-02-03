@@ -11,7 +11,6 @@ interface CalendarDay {
 
 interface BookingCalendarProps {
   onSelectDate: (date: string) => void;
-  selectedDate: string | null;
 }
 
 // 로컬 타임존 기준으로 YYYY-MM-DD 문자열 생성
@@ -24,7 +23,6 @@ function formatDateToString(date: Date): string {
 
 export default function BookingCalendar({
   onSelectDate,
-  selectedDate,
 }: BookingCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [calendarDays, setCalendarDays] = useState<CalendarDay[]>([]);
@@ -48,6 +46,12 @@ export default function BookingCalendar({
 
       if (!data.ok) {
         console.error("Failed to load booking dates:", data.message);
+        // Quota 초과 에러인 경우 빈 배열로 처리
+        if (data.message?.includes("Quota exceeded")) {
+          const days = generateCalendarGrid(currentMonth, []);
+          setCalendarDays(days);
+          return;
+        }
         return;
       }
 
@@ -109,6 +113,10 @@ export default function BookingCalendar({
         const availableDate = availableDates.find((d) => d.date === dateStr);
         if (availableDate) {
           status = availableDate.status as CalendarDay["status"];
+        } else {
+          // API에 없는 날짜는 기본적으로 disabled가 아닌 available로 처리하지 않음
+          // 즉, 예약가능시간 시트에 없으면 선택 불가
+          console.log(`[BookingCalendar] Date ${dateStr} not found in availableDates`);
         }
       }
 
@@ -148,7 +156,7 @@ export default function BookingCalendar({
   }
 
   function handleDateClick(day: CalendarDay) {
-    if (day.status === "disabled" || day.status === "full") return;
+    if (day.status === "disabled") return;
     onSelectDate(day.date);
   }
 
@@ -228,23 +236,28 @@ export default function BookingCalendar({
       {!loading && (
         <div className="grid grid-cols-7 gap-2">
           {calendarDays.map((day, index) => {
-            const isSelected = selectedDate === day.date;
             const isDisabled = day.status === "disabled";
             const isFull = day.status === "full";
-            const isAvailable = day.status === "available" || day.status === "partial";
+            const isAvailable = day.status === "available";
+            const isPartial = day.status === "partial";
+            
+            // 오늘 날짜 체크
+            const today = new Date();
+            const todayStr = formatDateToString(today);
+            const isToday = day.date === todayStr && day.isCurrentMonth;
 
             return (
               <button
                 key={`${day.date}-${index}`}
                 onClick={() => handleDateClick(day)}
-                disabled={isDisabled || isFull}
+                disabled={isDisabled}
                 className={`
                   aspect-square p-2 rounded-lg text-sm font-medium transition-all
                   ${!day.isCurrentMonth ? "text-gray-300" : ""}
                   ${isDisabled ? "text-gray-300 cursor-not-allowed" : ""}
-                  ${isFull ? "bg-purple-600 text-white cursor-not-allowed" : ""}
-                  ${isAvailable && !isSelected ? "bg-white border-2 border-gray-200 text-gray-900 hover:border-purple-400 cursor-pointer" : ""}
-                  ${isSelected ? "bg-purple-600 text-white border-2 border-purple-600 cursor-pointer" : ""}
+                  ${isFull ? "bg-purple-600 text-white cursor-pointer hover:bg-purple-700 border-2 border-purple-600" : ""}
+                  ${isToday && !isFull ? "bg-white border-2 border-purple-600 text-purple-700 cursor-pointer hover:bg-purple-50" : ""}
+                  ${(isAvailable || isPartial) && !isToday ? "bg-purple-100 border-2 border-purple-100 text-white hover:bg-purple-200 cursor-pointer" : ""}
                 `}
               >
                 <div className="flex flex-col items-center justify-center h-full">

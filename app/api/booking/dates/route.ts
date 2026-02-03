@@ -28,6 +28,15 @@ export async function GET(request: NextRequest) {
         dates: result.dates || [],
       });
     } else {
+      // Quota 초과는 일시적 문제이므로 빈 배열 반환
+      if (result.error?.includes("Quota exceeded")) {
+        return NextResponse.json({
+          ok: true,
+          dates: [],
+          message: "일시적으로 데이터를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.",
+        });
+      }
+      
       return NextResponse.json(
         {
           ok: false,
