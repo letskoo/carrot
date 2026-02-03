@@ -11,6 +11,7 @@ interface CalendarDay {
 
 interface BookingCalendarProps {
   onSelectDate: (date: string) => void;
+  selectedDate?: string; // YYYY-MM-DD
 }
 
 // 로컬 타임존 기준으로 YYYY-MM-DD 문자열 생성
@@ -23,6 +24,7 @@ function formatDateToString(date: Date): string {
 
 export default function BookingCalendar({
   onSelectDate,
+  selectedDate,
 }: BookingCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [calendarDays, setCalendarDays] = useState<CalendarDay[]>([]);
@@ -249,6 +251,8 @@ export default function BookingCalendar({
             const todayStr = formatDateToString(today);
             const isToday = day.date === todayStr && day.isCurrentMonth;
 
+            const isSelected = day.date === selectedDate && day.isCurrentMonth;
+
             return (
               <button
                 key={`${day.date}-${index}`}
@@ -264,9 +268,12 @@ export default function BookingCalendar({
                 `}
               >
                 <div className="flex flex-col items-center justify-center h-full">
-                  <span>{day.dayOfMonth}</span>
-                  {isFull && (
-                    <span className="text-[10px] mt-0.5">마감</span>
+                  {isSelected ? (
+                    <svg className="w-5 h-5 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <span>{day.dayOfMonth}</span>
                   )}
                 </div>
               </button>

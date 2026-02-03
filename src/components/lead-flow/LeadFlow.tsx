@@ -318,6 +318,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
 
               <BookingCalendar
                 onSelectDate={handleDateSelect}
+                selectedDate={formData.bookingDate}
               />
 
               {/* 선택된 예약 정보 */}
