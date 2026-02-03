@@ -1,6 +1,6 @@
 ﻿import { NextResponse } from "next/server";
 import { buildAdminConfirmEmail } from "../../../src/lib/sendEmail";
-import { getLastRowIndex, appendLeadToSheet } from "../../../lib/googleSheets";
+import { getLastRowIndex, appendLeadToSheet, getAdminSettings } from "../../../lib/googleSheets";
 
 // 선택적 기능 플래그 (환경변수 기반)
 const ENABLE_LOCAL_RECORDS = false; // 로컬 저장 비활성화 (우선순위 낮음)
@@ -151,6 +151,10 @@ export async function POST(req: Request) {
         const rowIndexResult = await getLastRowIndex();
         const rowIndex = rowIndexResult.rowIndex || 0;
 
+        // 관리자 설정에서 SMS 커스텀 메시지 가져오기
+        const settings = await getAdminSettings();
+        const smsCustomMessage = settings?.smsCustomMessage || "예약일에 만나요! :)";
+
         const { Resend } = await import("resend");
         const resend = new Resend(process.env.RESEND_API_KEY);
         
@@ -163,6 +167,7 @@ export async function POST(req: Request) {
           bookingTime,
           createdAt: new Date(),
           rowIndex,
+          smsCustomMessage,
         });
 
         const result = await resend.emails.send({

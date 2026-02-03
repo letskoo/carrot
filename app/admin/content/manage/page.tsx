@@ -20,6 +20,7 @@ interface ContentSettings {
   heroImageUrls: string[];
   profileImageUrl: string;
   benefits: Benefit[];
+  smsCustomMessage: string;
 }
 
 export default function ContentManagePage() {
@@ -33,6 +34,7 @@ export default function ContentManagePage() {
     formTitle: "신청이 완료 되었어요",
     heroImageUrls: [],
     profileImageUrl: "",
+    smsCustomMessage: "예약일에 만나요! :)",
     benefits: [
       {
         number: 1,
@@ -139,6 +141,7 @@ export default function ContentManagePage() {
         "heroImageUrls",
         "profileImageUrl",
         "benefits",
+        "smsCustomMessage",
       ];
 
       for (const key of keys) {
@@ -311,6 +314,22 @@ export default function ContentManagePage() {
                 onChange={(e) => handleChange("formTitle", e.target.value)}
                 className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
               />
+            </div>
+
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-900 mb-2">
+                SMS 추가 메시지
+              </label>
+              <textarea
+                value={settings.smsCustomMessage}
+                onChange={(e) => handleChange("smsCustomMessage", e.target.value)}
+                placeholder="예약 확정 문자에 포함될 추가 메시지를 입력하세요\n예) 당일 연락주세요: 010-1234-5678"
+                rows={3}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] resize-none"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                예약자, 날짜, 시간 정보 아래에 표시됩니다. 연락처, 주소 등 추가 정보를 입력하세요.
+              </p>
             </div>
           </div>
 

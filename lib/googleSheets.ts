@@ -717,6 +717,7 @@ export interface AdminSettings {
   heroImageUrls: string[]; // 최대 20개
   profileImageUrl: string;
   profileName: string;
+  smsCustomMessage: string; // 관리자가 추가하는 SMS 메시지
   benefits: Array<{
     number: number;
     title: string;
@@ -759,6 +760,7 @@ const ADMIN_SETTING_KEY_TO_LABEL: Record<string, string> = {
   heroImageUrls: "히어로 이미지",
   profileImageUrl: "프로필 이미지",
   profileName: "프로필 이름",
+  smsCustomMessage: "SMS 추가 메시지",
   benefits: "혜택 항목",
   consentDetails: "개인정보 동의",
   languages: "언어 설정",
@@ -848,6 +850,7 @@ export async function setupAdminSettingsSheet(): Promise<void> {
         [ADMIN_SETTING_KEY_TO_LABEL.heroImageUrls, ""],
         [ADMIN_SETTING_KEY_TO_LABEL.profileImageUrl, ""],
         [ADMIN_SETTING_KEY_TO_LABEL.profileName, "포토그루브"],
+        [ADMIN_SETTING_KEY_TO_LABEL.smsCustomMessage, "예약일에 만나요! :)"],
         [ADMIN_SETTING_KEY_TO_LABEL.benefits, ""],
         [ADMIN_SETTING_KEY_TO_LABEL.consentDetails, ""],
         [ADMIN_SETTING_KEY_TO_LABEL.languages, ""],
@@ -855,7 +858,7 @@ export async function setupAdminSettingsSheet(): Promise<void> {
 
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${sheetName}!A1:B14`,
+        range: `${sheetName}!A1:B15`,
         valueInputOption: "USER_ENTERED",
         requestBody: {
           values: defaultSettings,

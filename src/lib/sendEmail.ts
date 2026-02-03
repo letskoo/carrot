@@ -41,7 +41,7 @@ function formatKSTDateTime(date: Date): string {
  * - 바로 확정 버튼 (클릭 시 POST /api/booking/confirm 호출)
  * - 문자 발송 템플릿 (복사 가능)
  */
-export function buildAdminConfirmEmail(payload: LeadEmailPayload & { rowIndex: number }): {
+export function buildAdminConfirmEmail(payload: LeadEmailPayload & { rowIndex: number; smsCustomMessage?: string }): {
   subject: string;
   text: string;
   html: string;
@@ -57,8 +57,7 @@ export function buildAdminConfirmEmail(payload: LeadEmailPayload & { rowIndex: n
 안녕하세요! 예약이 확정되었습니다.
 • 예약자: ${payload.name}
 • 날짜: ${payload.bookingDate}
-• 시간: ${payload.bookingTime}
-• 확인: ${confirmLink}`;
+• 시간: ${payload.bookingTime}${payload.smsCustomMessage ? `\n\n${payload.smsCustomMessage}` : ''}`;
 
   const smsLink = `sms:${payload.phone}?body=${encodeURIComponent(smsTemplate)}`;
 
