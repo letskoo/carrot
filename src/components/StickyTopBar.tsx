@@ -83,7 +83,7 @@ export default function StickyTopBar({ maxWidthClass = "lg:max-w-[1100px]", isAd
             )}
 
             {/* 오른쪽: 언어 선택 드롭다운 */}
-            {availableLanguages && (
+            {availableLanguages.length > 1 && (
               <select
                 value={currentLanguage}
                 onChange={(e) => setLanguage(e.target.value as any)}

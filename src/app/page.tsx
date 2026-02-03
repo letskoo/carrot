@@ -6,6 +6,10 @@ import { useLanguage } from "@/contexts/LanguageContext";
 export default function Home() {
   const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
 
+  console.log("[Home Page] availableLanguages:", availableLanguages);
+  console.log("[Home Page] availableLanguages.length:", availableLanguages.length);
+  console.log("[Home Page] Show dropdown?:", availableLanguages.length > 1);
+
   const languageNames = {
     ko: "🇰🇷 한국어",
     en: "🇬🇧 EN",
@@ -17,7 +21,7 @@ export default function Home() {
     <main className="min-h-screen bg-white">
       {/* 헤더: 언어 선택 드롭다운 */}
       <div className="pt-4 pb-2 px-4 flex justify-end max-w-[640px] mx-auto">
-        {availableLanguages && (
+        {availableLanguages.length > 1 && (
           <select
             value={currentLanguage}
             onChange={(e) => setLanguage(e.target.value as any)}

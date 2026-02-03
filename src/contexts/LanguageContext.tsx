@@ -29,11 +29,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         const response = await fetch("/api/admin/settings");
         const data = await response.json();
 
+        console.log("[LanguageContext] API Response:", data);
+
         if (data.ok && data.settings?.languages) {
           const savedLanguages: LanguageSettingsMap =
             typeof data.settings.languages === "string"
               ? (JSON.parse(data.settings.languages) as LanguageSettingsMap)
               : (data.settings.languages as LanguageSettingsMap);
+
+          console.log("[LanguageContext] Parsed languages:", savedLanguages);
 
           const enabled = Object.entries(savedLanguages || {})
             .filter(([, value]) => value?.enabled)
@@ -42,9 +46,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
               ["ko", "en", "ja", "zh"].includes(key)
             );
 
+          console.log("[LanguageContext] Enabled languages:", enabled);
+
           const unique: Language[] = Array.from(
             new Set<Language>(["ko", ...enabled])
           );
+          
+          console.log("[LanguageContext] Final available languages:", unique);
           setAvailableLanguages(unique);
           return;
         }

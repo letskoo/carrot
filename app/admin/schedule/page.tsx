@@ -92,6 +92,14 @@ export default function AdminSchedulePage() {
               >
                 {loading ? "로그인 중..." : "로그인"}
               </button>
+
+              <button
+                type="button"
+                onClick={() => router.push("/")}
+                className="block mx-auto text-xs text-gray-400 font-medium hover:text-gray-500 transition-colors cursor-pointer mt-2"
+              >
+                돌아가기 →
+              </button>
             </form>
         </div>
       </div>
