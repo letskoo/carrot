@@ -144,31 +144,17 @@ export default function AdminSchedulePage() {
             </button>
           </div>
 
-          {/* 3. 비밀번호 변경 */}
+          {/* 3. 비밀번호 변경 및 기타 설정 */}
           <div className="flex flex-col py-6 border-b border-gray-200">
             <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">비밀번호 변경</h2>
-              <p className="text-sm text-gray-500">관리자 로그인 비밀번호를 변경합니다</p>
+              <h2 className="text-lg font-bold text-gray-900 mb-1">비밀번호 변경 및 기타 설정</h2>
+              <p className="text-sm text-gray-500">비밀번호, 다국어, SMS 안내사항을 설정합니다</p>
             </div>
             <button 
               onClick={() => router.push("/admin/password/change")}
               className="mt-4 text-purple-600 text-sm font-semibold hover:text-purple-700 transition-colors text-left cursor-pointer"
             >
-              비밀번호 변경 →
-            </button>
-          </div>
-
-          {/* 4. 다국어 설정 */}
-          <div className="flex flex-col py-6 border-b border-gray-200">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">다국어 설정</h2>
-              <p className="text-sm text-gray-500">각 언어별 콘텐츠를 설정합니다</p>
-            </div>
-            <button 
-              onClick={() => router.push("/admin/language/manage")}
-              className="mt-4 text-purple-600 text-sm font-semibold hover:text-purple-700 transition-colors text-left cursor-pointer"
-            >
-              언어 설정하기 →
+              설정하기 →
             </button>
           </div>
         </div>
