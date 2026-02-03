@@ -113,11 +113,14 @@ export default function BookingCalendar({
         const availableDate = availableDates.find((d) => d.date === dateStr);
         if (availableDate) {
           status = availableDate.status as CalendarDay["status"];
+          console.log(`[BookingCalendar] Date ${dateStr}: status=${status}, isToday=${dateStr === formatDateToString(today)}`);
         } else {
           // API에 없는 날짜는 기본적으로 disabled가 아닌 available로 처리하지 않음
           // 즉, 예약가능시간 시트에 없으면 선택 불가
           console.log(`[BookingCalendar] Date ${dateStr} not found in availableDates`);
         }
+      } else {
+        console.log(`[BookingCalendar] Date ${dateStr} is in the past, status=disabled`);
       }
 
       days.push({

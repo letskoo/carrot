@@ -505,18 +505,15 @@ export async function getAvailableDates(
         }
       }
       
-      // capacity가 0이면 비활성화된 슬롯이므로 제외
-      if (capacity <= 0) {
-        return;
-      }
-      
       // 날짜 정보 추가
       if (!dateInfo.has(date)) {
         dateInfo.set(date, { times: new Set(), capacity });
       }
       
-      // 시간대 추가
-      dateInfo.get(date)!.times.add(time);
+      // 시간대 추가 (capacity가 0 이상인 경우만)
+      if (capacity > 0) {
+        dateInfo.get(date)!.times.add(time);
+      }
     });
 
     if (dateInfo.size === 0) {
