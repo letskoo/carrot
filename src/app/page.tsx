@@ -1,10 +1,37 @@
 "use client";
 
 import HeroSlider from "@/components/HeroSlider";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Home() {
+  const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
+
+  const languageNames = {
+    ko: "🇰🇷 한국어",
+    en: "🇬🇧 EN",
+    ja: "🇯🇵 日本語",
+    zh: "🇨🇳 中文",
+  };
+
   return (
     <main className="min-h-screen bg-white">
+      {/* 헤더: 언어 선택 드롭다운 */}
+      <div className="pt-4 pb-2 px-4 flex justify-end max-w-[640px] mx-auto">
+        {availableLanguages && (
+          <select
+            value={currentLanguage}
+            onChange={(e) => setLanguage(e.target.value as any)}
+            className="text-[12px] font-semibold text-gray-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer"
+          >
+            {availableLanguages.map((lang) => (
+              <option key={lang} value={lang}>
+                {languageNames[lang]}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+
       <HeroSlider />
 
       <section className="px-4 py-8">

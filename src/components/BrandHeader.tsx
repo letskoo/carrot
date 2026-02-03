@@ -2,18 +2,9 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function BrandHeader() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
-
-  const languageNames = {
-    ko: "🇰🇷 한국어",
-    en: "🇬🇧 EN",
-    ja: "🇯🇵 日本語",
-    zh: "🇨🇳 中文",
-  };
 
   useEffect(() => {
     if (isModalOpen) {
@@ -44,20 +35,6 @@ export default function BrandHeader() {
             </button>
             <span className="text-[13px] font-medium text-gray-900 lg:text-base">포토그루브</span>
           </div>
-
-          {availableLanguages.length > 1 && (
-            <select
-              value={currentLanguage}
-              onChange={(e) => setLanguage(e.target.value as any)}
-              className="text-[12px] font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-purple-600 cursor-pointer"
-            >
-              {availableLanguages.map((lang) => (
-                <option key={lang} value={lang}>
-                  {languageNames[lang]}
-                </option>
-              ))}
-            </select>
-          )}
         </div>
       </div>
 

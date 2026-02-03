@@ -57,7 +57,8 @@ export default function StickyTopBar({ maxWidthClass = "lg:max-w-[1100px]", isAd
     >
       <div className={`flex items-center h-14 w-full ${maxWidthClass}`}>
         <div className="px-4 w-full">
-          <div className="max-w-[640px] mx-auto flex items-center justify-between">
+          <div className="max-w-[640px] mx-auto h-full flex items-center justify-between">
+            {/* 왼쪽: 뒤로가기 또는 관리자 로그인 */}
             {isAdminPage ? (
               <button
                 onClick={handleAdminLogin}
@@ -81,12 +82,12 @@ export default function StickyTopBar({ maxWidthClass = "lg:max-w-[1100px]", isAd
               </button>
             )}
 
-            {/* 언어 선택 드롭다운 (관리자 페이지가 아닐 때만 표시) */}
-            {!isAdminPage && availableLanguages.length > 1 && (
+            {/* 오른쪽: 언어 선택 드롭다운 */}
+            {availableLanguages && (
               <select
                 value={currentLanguage}
                 onChange={(e) => setLanguage(e.target.value as any)}
-                className="text-sm font-semibold text-gray-700 bg-transparent border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:border-purple-600"
+                className="text-[12px] font-semibold text-gray-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer"
               >
                 {availableLanguages.map((lang) => (
                   <option key={lang} value={lang}>
