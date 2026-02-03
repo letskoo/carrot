@@ -10,7 +10,6 @@ interface LanguageContextType {
   currentLanguage: Language;
   setLanguage: (lang: Language) => void;
   availableLanguages: Language[];
-  setAvailableLanguages: (langs: Language[]) => void;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
@@ -23,21 +22,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     "ko",
   ]);
 
+  // 초기 로드 + BroadcastChannel + storage event 감지
   useEffect(() => {
-    const loadAvailableLanguages = async () => {
+    const loadLanguages = async () => {
       try {
         const response = await fetch("/api/admin/settings");
         const data = await response.json();
 
-        console.log("[LanguageContext] API Response:", data);
-
         if (data.ok && data.settings?.languages) {
           const savedLanguages: LanguageSettingsMap =
             typeof data.settings.languages === "string"
-              ? (JSON.parse(data.settings.languages) as LanguageSettingsMap)
-              : (data.settings.languages as LanguageSettingsMap);
-
-          console.log("[LanguageContext] Parsed languages:", savedLanguages);
+              ? JSON.parse(data.settings.languages)
+              : data.settings.languages;
 
           const enabled = Object.entries(savedLanguages || {})
             .filter(([, value]) => value?.enabled)
@@ -46,31 +42,61 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
               ["ko", "en", "ja", "zh"].includes(key)
             );
 
-          console.log("[LanguageContext] Enabled languages:", enabled);
-
-          const unique: Language[] = Array.from(
+          // 항상 'ko' 포함, 중복 제거
+          const unique = Array.from(
             new Set<Language>(["ko", ...enabled])
           );
-          
-          console.log("[LanguageContext] Final available languages:", unique);
+
+          console.log("[LanguageContext] Loaded languages:", unique);
           setAvailableLanguages(unique);
-          return;
         }
       } catch (error) {
-        console.error("Failed to load available languages:", error);
+        console.error("[LanguageContext] Failed to load languages:", error);
       }
-
-      setAvailableLanguages(["ko"]);
     };
 
-    loadAvailableLanguages();
+    loadLanguages();
+
+    // BroadcastChannel로 모든 탭에서 즉시 동기화
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel("language-settings-channel");
+      const handleBroadcast = (event: MessageEvent) => {
+        if (event.data.type === "language-updated") {
+          console.log("[LanguageContext] BroadcastChannel received language update");
+          loadLanguages();
+        }
+      };
+      channel.onmessage = handleBroadcast;
+    } catch (error) {
+      console.warn("[LanguageContext] BroadcastChannel not supported:", error);
+    }
+
+    // 다른 탭에서 admin-settings-updated 변경 감지 (폴백)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "admin-settings-updated") {
+        console.log("[LanguageContext] Storage event detected, reloading...");
+        loadLanguages();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      if (channel) {
+        channel.close();
+      }
+    };
   }, []);
 
+  // 저장된 언어 설정 복원
   useEffect(() => {
-    // 로컬 스토리지에서 언어 설정 불러오기
     const savedLang = localStorage.getItem("user_language") as Language;
     if (savedLang && availableLanguages.includes(savedLang)) {
       setCurrentLanguage(savedLang);
+    } else {
+      setCurrentLanguage("ko");
     }
   }, [availableLanguages]);
 
@@ -85,7 +111,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         currentLanguage,
         setLanguage,
         availableLanguages,
-        setAvailableLanguages,
       }}
     >
       {children}

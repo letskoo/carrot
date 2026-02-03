@@ -193,43 +193,64 @@ export default function SettingsPage() {
     }
   };
 
-  const handleLanguageSave = async () => {
-    setLoading(true);
+  const handleToggleLanguage = async (lang: "ko" | "en" | "ja" | "zh") => {
+    // UI 즉시 업데이트
+    const updatedLanguages = {
+      ...languages,
+      [lang]: {
+        ...languages[lang],
+        enabled: !languages[lang].enabled,
+      },
+    };
+    setLanguages(updatedLanguages);
 
+    // 즉시 API 저장
     try {
       const response = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           key: "languages",
-          value: languages,
+          value: updatedLanguages,
         }),
       });
 
       if (response.ok) {
-        setMessage("✅ 언어 설정이 저장되었습니다");
-        setTimeout(() => setMessage(""), 3000);
+        console.log(`[Admin] Language ${lang} toggled and saved`);
+        
+        // BroadcastChannel로 모든 탭에 즉시 알림
+        try {
+          const channel = new BroadcastChannel("language-settings-channel");
+          channel.postMessage({ type: "language-updated" });
+          channel.close();
+          console.log("[Admin] BroadcastChannel sent language update message");
+        } catch (error) {
+          console.warn("[Admin] BroadcastChannel not available, using localStorage fallback");
+          // 폴백: localStorage 마크 남겨 다른 탭에서 감지하도록
+          localStorage.setItem("admin-settings-updated", Date.now().toString());
+        }
       } else {
-        setMessage("❌ 저장에 실패했습니다");
-        setTimeout(() => setMessage(""), 3000);
+        console.error(`[Admin] Failed to save language ${lang}`);
+        // 실패 시 UI 되돌리기
+        setLanguages({
+          ...languages,
+          [lang]: {
+            ...languages[lang],
+            enabled: !updatedLanguages[lang].enabled,
+          },
+        });
       }
     } catch (error) {
-      console.error("Failed to save languages:", error);
-      setMessage("❌ 저장 중 오류가 발생했습니다");
-      setTimeout(() => setMessage(""), 3000);
-    } finally {
-      setLoading(false);
+      console.error("[Admin] Toggle language error:", error);
+      // 실패 시 UI 되돌리기
+      setLanguages({
+        ...languages,
+        [lang]: {
+          ...languages[lang],
+          enabled: !updatedLanguages[lang].enabled,
+        },
+      });
     }
-  };
-
-  const handleToggleLanguage = (lang: "ko" | "en" | "ja" | "zh") => {
-    setLanguages((prev) => ({
-      ...prev,
-      [lang]: {
-        ...prev[lang],
-        enabled: !prev[lang].enabled,
-      },
-    }));
   };
 
   const languageNames = {
@@ -356,16 +377,6 @@ export default function SettingsPage() {
                   </span>
                 </label>
               ))}
-            </div>
-
-            <div className="flex justify-center">
-              <button
-                onClick={handleLanguageSave}
-                disabled={loading}
-                className="w-auto px-6 h-8 rounded-lg bg-[#7c3aed] text-xs font-semibold text-white hover:bg-[#6d28d9] transition-colors disabled:bg-gray-300"
-              >
-                {loading ? "저장 중..." : "언어 설정 저장"}
-              </button>
             </div>
           </div>
 

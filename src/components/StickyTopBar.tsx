@@ -82,20 +82,18 @@ export default function StickyTopBar({ maxWidthClass = "lg:max-w-[1100px]", isAd
               </button>
             )}
 
-            {/* 오른쪽: 언어 선택 드롭다운 */}
-            {availableLanguages.length > 1 && (
-              <select
-                value={currentLanguage}
-                onChange={(e) => setLanguage(e.target.value as any)}
-                className="text-[12px] font-semibold text-gray-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer"
-              >
-                {availableLanguages.map((lang) => (
-                  <option key={lang} value={lang}>
-                    {languageNames[lang]}
-                  </option>
-                ))}
-              </select>
-            )}
+            {/* 오른쪽: 언어 선택 드롭다운 (항상 표시) */}
+            <select
+              value={currentLanguage}
+              onChange={(e) => setLanguage(e.target.value as any)}
+              className="text-[12px] font-semibold text-gray-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer"
+            >
+              {availableLanguages.map((lang) => (
+                <option key={lang} value={lang}>
+                  {languageNames[lang]}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>

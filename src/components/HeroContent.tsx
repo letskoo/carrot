@@ -56,7 +56,7 @@ export default function HeroContent() {
   }, [statsVersion]);
 
   const statsText = loading
-    ? "신청자 수 불러오는 중…"
+    ? "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)"
     : stats
     ? `최근 한달간 ${stats.last30DaysCount}명 신청 중 ( 누적 ${stats.totalCount}명 )`
     : "전국 가맹점이 신청 중입니다";

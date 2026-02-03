@@ -917,7 +917,7 @@ export async function getAdminSettings(): Promise<AdminSettings | null> {
     });
 
     if (!response.data.values || response.data.values.length < 2) {
-      console.warn("[getAdminSettings] No data found");
+      console.warn("[getAdminSettings] No data found, returning null");
       return null;
     }
 
@@ -925,22 +925,26 @@ export async function getAdminSettings(): Promise<AdminSettings | null> {
     const settings: any = {};
 
     for (let i = 1; i < rows.length; i++) {
-      const [rawKey, value] = rows[i];
-      if (rawKey) {
-        const key = ADMIN_SETTING_LABEL_TO_KEY[rawKey] || rawKey;
-        // JSON 형태의 값 파싱
-        try {
-          settings[key] = value ? JSON.parse(value) : value;
-        } catch {
-          // JSON 파싱 실패 시 문자열로 저장
-          settings[key] = value;
-        }
+      const row = rows[i];
+      if (!row || !row[0]) continue; // 빈 행 스킵
+      
+      const rawKey = row[0];
+      const value = row[1];
+      const key = ADMIN_SETTING_LABEL_TO_KEY[rawKey] || rawKey;
+      
+      // JSON 형태의 값 파싱
+      try {
+        settings[key] = value ? JSON.parse(value) : value;
+      } catch {
+        // JSON 파싱 실패 시 문자열로 저장
+        settings[key] = value;
       }
     }
 
-    return settings as AdminSettings;
+    console.log("[getAdminSettings] Loaded settings:", Object.keys(settings));
+    return Object.keys(settings).length > 0 ? (settings as AdminSettings) : null;
   } catch (error: any) {
-    console.error("[getAdminSettings] Error:", error);
+    console.error("[getAdminSettings] Error:", error.message);
     return null;
   }
 }

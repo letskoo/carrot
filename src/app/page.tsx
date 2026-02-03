@@ -6,10 +6,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 export default function Home() {
   const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
 
-  console.log("[Home Page] availableLanguages:", availableLanguages);
-  console.log("[Home Page] availableLanguages.length:", availableLanguages.length);
-  console.log("[Home Page] Show dropdown?:", availableLanguages.length > 1);
-
   const languageNames = {
     ko: "🇰🇷 한국어",
     en: "🇬🇧 EN",
@@ -19,21 +15,19 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-white">
-      {/* 헤더: 언어 선택 드롭다운 */}
+      {/* 헤더: 언어 선택 드롭다운 (항상 표시) */}
       <div className="pt-4 pb-2 px-4 flex justify-end max-w-[640px] mx-auto">
-        {availableLanguages.length > 1 && (
-          <select
-            value={currentLanguage}
-            onChange={(e) => setLanguage(e.target.value as any)}
-            className="text-[12px] font-semibold text-gray-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer"
-          >
-            {availableLanguages.map((lang) => (
-              <option key={lang} value={lang}>
-                {languageNames[lang]}
-              </option>
-            ))}
-          </select>
-        )}
+        <select
+          value={currentLanguage}
+          onChange={(e) => setLanguage(e.target.value as any)}
+          className="text-[12px] font-semibold text-gray-300 bg-white rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer"
+        >
+          {availableLanguages.map((lang) => (
+            <option key={lang} value={lang}>
+              {languageNames[lang]}
+            </option>
+          ))}
+        </select>
       </div>
 
       <HeroSlider />

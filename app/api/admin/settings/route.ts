@@ -12,26 +12,18 @@ import {
  */
 export async function GET(request: NextRequest) {
   try {
-    // 관리자 설정 탭이 없으면 생성
-    await setupAdminSettingsSheet();
-    
+    // setupAdminSettingsSheet() 제거 - 이미 설정되어 있고, quota 낭비
     const settings = await getAdminSettings();
 
-    if (!settings) {
-      return NextResponse.json(
-        { ok: false, message: "설정을 불러올 수 없습니다" },
-        { status: 500 }
-      );
-    }
-
+    // settings가 null이어도 빈 객체로 반환 (초기 로드 시)
     return NextResponse.json({
       ok: true,
-      settings,
+      settings: settings || {},
     });
   } catch (error: any) {
     console.error("[admin/settings] GET Error:", error);
     return NextResponse.json(
-      { ok: false, message: "서버 오류가 발생했습니다" },
+      { ok: false, message: "서버 오류가 발생했습니다", error: error.message },
       { status: 500 }
     );
   }
