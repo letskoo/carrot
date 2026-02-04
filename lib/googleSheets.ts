@@ -624,6 +624,24 @@ export async function generateBookingTimesFromSettings(settings: {
     const sheets = getSheetsClient();
     const sheetName = "예약가능시간";
 
+    // 헤더 행이 없으면 추가 (A1: 날짜, B1: 시간, C1: 용량)
+    const headerRange = `${sheetName}!A1:C1`;
+    const headerResponse = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: headerRange,
+    });
+    const headerValues = headerResponse.data.values || [];
+    if (!headerValues.length || headerValues[0][0] !== "날짜") {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: headerRange,
+        valueInputOption: "USER_ENTERED",
+        requestBody: {
+          values: [["날짜", "시간", "용량"]],
+        },
+      });
+    }
+
     // 날짜 파싱
     const start = new Date(settings.startDate);
     const end = new Date(settings.endDate);

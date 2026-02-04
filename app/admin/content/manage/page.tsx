@@ -226,17 +226,41 @@ export default function ContentManagePage() {
 
       const textsToTranslate = [...baseTexts, ...benefitTexts, ...consentTexts];
 
-      // 3. MyMemory API로 번역 (한국어 → 영어, 일본어, 중국어)
+      // 3. Google Cloud Translation API로 번역 (한국어 → 영어, 일본어, 중국어)
       const translateText = async (text: string, targetLang: string) => {
         try {
+          const apiKey = process.env.NEXT_PUBLIC_GOOGLE_TRANSLATE_API_KEY;
+          
+          if (!apiKey) {
+            console.warn("Google Translate API key not found, using original Korean text");
+            return text;
+          }
+          
           const response = await fetch(
-            `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ko|${targetLang}`
+            `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                q: text,
+                source: "ko",
+                target: targetLang,
+                format: "text",
+              }),
+            }
           );
+          
           const data = await response.json();
-          return data.responseData.translatedText || text;
+          
+          if (data.error) {
+            console.error(`Google Translate API error:`, data.error);
+            return text; // 에러시 원본 한국어 반환
+          }
+          
+          return data.data?.translations?.[0]?.translatedText || text;
         } catch (err) {
           console.error(`Translation failed for "${text}" to ${targetLang}:`, err);
-          return text;
+          return text; // 에러시 원본 한국어 반환
         }
       };
 
@@ -244,7 +268,7 @@ export default function ContentManagePage() {
       const [enTexts, jaTexts, zhTexts] = await Promise.all([
         Promise.all(textsToTranslate.map(t => translateText(t, "en"))),
         Promise.all(textsToTranslate.map(t => translateText(t, "ja"))),
-        Promise.all(textsToTranslate.map(t => translateText(t, "zh"))),
+        Promise.all(textsToTranslate.map(t => translateText(t, "zh-CN"))), // Google API는 zh-CN 사용
       ]);
 
       // 5. 번역된 텍스트로 콘텐츠 객체 생성
@@ -489,6 +513,15 @@ export default function ContentManagePage() {
                   ...prev,
                   heroImageUrls: urls,
                 }));
+                // 업로드 후 즉시 저장
+                await fetch("/api/admin/settings", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    key: "heroImageUrls",
+                    value: urls,
+                  }),
+                });
               }}
             />
 
@@ -501,6 +534,15 @@ export default function ContentManagePage() {
                   ...prev,
                   profileImageUrl: urls[0] || "",
                 }));
+                // 업로드 후 즉시 저장
+                await fetch("/api/admin/settings", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    key: "profileImageUrl",
+                    value: urls[0] || "",
+                  }),
+                });
               }}
             />
           </div>

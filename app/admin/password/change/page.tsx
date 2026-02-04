@@ -37,8 +37,8 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   
-  // 기본 언어 상태
-  const [defaultLanguage, setDefaultLanguage] = useState<"ko" | "en" | "ja" | "zh">("ko");
+  // 기본 언어 상태 (초기값 undefined, 하드코딩 제거)
+  const [defaultLanguage, setDefaultLanguage] = useState<"ko" | "en" | "ja" | "zh" | undefined>(undefined);
   
   // SMS 커스텀 메시지 상태
   const [smsCustomMessage, setSmsCustomMessage] = useState("예약일에 만나요! :)");
@@ -169,15 +169,21 @@ export default function SettingsPage() {
               savedStatsTemplate.includes("{count1}") && 
               savedStatsTemplate.includes("{count2}");
             
-            if (!isStatsTemplateValid) {
-              console.warn(`[Admin] ${lang} statsTemplate is corrupted, using default`);
+            // 일반 필드 검증: MYMEMORY WARNING 같은 에러 메시지 감지
+            const savedContent = savedLanguages[lang]?.content || {};
+            const hasApiError = Object.values(savedContent).some(value => 
+              typeof value === 'string' && (value.includes("MYMEMORY") || value.includes("WARNING") || value.includes("LIMIT"))
+            );
+            
+            if (!isStatsTemplateValid || hasApiError) {
+              console.warn(`[Admin] ${lang} content is corrupted (statsTemplate invalid or API error detected), using default`);
               needsUpdate = true;
             }
             
             // content 병합
             const mergedContent = {
               ...mergedLanguages[lang].content, // 기본값 먼저
-              ...(isStatsTemplateValid ? savedLanguages[lang]?.content : {}), // 손상되지 않았으면 Google Sheets 값 사용
+              ...(isStatsTemplateValid && !hasApiError ? savedLanguages[lang]?.content : {}), // 손상되지 않았으면 Google Sheets 값 사용
             };
             
             mergedLanguages[lang] = {

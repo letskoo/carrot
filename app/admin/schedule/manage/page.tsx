@@ -380,7 +380,11 @@ export default function ScheduleManagePage() {
                           return (
                             <div
                               key={`start-${value}`}
-                              className="h-9 rounded-md text-sm text-gray-900 flex items-center justify-center"
+                              className="h-9 rounded-md text-sm text-gray-900 flex items-center justify-center cursor-pointer hover:bg-purple-100"
+                              onClick={() => {
+                                setStartDate(value);
+                                setOpenPicker(null);
+                              }}
                             >
                               {date.getDate()}
                             </div>
@@ -482,7 +486,11 @@ export default function ScheduleManagePage() {
                           return (
                             <div
                               key={`end-${value}`}
-                              className="h-9 rounded-md text-sm text-gray-900 flex items-center justify-center"
+                              className="h-9 rounded-md text-sm text-gray-900 flex items-center justify-center cursor-pointer hover:bg-purple-100"
+                              onClick={() => {
+                                setEndDate(value);
+                                setOpenPicker(null);
+                              }}
                             >
                               {date.getDate()}
                             </div>
