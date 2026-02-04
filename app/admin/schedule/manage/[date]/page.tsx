@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TimeSlot {
   date: string;
@@ -25,6 +26,7 @@ interface Booking {
 export default function DateDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const { languageContent } = useLanguage();
   const date = params.date as string;
 
   const [slots, setSlots] = useState<TimeSlot[]>([]);
@@ -74,7 +76,8 @@ export default function DateDetailPage() {
   const handleTimeClick = async (time: string, bookedCount: number, capacity: number) => {
     // capacity가 0이면 취소된 슬롯이므로 재활성화
     if (capacity === 0) {
-      if (!confirm(`${time} 시간대를 다시 활성화하시겠습니까?`)) {
+      const message = (languageContent?.enableSlotConfirmMessage || "{time} 시간대를 다시 활성화하습니까?").replace("{time}", time);
+      if (!confirm(message)) {
         return;
       }
 
@@ -88,14 +91,14 @@ export default function DateDetailPage() {
         const data = await response.json();
 
         if (data.ok) {
-          alert("✅ 시간대가 활성화되었습니다");
+          alert(languageContent?.enabledSlotMessage || "✅ 시간대가 활성화되었습니다");
           fetchSlots();
         } else {
           alert(`❌ ${data.message}`);
         }
       } catch (error) {
         console.error("Failed to enable slot:", error);
-        alert("❌ 시간대 활성화 중 오류가 발생했습니다");
+        alert(languageContent?.enableSlotErrorMessage || "❌ 시간대 활성화 중 오류가 발생했습니다");
       }
       return;
     }
@@ -111,7 +114,8 @@ export default function DateDetailPage() {
   };
 
   const handleDisableSlot = async (time: string) => {
-    if (!confirm(`${time} 시간대를 비활성화하시겠습니까?\n\n비활성화하면 더 이상 예약을 받을 수 없습니다.`)) {
+    const message = (languageContent?.disableSlotConfirmMessage || "{time} 시간대를 비활성화하습니까?\n\n비활성화하면 더 이상 예약을 받을 수 없습니다.").replace("{time}", time);
+    if (!confirm(message)) {
       return;
     }
 
@@ -125,7 +129,7 @@ export default function DateDetailPage() {
       const data = await response.json();
 
       if (data.ok) {
-        alert("✅ 시간대가 비활성화되었습니다");
+        alert(languageContent?.disabledSlotMessage || "✅ 시간대가 비활성화되었습니다");
         setSelectedTime(null);
         setBookings([]);
         fetchSlots();
@@ -134,12 +138,13 @@ export default function DateDetailPage() {
       }
     } catch (error) {
       console.error("Failed to disable slot:", error);
-      alert("❌ 시간대 비활성화 중 오류가 발생했습니다");
+      alert(languageContent?.disableSlotErrorMessage || "❌ 시간대 비활성화 중 오류가 발생했습니다");
     }
   };
 
   const handleDisableAllSlots = async () => {
-    if (!confirm(`${date}의 모든 시간대를 비활성화하시겠습니까?\n\n확정/대기 예약이 있는 시간대는 건너뜁니다.`)) {
+    const message = (languageContent?.disableAllSlotsConfirmMessage || "{date}의 모든 시간대를 비활성화하습니까?\n\n확정/대기 예약이 있는 시간대는 건너든닙니다.").replace("{date}", date);
+    if (!confirm(message)) {
       return;
     }
 
@@ -168,13 +173,13 @@ export default function DateDetailPage() {
       }
     }
 
-    const message = [
-      `✅ ${disabledCount}개 시간대가 비활성화되었습니다`,
-      skippedCount > 0 ? `⚠️ ${skippedCount}개 시간대는 예약이 있어 건너뛰었습니다` : null,
-      errors.length > 0 ? `❌ ${errors.length}개 시간대 처리 중 오류 발생` : null,
+    const alertMessage = [
+      (languageContent?.disabledAllSlotMessage || "✅ {count}개 시간대가 비활성화되었습니다").replace("{count}", disabledCount.toString()),
+      skippedCount > 0 ? (languageContent?.skippedCountMessage || "⚠️ {count}개 시간대는 예약이 있어 건너뛰었습니다").replace("{count}", skippedCount.toString()) : null,
+      errors.length > 0 ? (languageContent?.errorCountMessage || "❌ {count}개 시간대 처리 중 오류 발생").replace("{count}", errors.length.toString()) : null,
     ].filter(Boolean).join("\n\n");
 
-    alert(message);
+    alert(alertMessage);
     setSelectedTime(null);
     setBookings([]);
     fetchSlots();
@@ -209,7 +214,7 @@ export default function DateDetailPage() {
   };
 
   const handleDeleteBooking = async (rowIndex: number) => {
-    if (!confirm("이 예약을 삭제하시겠습니까?")) return;
+    if (!confirm(languageContent?.deleteConfirmMessage?.replace("{count}", "1") || "이 예약을 삭제하시겠습니까?")) return;
 
     // 낙관적 업데이트: 즉시 리스트에서 제거
     const originalBookings = bookings;
@@ -260,10 +265,10 @@ export default function DateDetailPage() {
         <div className="max-w-[640px] mx-auto">
           
           {loading ? (
-            <div className="text-center py-12 text-gray-500">로딩 중...</div>
+            <div className="text-center py-12 text-gray-500">{languageContent?.loadingText || "로딩 중..."}</div>
           ) : slots.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
-              이 날짜에 예약 가능한 시간이 없습니다
+              {languageContent?.noAvailableSlots || "이 날짜에 예약 가능한 시간이 없습니다"}
             </div>
           ) : (
             <>
@@ -291,7 +296,7 @@ export default function DateDetailPage() {
                       >
                         <div className="font-semibold text-base">{slot.time}</div>
                         <div className="text-xs mt-1">
-                          {isDisabled ? "취소됨" : `${slot.bookedCount}/${slot.capacity}`}
+                          {isDisabled ? (languageContent?.cancelledLabel || "취소됨") : `${slot.bookedCount}/${slot.capacity}`}
                         </div>
                       </button>
                     );
@@ -305,7 +310,7 @@ export default function DateDetailPage() {
                   onClick={handleDisableAllSlots}
                   className="px-3 py-1 text-xs font-semibold bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
-                  전체 취소
+                  {languageContent?.disableAllButtonLabel || "전체 취소"}
                 </button>
                 <button
                   onClick={() => selectedTime && handleDisableSlot(selectedTime)}
@@ -316,7 +321,7 @@ export default function DateDetailPage() {
                       : "text-gray-400 border-2 border-gray-300 cursor-not-allowed"
                   }`}
                 >
-                  선택 취소
+                  {languageContent?.disableSelectedButtonLabel || "선택 취소"}
                 </button>
               </div>
 
@@ -324,20 +329,20 @@ export default function DateDetailPage() {
               {selectedTime && (
                 <div className="border-t border-gray-200 pt-6">
                   <h2 className="text-lg font-bold text-gray-900 mb-4">
-                    {selectedTime} 예약 현황
+                    {(languageContent?.bookingStatusTitle || "{time} 예약 현황").replace("{time}", selectedTime)}
                   </h2>
 
                   {bookingsLoading ? (
-                    <div className="text-center py-8 text-gray-500">로딩 중...</div>
+                    <div className="text-center py-8 text-gray-500">{languageContent?.loadingText || "로딩 중..."}</div>
                   ) : bookings.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
-                      예약이 없습니다
+                      {languageContent?.noBookingsLabel || "예약이 없습니다"}
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {bookings.map((booking) => {
-                        const isConfirmed = booking.status === "확정";
-                        const statusLabel = isConfirmed ? "확정" : "대기";
+                        const isConfirmed = booking.status === (languageContent?.confirmedLabel || "확정");
+                        const statusLabel = isConfirmed ? (languageContent?.confirmedLabel || "확정") : (languageContent?.waitingLabel || "대기");
                         return (
                         <div
                           key={booking.rowIndex}
@@ -380,7 +385,7 @@ export default function DateDetailPage() {
                               onClick={() =>
                                 handleStatusChange(
                                   booking.rowIndex,
-                                  isConfirmed ? "대기" : "확정"
+                                  isConfirmed ? (languageContent?.waitingLabel || "대기") : (languageContent?.confirmedLabel || "확정")
                                 )
                               }
                               className={`px-2 py-1.5 text-xs font-semibold rounded-md border-2 transition-colors ${
@@ -389,13 +394,13 @@ export default function DateDetailPage() {
                                   : "text-green-700 border-green-600 hover:bg-green-50"
                               }`}
                             >
-                              {isConfirmed ? "취소" : "확정"}
+                              {isConfirmed ? (languageContent?.cancelButtonLabel || "취소") : (languageContent?.confirmButtonLabel || "확정")}
                             </button>
                             <button
                               onClick={() => handleDeleteBooking(booking.rowIndex)}
                               className="px-2 py-1.5 text-xs font-semibold rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
                             >
-                              삭제
+                              {languageContent?.deleteButtonLabel || "삭제"}
                             </button>
                           </div>
 

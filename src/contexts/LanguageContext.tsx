@@ -86,6 +86,101 @@ type LanguageContent = {
   passwordSettingsTitle?: string;
   passwordSettingsDesc?: string;
   passwordSettingsButton?: string;
+  // 예약 일정 설정 페이지
+  schedulePageTitle?: string;
+  bulkScheduleTitle?: string;
+  startDateLabel?: string;
+  endDateLabel?: string;
+  weekdaySettingsTitle?: string;
+  weekendSettingsTitle?: string;
+  maxBookingsLabel?: string;
+  availableTimesLabel?: string;
+  generateScheduleButton?: string;
+  generatingScheduleButton?: string;
+  previousMonth?: string;
+  nextMonth?: string;
+  // 메인 콘텐츠 수정 페이지
+  contentPageTitle?: string;
+  mainPageSection?: string;
+  mainTitleLabel?: string;
+  subTitleLabel?: string;
+  saveButton?: string;
+  savingButton?: string;
+  // 비밀번호 변경 페이지
+  passwordPageTitle?: string;
+  passwordChangeSection?: string;
+  newPasswordLabel?: string;
+  newPasswordPlaceholder?: string;
+  confirmPasswordLabel?: string;
+  confirmPasswordPlaceholder?: string;
+  changePasswordButton?: string;
+  languageSettingsSection?: string;
+  languageSettingsDesc?: string;
+  smsSettingsSection?: string;
+  passwordMinLengthMessage?: string;
+  smsMessageLabel?: string;
+  smsMessagePlaceholder?: string;
+  smsMessageHint?: string;
+  saveSmsButton?: string;
+  savingSmsButton?: string;
+  existingSchedulesLabel?: string;
+  selectDeleteButton?: string;
+  deleteConfirmMessage?: string;
+  deletedMessage?: string;
+  deleteErrorMessage?: string;
+  enableSlotConfirmMessage?: string;
+  enabledSlotMessage?: string;
+  enableSlotErrorMessage?: string;
+  disableSlotConfirmMessage?: string;
+  disabledSlotMessage?: string;
+  disableSlotErrorMessage?: string;
+  disableAllSlotsConfirmMessage?: string;
+  disabledAllSlotMessage?: string;
+  skippedCountMessage?: string;
+  cancelledLabel?: string;
+  bookingStatusTitle?: string;
+  noBookingsLabel?: string;
+  confirmedLabel?: string;
+  waitingLabel?: string;
+  confirmButtonLabel?: string;
+  cancelButtonLabel?: string;
+  deleteButtonLabel?: string;
+  disableAllButtonLabel?: string;
+  disableSelectedButtonLabel?: string;
+  imageManagementLabel?: string;
+  heroImagesLabel?: string;
+  profileImageLabel?: string;
+  applicationInfoLabel?: string;
+  applicationItemField?: string;
+  companyNameField?: string;
+  buttonTextsLabel?: string;
+  ctaButtonLabel?: string;
+  formPageTitleLabel?: string;
+  completionPageTitleLabel?: string;
+  smsAdditionalLabel?: string;
+  statsLoadingLabel?: string;
+  statsTemplateLabel?: string;
+  fixedContentLabel?: string;
+  readOnlyBadge?: string;
+  fixedContentDesc?: string;
+  adminLoginTextLabel?: string;
+  formPageTextsLabel?: string;
+  businessRegistrationLabel?: string;
+  consentDetailsTitle?: string;
+  consentDetailsDesc?: string;
+  consentItemLabel?: string;
+  consentTitlePlaceholder?: string;
+  consentSubtitlePlaceholder?: string;
+  consentBodyPlaceholder?: string;
+  benefitsLabel?: string;
+  addBenefitButton?: string;
+  deleteBenefitButton?: string;
+  benefitItemLabel?: string;
+  benefitTitlePlaceholder?: string;
+  benefitDescriptionPlaceholder?: string;
+  placeholderNote?: string;
+  smsMessagePlaceholderText?: string;
+  smsMessageHintText?: string;
 };
 
 type LanguageSettings = {
@@ -160,6 +255,102 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       passwordSettingsTitle: "비밀번호 변경 및 기타 설정",
       passwordSettingsDesc: "비밀번호, 다국어, SMS 안내사항을 설정합니다",
       passwordSettingsButton: "설정하기 →",
+      // 예약 일정 설정 페이지
+      schedulePageTitle: "예약 일정 설정",
+      bulkScheduleTitle: "대량 일정 생성",
+      startDateLabel: "시작일",
+      endDateLabel: "종료일",
+      weekdaySettingsTitle: "평일 설정",
+      weekendSettingsTitle: "주말 설정",
+      maxBookingsLabel: "최대 예약 수",
+      availableTimesLabel: "예약 가능 시간 (쉼표로 구분)",
+      generateScheduleButton: "일정 생성",
+      generatingScheduleButton: "생성 중...",
+      previousMonth: "이전",
+      nextMonth: "다음",
+      // 메인 콘텐츠 수정 페이지
+      contentPageTitle: "메인 콘텐츠 수정",
+      mainPageSection: "메인 페이지",
+      mainTitleLabel: "메인 제목",
+      subTitleLabel: "서브 제목",
+      saveButton: "저장",
+      savingButton: "저장 중...",
+      // 비밀번호 변경 페이지
+      passwordPageTitle: "비밀번호 변경 및 기타 설정",
+      passwordChangeSection: "비밀번호 변경",
+      newPasswordLabel: "새 비밀번호",
+      newPasswordPlaceholder: "새 비밀번호를 입력하세요",
+      confirmPasswordLabel: "비밀번호 확인",
+      confirmPasswordPlaceholder: "비밀번호를 다시 입력하세요",
+      changePasswordButton: "비밀번호 변경",
+      languageSettingsSection: "다국어 설정",
+      languageSettingsDesc: "활성화할 언어를 선택하세요",
+      smsSettingsSection: "확정문자 추가 안내사항",
+      passwordMinLengthMessage: "비밀번호는 최소 4자 이상이어야 합니다",
+      smsMessageLabel: "SMS 추가 메시지",
+      smsMessagePlaceholder: "예약 확정 문자에 포함될 추가 메시지를 입력하세요\n예) 예약일에 만나요! :)",
+      smsMessageHint: "예약자, 날짜, 시간 정보 아래에 표시됩니다. 연락처, 주소 등 추가 정보를 입력하세요.",
+      saveSmsButton: "SMS 메시지 저장",
+      savingSmsButton: "저장 중...",
+      existingSchedulesLabel: "기존 일정",
+      selectDeleteButton: "선택 삭제",
+      deleteConfirmMessage: "선택한 {count}개의 일정을 삭제하시겠습니까?",
+      deletedMessage: "✅ 선택한 일정이 삭제되었습니다",
+      deleteErrorMessage: "❌ 삭제 중 오류가 발생했습니다",
+      enableSlotConfirmMessage: "{time} 시간대를 다시 활성화하시겠습니까?",
+      enabledSlotMessage: "✅ 시간대가 활성화되었습니다",
+      enableSlotErrorMessage: "❌ 시간대 활성화 중 오류가 발생했습니다",
+      disableSlotConfirmMessage: "{time} 시간대를 비활성화하시겠습니까?\n\n비활성화하면 더 이상 예약을 받을 수 없습니다.",
+      disabledSlotMessage: "✅ 시간대가 비활성화되었습니다",
+      disableSlotErrorMessage: "❌ 시간대 비활성화 중 오류가 발생했습니다",
+      disableAllSlotsConfirmMessage: "{date}의 모든 시간대를 비활성화하시겠습니까?\n\n확정/대기 예약이 있는 시간대는 건너뜁니다.",
+      disabledAllSlotMessage: "✅ {count}개 시간대가 비활성화되었습니다",
+      skippedCountMessage: "⚠️ {count}개 시간대는 예약이 있어 건너뛰었습니다",
+      errorCountMessage: "❌ {count}개 시간대 처리 중 오류 발생",
+      cancelledLabel: "취소됨",
+      bookingStatusTitle: "{time} 예약 현황",
+      noBookingsLabel: "예약이 없습니다",
+      confirmedLabel: "확정",
+      waitingLabel: "대기",
+      confirmButtonLabel: "확정",
+      cancelButtonLabel: "취소",
+      deleteButtonLabel: "삭제",
+      disableAllButtonLabel: "전체 취소",
+      disableSelectedButtonLabel: "선택 취소",
+      imageManagementLabel: "이미지 관리",
+      heroImagesLabel: "히어로 슬라이더 이미지 (최대 20개)",
+      profileImageLabel: "프로필 이미지 (1개)",
+      applicationInfoLabel: "신청 정보",
+      applicationItemField: "신청 항목",
+      companyNameField: "상호명",
+      buttonTextsLabel: "버튼 & 문구",
+      ctaButtonLabel: "하단 CTA 버튼",
+      formPageTitleLabel: "폼 페이지 제목",
+      completionPageTitleLabel: "완료 페이지 제목",
+      smsAdditionalLabel: "SMS 추가 메시지",
+      statsLoadingLabel: "통계 로딩 텍스트",
+      statsTemplateLabel: "통계 텍스트 템플릿",
+      fixedContentLabel: "고정 콘텐츠 (수정 불가 - 자동 번역됨)",
+      readOnlyBadge: "읽기전용",
+      fixedContentDesc: "아래의 콘텐츠는 모든 언어로 자동 번역되지만 관리자가 수정할 수 없습니다.",
+      adminLoginTextLabel: "관리자 로그인 텍스트",
+      formPageTextsLabel: "폼 페이지 텍스트들",
+      businessRegistrationLabel: "사업자등록증 보기 텍스트",
+      consentDetailsTitle: "개인정보 동의 항목",
+      consentDetailsDesc: "체크박스 제목/설명과 상세 동의 내용을 수정합니다. 모든 언어로 자동 번역됩니다.",
+      consentItemLabel: "항목",
+      consentTitlePlaceholder: "제목",
+      consentSubtitlePlaceholder: "부제목",
+      consentBodyPlaceholder: "상세 내용",
+      benefitsLabel: "혜택 항목",
+      addBenefitButton: "+ 추가",
+      deleteBenefitButton: "삭제",
+      benefitItemLabel: "항목",
+      benefitTitlePlaceholder: "제목",
+      benefitDescriptionPlaceholder: "설명",
+      placeholderNote: "{count1}과 {count2}는 실제 숫자로 자동 대체됩니다.",
+      smsMessagePlaceholderText: "예약 확정 문자에 포함될 추가 메시지를 입력하세요\n예) 당일 연락주세요: 010-1234-5678",
+      smsMessageHintText: "예약자, 날짜, 시간 정보 아래에 표시됩니다. 연락처, 주소 등 추가 정보를 입력하세요.",
       statsLoadingText: "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)",
       statsTemplate: "최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )",
       businessRegistrationText: "사업자등록증 보기",
@@ -253,7 +444,104 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       mainContentButton: "Edit Content →",
       passwordSettingsTitle: "Password & Settings",
       passwordSettingsDesc: "Configure password, languages, SMS messages",
-      passwordSettingsButton: "Settings →",      statsLoadingText: "Loading applicant count... (Please wait if many users online)",
+      passwordSettingsButton: "Settings →",
+      // Schedule Settings Page
+      schedulePageTitle: "Schedule Settings",
+      bulkScheduleTitle: "Bulk Schedule Generation",
+      startDateLabel: "Start Date",
+      endDateLabel: "End Date",
+      weekdaySettingsTitle: "Weekday Settings",
+      weekendSettingsTitle: "Weekend Settings",
+      maxBookingsLabel: "Max Bookings",
+      availableTimesLabel: "Available Times (comma separated)",
+      generateScheduleButton: "Generate Schedule",
+      generatingScheduleButton: "Generating...",
+      previousMonth: "Previous",
+      nextMonth: "Next",
+      // Content Management Page
+      contentPageTitle: "Edit Main Content",
+      mainPageSection: "Main Page",
+      mainTitleLabel: "Main Title",
+      subTitleLabel: "Subtitle",
+      saveButton: "Save",
+      savingButton: "Saving...",
+      // Password Change Page
+      passwordPageTitle: "Password & Settings",
+      passwordChangeSection: "Change Password",
+      newPasswordLabel: "New Password",
+      newPasswordPlaceholder: "Enter new password",
+      confirmPasswordLabel: "Confirm Password",
+      confirmPasswordPlaceholder: "Re-enter password",
+      changePasswordButton: "Change Password",
+      languageSettingsSection: "Language Settings",
+      languageSettingsDesc: "Select languages to enable",
+      smsSettingsSection: "Additional SMS Instructions",
+      passwordMinLengthMessage: "Password must be at least 4 characters",
+      smsMessageLabel: "SMS Additional Message",
+      smsMessagePlaceholder: "Enter an additional message to include in the booking confirmation text\nExample) See you on booking day! :)",
+      smsMessageHint: "Displayed below the booker, date, and time information. Enter additional information such as contact information and address.",
+      saveSmsButton: "Save SMS Message",
+      savingSmsButton: "Saving...",
+      existingSchedulesLabel: "Existing Schedules",
+      selectDeleteButton: "Delete Selected",
+      deleteConfirmMessage: "Delete {count} selected schedule(s)?",
+      deletedMessage: "✅ Selected schedules deleted",
+      deleteErrorMessage: "❌ Error deleting schedules",
+      enableSlotConfirmMessage: "Re-enable {time}?",
+      enabledSlotMessage: "✅ Time slot enabled",
+      enableSlotErrorMessage: "❌ Error enabling time slot",
+      disableSlotConfirmMessage: "Disable {time}?\n\nDisabling stops accepting bookings for this time.",
+      disabledSlotMessage: "✅ Time slot disabled",
+      disableSlotErrorMessage: "❌ Error disabling time slot",
+      disableAllSlotsConfirmMessage: "Disable all time slots for {date}?\n\nTime slots with confirmed/pending bookings will be skipped.",
+      disabledAllSlotMessage: "✅ {count} time slots disabled",
+      skippedCountMessage: "⚠️ {count} time slots skipped (have bookings)",
+      errorCountMessage: "❌ Error processing {count} time slots",
+      cancelledLabel: "Cancelled",
+      bookingStatusTitle: "{time} Bookings",
+      noBookingsLabel: "No bookings",
+      confirmedLabel: "Confirmed",
+      waitingLabel: "Waiting",
+      confirmButtonLabel: "Confirm",
+      cancelButtonLabel: "Cancel",
+      deleteButtonLabel: "Delete",
+      disableAllButtonLabel: "Disable All",
+      disableSelectedButtonLabel: "Disable Selected",
+      imageManagementLabel: "Image Management",
+      heroImagesLabel: "Hero Slider Images (Max 20)",
+      profileImageLabel: "Profile Image (1 required)",
+      applicationInfoLabel: "Application Information",
+      applicationItemField: "Application Item",
+      companyNameField: "Company Name",
+      buttonTextsLabel: "Button & Text",
+      ctaButtonLabel: "Bottom CTA Button",
+      formPageTitleLabel: "Form Page Title",
+      completionPageTitleLabel: "Completion Page Title",
+      smsAdditionalLabel: "SMS Additional Message",
+      statsLoadingLabel: "Statistics Loading Text",
+      statsTemplateLabel: "Statistics Text Template",
+      fixedContentLabel: "Fixed Content (Read-only - Auto-translated)",
+      readOnlyBadge: "Read-only",
+      fixedContentDesc: "The content below is auto-translated to all languages but cannot be edited by admin.",
+      adminLoginTextLabel: "Admin Login Text",
+      formPageTextsLabel: "Form Page Texts",
+      businessRegistrationLabel: "Business Registration Text",
+      consentDetailsTitle: "Personal Information Consent Items",
+      consentDetailsDesc: "Edit checkbox title/description and detailed consent content. Automatically translated to all languages.",
+      consentItemLabel: "Item",
+      consentTitlePlaceholder: "Title",
+      consentSubtitlePlaceholder: "Subtitle",
+      consentBodyPlaceholder: "Detailed content",
+      benefitsLabel: "Benefits",
+      addBenefitButton: "+ Add",
+      deleteBenefitButton: "Delete",
+      benefitItemLabel: "Item",
+      benefitTitlePlaceholder: "Title",
+      benefitDescriptionPlaceholder: "Description",
+      placeholderNote: "{count1} and {count2} are automatically replaced with actual numbers.",
+      smsMessagePlaceholderText: "Enter an additional message to include in the booking confirmation text\nExample) Please contact on the booking day: 010-1234-5678",
+      smsMessageHintText: "Displayed below the booker, date, and time information. Enter additional information such as contact and address.",
+      statsLoadingText: "Loading applicant count... (Please wait if many users online)",
       statsTemplate: "{count1} applicants in the last month ( Total {count2} )",
       businessRegistrationText: "View Business Registration",
         applicationItemLabel: "Application Item",
@@ -330,6 +618,102 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       passwordSettingsTitle: "パスワードと設定",
       passwordSettingsDesc: "パスワード、言語、SMS案内を設定します",
       passwordSettingsButton: "設定 →",
+      // スケジュール設定ページ
+      schedulePageTitle: "スケジュール設定",
+      bulkScheduleTitle: "一括スケジュール作成",
+      startDateLabel: "開始日",
+      endDateLabel: "終了日",
+      weekdaySettingsTitle: "平日設定",
+      weekendSettingsTitle: "週末設定",
+      maxBookingsLabel: "最大予約数",
+      availableTimesLabel: "予約可能時間（カンマ区切り）",
+      generateScheduleButton: "スケジュール作成",
+      generatingScheduleButton: "作成中...",
+      previousMonth: "前",
+      nextMonth: "次",
+      // コンテンツ管理ページ
+      contentPageTitle: "メインコンテンツ編集",
+      mainPageSection: "メインページ",
+      mainTitleLabel: "メインタイトル",
+      subTitleLabel: "サブタイトル",
+      saveButton: "保存",
+      savingButton: "保存中...",
+      // パスワード変更ページ
+      passwordPageTitle: "パスワードと設定",
+      passwordChangeSection: "パスワード変更",
+      newPasswordLabel: "新しいパスワード",
+      newPasswordPlaceholder: "新しいパスワードを入力",
+      confirmPasswordLabel: "パスワード確認",
+      confirmPasswordPlaceholder: "パスワードを再入力",
+      changePasswordButton: "パスワード変更",
+      languageSettingsSection: "言語設定",
+      languageSettingsDesc: "有効にする言語を選択",
+      smsSettingsSection: "追加SMS案内",
+      passwordMinLengthMessage: "パスワードは4文字以上である必要があります",
+      smsMessageLabel: "SMS追加メッセージ",
+      smsMessagePlaceholder: "予約確定メッセージに含める追加メッセージを入力してください\n例）予約日にお会いしましょう！:)",
+      smsMessageHint: "予約者、日付、時間情報の下に表示されます。連絡先、住所など追加情報を入力してください。",
+      saveSmsButton: "SMSメッセージを保存",
+      savingSmsButton: "保存中...",
+      existingSchedulesLabel: "既存スケジュール",
+      selectDeleteButton: "選択削除",
+      deleteConfirmMessage: "選択した{count}個のスケジュールを削除しますか？",
+      deletedMessage: "✅ 選択したスケジュールが削除されました",
+      deleteErrorMessage: "❌ スケジュール削除中にエラーが発生しました",
+      enableSlotConfirmMessage: "{time}を再度有効にしますか？",
+      enabledSlotMessage: "✅ タイムスロットが有効になりました",
+      enableSlotErrorMessage: "❌ タイムスロット有効化中にエラーが発生しました",
+      disableSlotConfirmMessage: "{time}を無効にしますか？\n\n無効にすると、このタイムスロットの予約を受け付けなくなります。",
+      disabledSlotMessage: "✅ タイムスロットが無効になりました",
+      disableSlotErrorMessage: "❌ タイムスロット無効化中にエラーが発生しました",
+      disableAllSlotsConfirmMessage: "{date}のすべてのタイムスロットを無効にしますか？\n\n確定/待機予約があるタイムスロットはスキップされます。",
+      disallSlotMessage: "✅ {count}個のタイムスロットが無効になりました",
+      disabledCountMessage: "⚠️ {count}個のタイムスロットはスキップされました（予約があります）",
+      errorCountMessage: "❌ {count}個のタイムスロット処理中にエラーが発生しました",
+      cancelledLabel: "キャンセル済み",
+      bookingStatusTitle: "{time}の予約",
+      noBookingsLabel: "予約がありません",
+      confirmedLabel: "確定",
+      waitingLabel: "待機中",
+      confirmButtonLabel: "確定",
+      cancelButtonLabel: "キャンセル",
+      deleteButtonLabel: "削除",
+      disableAllButtonLabel: "すべて無効にする",
+      disableSelectedButtonLabel: "選択を無効にする",
+      imageManagementLabel: "画像管理",
+      heroImagesLabel: "ヒーロースライダー画像（最大20個）",
+      profileImageLabel: "プロフィール画像（1個必須）",
+      applicationInfoLabel: "申請情報",
+      applicationItemField: "申請項目",
+      companyNameField: "会社名",
+      buttonTextsLabel: "ボタンとテキスト",
+      ctaButtonLabel: "下部CTAボタン",
+      formPageTitleLabel: "フォームページタイトル",
+      completionPageTitleLabel: "完了ページタイトル",
+      smsAdditionalLabel: "SMS追加メッセージ",
+      statsLoadingLabel: "統計読込テキスト",
+      statsTemplateLabel: "統計テキストテンプレート",
+      fixedContentLabel: "固定コンテンツ（読み取り専用 - 自動翻訳）",
+      readOnlyBadge: "読み取り専用",
+      fixedContentDesc: "以下のコンテンツはすべての言語に自動翻訳されていますが、管理者が編集することはできません。",
+      adminLoginTextLabel: "管理者ログインテキスト",
+      formPageTextsLabel: "フォームページテキスト",
+      businessRegistrationLabel: "事業者登録証テキスト",
+      consentDetailsTitle: "個人情報同意項目",
+      consentDetailsDesc: "チェックボックスのタイトル/説明と詳細な同意内容を編集します。すべての言語に自動翻訳されます。",
+      consentItemLabel: "項目",
+      consentTitlePlaceholder: "タイトル",
+      consentSubtitlePlaceholder: "サブタイトル",
+      consentBodyPlaceholder: "詳細内容",
+      benefitsLabel: "特典",
+      addBenefitButton: "+ 追加",
+      deleteBenefitButton: "削除",
+      benefitItemLabel: "項目",
+      benefitTitlePlaceholder: "タイトル",
+      benefitDescriptionPlaceholder: "説明",
+      placeholderNote: "{count1}と{count2}は実際の数字に自動置換されます。",
+      smsMessagePlaceholderText: "予約確定メッセージに含めるための追加メッセージを入力してください\n例）予約当日にご連絡ください: 010-1234-5678",
+      smsMessageHintText: "予約者、日付、時間情報の下に表示されます。連絡先、住所など追加情報を入力してください。",
       statsLoadingText: "申請者数を読み込み中... (同時接続者が多い場合は時間がかかります)",
       statsTemplate: "最近1ヶ月間{count1}名申請中 ( 累計{count2}名 )",
       businessRegistrationText: "事業者登録証を見る",
@@ -424,6 +808,102 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       passwordSettingsTitle: "密码和设置",
       passwordSettingsDesc: "配置密码、语言、短信通知",
       passwordSettingsButton: "设置 →",
+      // 日程设置页面
+      schedulePageTitle: "日程设置",
+      bulkScheduleTitle: "批量日程创建",
+      startDateLabel: "开始日期",
+      endDateLabel: "结束日期",
+      weekdaySettingsTitle: "工作日设置",
+      weekendSettingsTitle: "周末设置",
+      maxBookingsLabel: "最大预约数",
+      availableTimesLabel: "可预约时间（逗号分隔）",
+      generateScheduleButton: "创建日程",
+      generatingScheduleButton: "创建中...",
+      previousMonth: "上一页",
+      nextMonth: "下一页",
+      // 内容管理页面
+      contentPageTitle: "编辑主要内容",
+      mainPageSection: "主页",
+      mainTitleLabel: "主标题",
+      subTitleLabel: "副标题",
+      saveButton: "保存",
+      savingButton: "保存中...",
+      // 密码变更页面
+      passwordPageTitle: "密码和设置",
+      passwordChangeSection: "更改密码",
+      newPasswordLabel: "新密码",
+      newPasswordPlaceholder: "输入新密码",
+      confirmPasswordLabel: "确认密码",
+      confirmPasswordPlaceholder: "再次输入密码",
+      changePasswordButton: "更改密码",
+      languageSettingsSection: "语言设置",
+      languageSettingsDesc: "选择要启用的语言",
+      smsSettingsSection: "附加短信说明",
+      passwordMinLengthMessage: "密码必须至少4个字符",
+      smsMessageLabel: "短信附加消息",
+      smsMessagePlaceholder: "输入要包含在预约确认短信中的附加消息\n例) 预约日期见！:)",
+      smsMessageHint: "显示在预约人员、日期和时间信息下方。输入额外信息，如联系信息和地址。",
+      saveSmsButton: "保存短信消息",
+      savingSmsButton: "保存中...",
+      existingSchedulesLabel: "现有日程",
+      selectDeleteButton: "删除选定",
+      deleteConfirmMessage: "删除选定的{count}个日程？",
+      deletedMessage: "✅ 选定的日程已删除",
+      deleteErrorMessage: "❌ 删除日程时出错",
+      enableSlotConfirmMessage: "重新启用{time}？",
+      enabledSlotMessage: "✅ 时间段已启用",
+      enableSlotErrorMessage: "❌ 启用时间段时出错",
+      disableSlotConfirmMessage: "禁用{time}？\n\n禁用将停止接受此时间段的预订。",
+      disabledSlotMessage: "✅ 时间段已禁用",
+      disableSlotErrorMessage: "❌ 禁用时间段时出错",
+      disableAllSlotsConfirmMessage: "禁用{date}的所有时间段？\n\n具有确认/待查预订的时间段将被跳过。",
+      disallSlotMessage: "✅ {count}个时间段已禁用",
+      disabledCountMessage: "⚠️ {count}个时间段被跳过（有预订）",
+      errorCountMessage: "❌ 处理{count}个时间段时出错",
+      cancelledLabel: "已取消",
+      bookingStatusTitle: "{time}的预订",
+      noBookingsLabel: "无预订",
+      confirmedLabel: "已确认",
+      waitingLabel: "等待中",
+      confirmButtonLabel: "确认",
+      cancelButtonLabel: "取消",
+      deleteButtonLabel: "删除",
+      disableAllButtonLabel: "禁用全部",
+      disableSelectedButtonLabel: "禁用选定",
+      imageManagementLabel: "图像管理",
+      heroImagesLabel: "英雄滑块图像（最多20个）",
+      profileImageLabel: "个人资料图像（1个必需）",
+      applicationInfoLabel: "申请信息",
+      applicationItemField: "申请项目",
+      companyNameField: "公司名称",
+      buttonTextsLabel: "按钮和文本",
+      ctaButtonLabel: "底部CTA按钮",
+      formPageTitleLabel: "表单页面标题",
+      completionPageTitleLabel: "完成页面标题",
+      smsAdditionalLabel: "短信附加消息",
+      statsLoadingLabel: "统计加载文本",
+      statsTemplateLabel: "统计文本模板",
+      fixedContentLabel: "固定内容（只读 - 自动翻译）",
+      readOnlyBadge: "只读",
+      fixedContentDesc: "以下内容会自动翻译为所有语言，但管理员无法编辑。",
+      adminLoginTextLabel: "管理员登录文本",
+      formPageTextsLabel: "表单页面文本",
+      businessRegistrationLabel: "营业执照文本",
+      consentDetailsTitle: "个人信息同意项目",
+      consentDetailsDesc: "编辑复选框标题/描述和详细同意内容。自动翻译为所有语言。",
+      consentItemLabel: "项目",
+      consentTitlePlaceholder: "标题",
+      consentSubtitlePlaceholder: "副标题",
+      consentBodyPlaceholder: "详细内容",
+      benefitsLabel: "福利",
+      addBenefitButton: "+ 添加",
+      deleteBenefitButton: "删除",
+      benefitItemLabel: "项目",
+      benefitTitlePlaceholder: "标题",
+      benefitDescriptionPlaceholder: "描述",
+      placeholderNote: "{count1}和{count2}自动替换为实际数字。",
+      smsMessagePlaceholderText: "输入要包含在预订确认短信中的附加消息\n例）请在预订当日联系：010-1234-5678",
+      smsMessageHintText: "显示在预约人员、日期和时间信息下方。输入额外信息，如联系信息和地址。",
       statsLoadingText: "正在加载申请人数... (同时在线用户较多时可能需要一些时间)",
       statsTemplate: "最近一个月{count1}人申请中 ( 累计{count2}人 )",
       businessRegistrationText: "查看营业执照",

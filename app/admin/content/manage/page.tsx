@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import ImageUploader from "@/components/admin/ImageUploader";
 
 interface Benefit {
@@ -35,6 +36,7 @@ interface ContentSettings {
 
 export default function ContentManagePage() {
   const router = useRouter();
+  const { languageContent } = useLanguage();
   const [settings, setSettings] = useState<ContentSettings>({
     mainTitle: "포토부스 체험단 모집",
     mainSubtitle: "뜨거운 반응, 네컷사진 포토부스 실비렌탈",
@@ -335,7 +337,7 @@ export default function ContentManagePage() {
               />
             </svg>
           </button>
-          <h1 className="text-lg font-bold text-gray-900">메인 콘텐츠 수정</h1>
+          <h1 className="text-lg font-bold text-gray-900">{languageContent?.contentPageTitle || "메인 콘텐츠 수정"}</h1>
         </div>
       </div>
 
@@ -344,11 +346,11 @@ export default function ContentManagePage() {
         <div className="max-w-[640px] mx-auto space-y-6">
           {/* 메인 섹션 */}
           <div className="space-y-5">
-            <h3 className="text-[18px] font-semibold text-gray-900">메인 페이지</h3>
+            <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.mainPageSection || "메인 페이지"}</h3>
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                메인 제목 <span className="text-[#7c3aed]">*</span>
+                {languageContent?.mainTitleLabel || "메인 제목"} <span className="text-[#7c3aed]">*</span>
               </label>
               <input
                 type="text"
@@ -360,7 +362,7 @@ export default function ContentManagePage() {
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                서브 제목
+                {languageContent?.subTitleLabel || "서브 제목"}
               </label>
               <input
                 type="text"
@@ -374,19 +376,19 @@ export default function ContentManagePage() {
           {/* 고정 콘텐츠 섹션 (관리자 수정 불가) */}
           <div className="space-y-5 pt-6 border-t border-gray-200 bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center gap-2">
-              <h3 className="text-[18px] font-semibold text-gray-900">고정 콘텐츠 (수정 불가 - 자동 번역됨)</h3>
-              <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">읽기전용</span>
+              <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.fixedContentLabel || "기정 콘테냈 (수정 불가 - 자동 번역됨)"}</h3>
+              <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">{languageContent?.readOnlyBadge || "읽기전용"}</span>
             </div>
-            <p className="text-[13px] text-gray-600">아래의 콘텐츠는 모든 언어로 자동 번역되지만 관리자가 수정할 수 없습니다.</p>
+            <p className="text-[13px] text-gray-600">{languageContent?.fixedContentDesc || "아래의 콘테냈는 모든 언어로 자동 번역되지만 관리자가 수정할 수 없습니다."}</p>
 
             <div className="bg-white p-3 rounded border border-gray-200">
-              <label className="block text-[12px] font-semibold text-gray-700 mb-1">관리자 로그인 텍스트</label>
-              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">관리자 로그인</div>
+              <label className="block text-[12px] font-semibold text-gray-700 mb-1">{languageContent?.adminLoginTextLabel || "관리자 로그인 텍스트"}</label>
+              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">{languageContent?.adminLogin || "관리자 로그인"}</div>
             </div>
 
             <div className="bg-white p-3 rounded border border-gray-200">
               <label className="block text-[12px] font-semibold text-gray-700 mb-1">신청자 수 로딩 텍스트</label>
-              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)</div>
+              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">{languageContent?.statsLoadingText || "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)"}</div>
             </div>
 
             <div className="bg-white p-3 rounded border border-gray-200">
@@ -395,12 +397,12 @@ export default function ContentManagePage() {
             </div>
 
             <div className="bg-white p-3 rounded border border-gray-200">
-              <label className="block text-[12px] font-semibold text-gray-700 mb-1">사업자등록증 보기 텍스트</label>
-              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">사업자등록증 보기</div>
+              <label className="block text-[12px] font-semibold text-gray-700 mb-1">{languageContent?.businessRegistrationLabel || "사업자등록증 보기 텍스트"}</label>
+              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">{languageContent?.businessRegistrationText || "사업자등록증 보기"}</div>
             </div>
 
             <div className="bg-white p-3 rounded border border-gray-200">
-              <label className="block text-[12px] font-semibold text-gray-700 mb-1">폼 페이지 텍스트들</label>
+              <label className="block text-[12px] font-semibold text-gray-700 mb-1">{languageContent?.formPageTextsLabel || "폰 페이지 텍스트들"}</label>
               <div className="text-[13px] text-gray-600 space-y-1 p-2 bg-gray-100 rounded">
                 <div>신청 정보 입력 페이지</div>
                 <div>이름, 연락처 입력 필드</div>
@@ -413,10 +415,10 @@ export default function ContentManagePage() {
 
           {/* 메인 섹션 */}
           <div className="space-y-5 pt-6 border-t border-gray-200">
-            <h3 className="text-[18px] font-semibold text-gray-900">이미지 관리</h3>
+            <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.imageManagementLabel || "이미지 관리"}</h3>
 
             <ImageUploader
-              title="히어로 슬라이더 이미지 (최대 20개)"
+              title={languageContent?.heroImagesLabel || "히어로 스라이더 이미지 (최대 20개)"}
               maxFiles={20}
               maxSizePerFile={5}
               onUpload={async (urls) => {
@@ -428,7 +430,7 @@ export default function ContentManagePage() {
             />
 
             <ImageUploader
-              title="프로필 이미지 (1개)"
+              title={languageContent?.profileImageLabel || "프로필 이미지 (1개)"}
               maxFiles={1}
               maxSizePerFile={5}
               onUpload={async (urls) => {
@@ -442,11 +444,11 @@ export default function ContentManagePage() {
 
           {/* 신청 정보 섹션 */}
           <div className="space-y-5 pt-6 border-t border-gray-200">
-            <h3 className="text-[18px] font-semibold text-gray-900">신청 정보</h3>
+            <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.applicationInfoLabel || "신청 정보"}</h3>
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                신청 항목
+                {languageContent?.applicationItemField || "신청 항목"}
               </label>
               <input
                 type="text"
@@ -458,7 +460,7 @@ export default function ContentManagePage() {
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                상호명
+                {languageContent?.companyNameField || "상호명"}
               </label>
               <input
                 type="text"
@@ -471,11 +473,11 @@ export default function ContentManagePage() {
 
           {/* 버튼 텍스트 섹션 */}
           <div className="space-y-5 pt-6 border-t border-gray-200">
-            <h3 className="text-[18px] font-semibold text-gray-900">버튼 & 문구</h3>
+            <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.buttonTextsLabel || "버튼 & 문구"}</h3>
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                하단 CTA 버튼
+                {languageContent?.ctaButtonLabel || "하단 CTA 버튼"}
               </label>
               <input
                 type="text"
@@ -487,7 +489,7 @@ export default function ContentManagePage() {
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                폼 페이지 제목
+                {languageContent?.formPageTitleLabel || "폰 페이지 제목"}
               </label>
               <input
                 type="text"
@@ -499,7 +501,7 @@ export default function ContentManagePage() {
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                완료 페이지 제목
+                {languageContent?.completionPageTitleLabel || "완료 패지 제목"}
               </label>
               <input
                 type="text"
@@ -511,23 +513,23 @@ export default function ContentManagePage() {
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                SMS 추가 메시지
+                {languageContent?.smsAdditionalLabel || "SMS 추가 메시지"}
               </label>
               <textarea
                 value={settings.smsCustomMessage}
                 onChange={(e) => handleChange("smsCustomMessage", e.target.value)}
-                placeholder="예약 확정 문자에 포함될 추가 메시지를 입력하세요\n예) 당일 연락주세요: 010-1234-5678"
+                placeholder={languageContent?.smsMessagePlaceholderText || "예약 확정 문자에 포함될 추가 메시지를 입력하세요\n예) 당일 연락주세요: 010-1234-5678"}
                 rows={3}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] resize-none"
               />
               <p className="mt-1 text-xs text-gray-500">
-                예약자, 날짜, 시간 정보 아래에 표시됩니다. 연락처, 주소 등 추가 정보를 입력하세요.
+                {languageContent?.smsMessageHintText || "예약자, 날짜, 시간 정보 아래에 표시됩니다. 연락처, 주소 등 추가 정보를 입력하세요."}
               </p>
             </div>
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                통계 로딩 텍스트
+                {languageContent?.statsLoadingLabel || "통계 로딩 텍스트"}
               </label>
               <input
                 type="text"
@@ -540,7 +542,7 @@ export default function ContentManagePage() {
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                통계 텍스트 템플릿
+                {languageContent?.statsTemplateLabel || "통계 텍스트 템플릿"}
               </label>
               <input
                 type="text"
@@ -550,16 +552,16 @@ export default function ContentManagePage() {
                 className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
               />
               <p className="mt-1 text-xs text-gray-500">
-                {"{count1}"}과 {"{count2}"}는 실제 숫자로 자동 대체됩니다.
+                {languageContent?.placeholderNote || "{count1}과 {count2}는 실제 숫자로 자동 대체됩니다."}
               </p>
             </div>
           </div>
 
           {/* 개인정보 동의 항목 */}
           <div className="space-y-5 pt-6 border-t border-gray-200">
-            <h3 className="text-[18px] font-semibold text-gray-900">개인정보 동의 항목</h3>
+            <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.consentDetailsTitle || "개인정보 동의 항목"}</h3>
             <p className="text-[13px] text-gray-600">
-              체크박스 제목/설명과 상세 동의 내용을 수정합니다. 모든 언어로 자동 번역됩니다.
+              {languageContent?.consentDetailsDesc || "체크박스 제목/설명과 상세 동의 내용을 수정합니다. 모든 언어로 자동 번역됩니다."}
             </p>
 
             <div className="space-y-4">
@@ -567,7 +569,7 @@ export default function ContentManagePage() {
                 <div key={index} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-[14px] font-semibold text-gray-900">
-                      항목 {index + 1}
+                      {languageContent?.consentItemLabel || "항목"} {index + 1}
                     </span>
                   </div>
 
@@ -578,7 +580,7 @@ export default function ContentManagePage() {
                       onChange={(e) =>
                         handleConsentDetailChange(index, "title", e.target.value)
                       }
-                      placeholder="제목"
+                      placeholder={languageContent?.consentTitlePlaceholder || "제목"}
                       className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
                     />
                     <input
@@ -587,7 +589,7 @@ export default function ContentManagePage() {
                       onChange={(e) =>
                         handleConsentDetailChange(index, "subtitle", e.target.value)
                       }
-                      placeholder="부제목"
+                      placeholder={languageContent?.consentSubtitlePlaceholder || "부제목"}
                       className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
                     />
                     <textarea
@@ -595,7 +597,7 @@ export default function ContentManagePage() {
                       onChange={(e) =>
                         handleConsentDetailChange(index, "body", e.target.value)
                       }
-                      placeholder="상세 내용"
+                      placeholder={languageContent?.consentBodyPlaceholder || "상세 내용"}
                       rows={6}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
                     />
@@ -608,13 +610,13 @@ export default function ContentManagePage() {
           {/* 혜택 섹션 */}
           <div className="space-y-5 pt-6 border-t border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-[18px] font-semibold text-gray-900">혜택 항목</h3>
+              <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.benefitsLabel || "협쿇 항목"}</h3>
               <button
                 type="button"
                 onClick={addBenefit}
                 className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-semibold hover:bg-purple-200 cursor-pointer"
               >
-                + 추가
+                {languageContent?.addBenefitButton || "+ 추가"}
               </button>
             </div>
 
@@ -623,7 +625,7 @@ export default function ContentManagePage() {
                 <div key={index} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-[14px] font-semibold text-gray-900">
-                      항목 {benefit.number}
+                      {languageContent?.benefitItemLabel || "항목"} {benefit.number}
                     </span>
                     {settings.benefits.length > 1 && (
                       <button
@@ -631,7 +633,7 @@ export default function ContentManagePage() {
                         onClick={() => removeBenefit(index)}
                         className="text-red-600 hover:text-red-700 text-sm font-semibold cursor-pointer"
                       >
-                        삭제
+                        {languageContent?.deleteBenefitButton || "삭제"}
                       </button>
                     )}
                   </div>
@@ -643,7 +645,7 @@ export default function ContentManagePage() {
                       onChange={(e) =>
                         handleBenefitChange(index, "title", e.target.value)
                       }
-                      placeholder="제목"
+                      placeholder={languageContent?.benefitTitlePlaceholder || "제목"}
                       className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
                     />
                     <textarea
@@ -651,7 +653,7 @@ export default function ContentManagePage() {
                       onChange={(e) =>
                         handleBenefitChange(index, "description", e.target.value)
                       }
-                      placeholder="설명"
+                      placeholder={languageContent?.benefitDescriptionPlaceholder || "설명"}
                       rows={2}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
                     />
@@ -679,7 +681,7 @@ export default function ContentManagePage() {
               disabled={loading}
               className="w-full h-14 rounded-[12px] bg-[#7c3aed] text-base font-bold text-white hover:bg-[#6d28d9] transition-colors active:scale-[0.98] disabled:bg-gray-300"
             >
-              {loading ? "저장 중..." : "저장"}
+              {loading ? (languageContent?.savingButton || "저장 중...") : (languageContent?.saveButton || "저장")}
             </button>
           </div>
         </div>

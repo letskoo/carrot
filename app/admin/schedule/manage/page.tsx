@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TimeSlot {
   date: string;
@@ -12,6 +13,7 @@ interface TimeSlot {
 
 export default function ScheduleManagePage() {
   const router = useRouter();
+  const { languageContent } = useLanguage();
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSlots, setSelectedSlots] = useState<Set<string>>(new Set());
@@ -120,7 +122,8 @@ export default function ScheduleManagePage() {
 
   const handleDeleteSelected = async () => {
     if (selectedSlots.size === 0) return;
-    if (!confirm(`선택한 ${selectedSlots.size}개의 일정을 삭제하시겠습니까?`)) return;
+    const message = (languageContent?.deleteConfirmMessage || "선택한 {count}개의 일정을 삭제하실건가주?").replace("{count}", selectedSlots.size.toString());
+    if (!confirm(message)) return;
 
     try {
       const slotsToDelete = Array.from(selectedSlots).map((key) => {
@@ -135,14 +138,14 @@ export default function ScheduleManagePage() {
       });
 
       if (response.ok) {
-        setMessage("✅ 선택한 일정이 삭제되었습니다");
+        setMessage(languageContent?.deletedMessage || "✅ 선택한 일정이 삭제되었습니다");
         setSelectedSlots(new Set());
         fetchSlots();
         setTimeout(() => setMessage(""), 3000);
       }
     } catch (error) {
       console.error("Failed to delete slots:", error);
-      setMessage("❌ 삭제 중 오류가 발생했습니다");
+      setMessage(languageContent?.deleteErrorMessage || "❌ 삭제 중 오류가 발생했습니다");
       setTimeout(() => setMessage(""), 3000);
     }
   };
@@ -271,7 +274,7 @@ export default function ScheduleManagePage() {
               />
             </svg>
           </button>
-          <h1 className="text-lg font-bold text-gray-900">예약 일정 설정</h1>
+          <h1 className="text-lg font-bold text-gray-900">{languageContent?.schedulePageTitle || "예약 일정 설정"}</h1>
         </div>
       </div>
 
@@ -281,13 +284,13 @@ export default function ScheduleManagePage() {
           
           {/* 대량 생성 섹션 */}
           <div className="mb-8 pb-8 border-b border-gray-200">
-            <h2 className="text-[20px] font-bold text-gray-900 mb-6">대량 일정 생성</h2>
+            <h2 className="text-[20px] font-bold text-gray-900 mb-6">{languageContent?.bulkScheduleTitle || "대량 일정 생성"}</h2>
             
             <div className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="relative">
                   <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                    시작일 <span className="text-[#7c3aed]">*</span>
+                    {languageContent?.startDateLabel || "시작일"} <span className="text-[#7c3aed]">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -340,7 +343,7 @@ export default function ScheduleManagePage() {
                           }
                           className="px-2 py-1 text-sm text-gray-600 hover:text-gray-900"
                         >
-                          이전
+                          {languageContent?.previousMonth || "이전"}
                         </button>
                         <div className="text-sm font-semibold text-gray-900">
                           {startPickerMonth.getFullYear()}년 {startPickerMonth.getMonth() + 1}월
@@ -358,7 +361,7 @@ export default function ScheduleManagePage() {
                           }
                           className="px-2 py-1 text-sm text-gray-600 hover:text-gray-900"
                         >
-                          다음
+                          {languageContent?.nextMonth || "다음"}
                         </button>
                       </div>
                       <div className="grid grid-cols-7 gap-1 text-xs text-gray-500 mb-1">
@@ -389,7 +392,7 @@ export default function ScheduleManagePage() {
                 </div>
                 <div className="relative">
                   <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                    종료일 <span className="text-[#7c3aed]">*</span>
+                    {languageContent?.endDateLabel || "종료일"} <span className="text-[#7c3aed]">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -442,7 +445,7 @@ export default function ScheduleManagePage() {
                           }
                           className="px-2 py-1 text-sm text-gray-600 hover:text-gray-900"
                         >
-                          이전
+                          {languageContent?.previousMonth || "이전"}
                         </button>
                         <div className="text-sm font-semibold text-gray-900">
                           {endPickerMonth.getFullYear()}년 {endPickerMonth.getMonth() + 1}월
@@ -460,7 +463,7 @@ export default function ScheduleManagePage() {
                           }
                           className="px-2 py-1 text-sm text-gray-600 hover:text-gray-900"
                         >
-                          다음
+                          {languageContent?.nextMonth || "다음"}
                         </button>
                       </div>
                       <div className="grid grid-cols-7 gap-1 text-xs text-gray-500 mb-1">
@@ -493,10 +496,10 @@ export default function ScheduleManagePage() {
 
               {/* 평일 설정 */}
               <div className="space-y-4">
-                <h3 className="text-[16px] font-semibold text-gray-900">평일 설정</h3>
+                <h3 className="text-[16px] font-semibold text-gray-900">{languageContent?.weekdaySettingsTitle || "평일 설정"}</h3>
                 <div>
                   <label className="block text-[14px] font-semibold text-gray-700 mb-2">
-                    최대 예약 수
+                    {languageContent?.maxBookingsLabel || "최대 예약 수"}
                   </label>
                   <input
                     type="number"
@@ -507,7 +510,7 @@ export default function ScheduleManagePage() {
                 </div>
                 <div>
                   <label className="block text-[14px] font-semibold text-gray-700 mb-2">
-                    예약 가능 시간 (쉼표로 구분)
+                    {languageContent?.availableTimesLabel || "예약 가능 시간 (쉰표로 구분)"}
                   </label>
                   <textarea
                     value={weekdayTimes}
@@ -521,10 +524,10 @@ export default function ScheduleManagePage() {
 
               {/* 주말 설정 */}
               <div className="space-y-4">
-                <h3 className="text-[16px] font-semibold text-gray-900">주말 설정</h3>
+                <h3 className="text-[16px] font-semibold text-gray-900">{languageContent?.weekendSettingsTitle || "주말 설정"}</h3>
                 <div>
                   <label className="block text-[14px] font-semibold text-gray-700 mb-2">
-                    최대 예약 수
+                    {languageContent?.maxBookingsLabel || "최대 예약 수"}
                   </label>
                   <input
                     type="number"
@@ -535,7 +538,7 @@ export default function ScheduleManagePage() {
                 </div>
                 <div>
                   <label className="block text-[14px] font-semibold text-gray-700 mb-2">
-                    예약 가능 시간 (쉼표로 구분)
+                    {languageContent?.availableTimesLabel || "예약 가능 시간 (쉰표로 구분)"}
                   </label>
                   <textarea
                     value={weekendTimes}
@@ -553,15 +556,15 @@ export default function ScheduleManagePage() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-[20px] font-bold text-gray-900">
-                기존 일정 ({slots.length}개)
+                {languageContent?.existingSchedulesLabel || "기존 일정"} ({slots.length}개)
               </h2>
             </div>
 
             {loading ? (
-              <div className="text-center py-12 text-gray-500">로딩 중...</div>
+              <div className="text-center py-12 text-gray-500">{languageContent?.loadingText || "로딩 중..."}</div>
             ) : Object.keys(groupedSlots).length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                생성된 일정이 없습니다
+                {languageContent?.noAvailableSlots || "생성된 일정이 없습니다"}
               </div>
             ) : (
               <div>
@@ -632,7 +635,7 @@ export default function ScheduleManagePage() {
                 onClick={handleDeleteSelected}
                 className="w-full h-14 rounded-[12px] bg-red-600 text-base font-bold text-white hover:bg-red-700 transition-colors active:scale-[0.98]"
               >
-                선택 삭제 ({selectedSlots.size}개)
+                {languageContent?.selectDeleteButton || "선택 삭제"} ({selectedSlots.size}개)
               </button>
             ) : (
               <button
@@ -640,7 +643,7 @@ export default function ScheduleManagePage() {
                 disabled={generating}
                 className="w-full h-14 rounded-[12px] bg-[#7c3aed] text-base font-bold text-white hover:bg-[#6d28d9] transition-colors active:scale-[0.98] disabled:bg-gray-300"
               >
-                {generating ? "생성 중..." : "일정 생성"}
+                {generating ? (languageContent?.generatingScheduleButton || "생성 중...") : (languageContent?.generateScheduleButton || "일정 생성")}
               </button>
             )}
           </div>

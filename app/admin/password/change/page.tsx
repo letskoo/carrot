@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import styles from "@/components/lead-flow/ConsentSheet.module.css";
 
 interface LanguageContent {
@@ -30,6 +31,7 @@ interface AllLanguages {
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { languageContent } = useLanguage();
   
   // 비밀번호 상태
   const [newPassword, setNewPassword] = useState("");
@@ -315,7 +317,7 @@ export default function SettingsPage() {
               />
             </svg>
           </button>
-          <h1 className="text-lg font-bold text-gray-900">비밀번호 변경 및 기타 설정</h1>
+          <h1 className="text-lg font-bold text-gray-900">{languageContent?.passwordPageTitle || "비밀번호 변경 및 기타 설정"}</h1>
         </div>
       </div>
 
@@ -325,36 +327,36 @@ export default function SettingsPage() {
           
           {/* 1. 비밀번호 변경 섹션 */}
           <div className="border-b border-gray-200 pb-8">
-            <h2 className="text-[18px] font-semibold text-gray-900 mb-6">비밀번호 변경</h2>
+            <h2 className="text-[18px] font-semibold text-gray-900 mb-6">{languageContent?.passwordChangeSection || "비밀번호 변경"}</h2>
             <div className="space-y-5">
               <div>
                 <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                  새 비밀번호 <span className="text-[#7c3aed]">*</span>
+                  {languageContent?.newPasswordLabel || "새 비밀번호"} <span className="text-[#7c3aed]">*</span>
                 </label>
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="새 비밀번호를 입력하세요"
+                  placeholder={languageContent?.newPasswordPlaceholder || "새 비밀번호를 입력하세요"}
                   className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
                 />
               </div>
 
               <div>
                 <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                  비밀번호 확인 <span className="text-[#7c3aed]">*</span>
+                  {languageContent?.confirmPasswordLabel || "비밀번호 확인"} <span className="text-[#7c3aed]">*</span>
                 </label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="비밀번호를 다시 입력하세요"
+                  placeholder={languageContent?.confirmPasswordPlaceholder || "비밀번호를 다시 입력하세요"}
                   className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
                 />
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
-                ℹ️ 비밀번호는 최소 4자 이상이어야 합니다
+                ℹ️ {languageContent?.passwordMinLengthMessage || "비밀번호는 최소 4자 이상이어야 합니다"}
               </div>
 
               <div className="flex justify-center">
@@ -363,7 +365,7 @@ export default function SettingsPage() {
                   disabled={loading || !newPassword || !confirmPassword}
                   className="w-auto px-6 h-8 rounded-lg bg-[#7c3aed] text-xs font-semibold text-white hover:bg-[#6d28d9] transition-colors disabled:bg-gray-300"
                 >
-                  {loading ? "변경 중..." : "비밀번호 변경"}
+                  {loading ? (languageContent?.savingButton || "변경 중...") : (languageContent?.changePasswordButton || "비밀번호 변경")}
                 </button>
               </div>
             </div>
@@ -371,8 +373,8 @@ export default function SettingsPage() {
 
           {/* 2. 다국어 설정 섹션 */}
           <div className="border-b border-gray-200 pb-8">
-            <h2 className="text-[18px] font-semibold text-gray-900 mb-6">다국어 설정</h2>
-            <p className="text-sm text-gray-500 mb-6">활성화할 언어를 선택하세요</p>
+            <h2 className="text-[18px] font-semibold text-gray-900 mb-6">{languageContent?.languageSettingsSection || "다국어 설정"}</h2>
+            <p className="text-sm text-gray-500 mb-6">{languageContent?.languageSettingsDesc || "활성화할 언어를 선택하세요"}</p>
             <div className="space-y-4 mb-6">
               {(["ko", "en", "ja", "zh"] as const).map((lang) => (
                 <label
@@ -413,21 +415,21 @@ export default function SettingsPage() {
 
           {/* 3. 확정문자 추가 안내사항 섹션 */}
           <div>
-            <h2 className="text-[18px] font-semibold text-gray-900 mb-6">확정문자 추가 안내사항</h2>
+            <h2 className="text-[18px] font-semibold text-gray-900 mb-6">{languageContent?.smsSettingsSection || "확정문자 추가 안내사항"}</h2>
             <div className="space-y-5">
               <div>
                 <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                  SMS 추가 메시지
+                  {languageContent?.smsMessageLabel || "SMS 추가 메시지"}
                 </label>
                 <textarea
                   value={smsCustomMessage}
                   onChange={(e) => setSmsCustomMessage(e.target.value)}
-                  placeholder="예약 확정 문자에 포함될 추가 메시지를 입력하세요&#10;예) 예약일에 만나요! :)"
+                  placeholder={languageContent?.smsMessagePlaceholder || "예약 확정 문자에 포함될 추가 메시지를 입력하세요\n예) 예약일에 만나요! :)"}
                   rows={4}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] resize-none"
                 />
                 <p className="mt-2 text-xs text-gray-500">
-                  예약자, 날짜, 시간 정보 아래에 표시됩니다. 연락처, 주소 등 추가 정보를 입력하세요.
+                  {languageContent?.smsMessageHint || "예약자, 날짜, 시간 정보 아래에 표시됩니다. 연락처, 주소 등 추가 정보를 입력하세요."}
                 </p>
               </div>
 
@@ -437,7 +439,7 @@ export default function SettingsPage() {
                   disabled={loading}
                   className="w-auto px-6 h-8 rounded-lg bg-[#7c3aed] text-xs font-semibold text-white hover:bg-[#6d28d9] transition-colors disabled:bg-gray-300"
                 >
-                  {loading ? "저장 중..." : "SMS 메시지 저장"}
+                  {loading ? (languageContent?.savingSmsButton || "저장 중...") : (languageContent?.saveSmsButton || "SMS 메시지 저장")}
                 </button>
               </div>
             </div>
