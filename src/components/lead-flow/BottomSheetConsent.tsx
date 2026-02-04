@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import styles from "./ConsentSheet.module.css";
 import { FormDataType, ConsentCheckboxes } from "./types";
 import ConsentDetailModal from "./ConsentDetailModal";
@@ -22,6 +23,7 @@ export default function BottomSheetConsent({
   onCheckboxChange,
   isLoading,
 }: BottomSheetConsentProps) {
+  const { languageContent } = useLanguage();
   const [isMounted, setIsMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [detailModal, setDetailModal] = useState<"personalDataCollection" | "personalDataThirdParty" | "personalDataCompany" | null>(null);
@@ -90,7 +92,7 @@ export default function BottomSheetConsent({
           <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-4 rounded-t-2xl">
             <div className="max-w-[640px] mx-auto">
               <h2 className="text-[18px] font-bold text-gray-900 text-center">
-                신청을 위해 정보 동의를 해주세요
+                {languageContent?.consentTitle || "신청을 위해 정보 동의를 해주세요"}
               </h2>
             </div>
           </div>
@@ -124,7 +126,7 @@ export default function BottomSheetConsent({
                   </svg>
                 </span>
                 <span className="text-[15px] font-semibold text-gray-900">
-                  모두 동의
+                  {languageContent?.consentAllAgree || "모두 동의"}
                 </span>
               </label>
             </div>

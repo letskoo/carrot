@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import styles from "./ConsentSheet.module.css";
 
 interface TimeSlot {
@@ -28,6 +29,7 @@ export default function TimeSlotSheet({
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { languageContent, currentLanguage } = useLanguage();
 
   const transitionDuration = 300;
 
@@ -95,10 +97,18 @@ export default function TimeSlotSheet({
 
   function formatDate(dateStr: string): string {
     const date = new Date(dateStr);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekday = ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
-    return `${month}월 ${day}일 (${weekday})`;
+    const localeMap: Record<string, string> = {
+      ko: "ko-KR",
+      en: "en-US",
+      ja: "ja-JP",
+      zh: "zh-CN",
+    };
+    const locale = localeMap[currentLanguage] || "ko-KR";
+    return new Intl.DateTimeFormat(locale, {
+      month: "long",
+      day: "numeric",
+      weekday: "short",
+    }).format(date);
   }
 
   if (!isMounted) return null;
@@ -123,7 +133,7 @@ export default function TimeSlotSheet({
                 {formatDate(selectedDate)}
               </h3>
               <p className="text-[14px] text-gray-600 mt-2 text-center">
-                예약 가능한 시간을 선택해주세요
+                {languageContent?.availableTimeLabel || "예약 가능한 시간을 선택해주세요"}
               </p>
             </div>
           </div>
@@ -133,13 +143,13 @@ export default function TimeSlotSheet({
             <div className="max-w-[640px] mx-auto px-4">
               {loading && (
                 <div className="text-center py-8 text-gray-500">
-                  로딩 중...
+                  {languageContent?.loadingText || "로딩 중..."}
                 </div>
               )}
 
               {!loading && availableSlots.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
-                  예약 가능한 시간이 없습니다.
+                  {languageContent?.noAvailableSlots || "예약 가능한 시간이 없습니다."}
                 </div>
               )}
 
@@ -168,7 +178,7 @@ export default function TimeSlotSheet({
                         <div className="flex items-center justify-between">
                           <span className="text-lg">{slot.time}</span>
                           <span className="text-sm text-gray-600">
-                            {isFull ? "마감" : `${slot.capacity - slot.booked}/${slot.capacity}`}
+                            {isFull ? (languageContent?.fullLabel || "마감") : `${slot.capacity - slot.booked}/${slot.capacity}`}
                           </span>
                         </div>
                       </button>
@@ -190,7 +200,7 @@ export default function TimeSlotSheet({
                     onClick={onClose}
                     className="flex-1 h-12 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors cursor-pointer"
                   >
-                    취소
+                    {languageContent?.cancelButton || "취소"}
                   </button>
                   <button
                     onClick={handleConfirm}
@@ -204,7 +214,7 @@ export default function TimeSlotSheet({
                       }
                     `}
                   >
-                    확인
+                    {languageContent?.confirmButton || "확인"}
                   </button>
                 </div>
               </div>

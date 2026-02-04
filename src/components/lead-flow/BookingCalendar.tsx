@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CalendarDay {
   date: string; // YYYY-MM-DD
@@ -26,6 +27,7 @@ export default function BookingCalendar({
   onSelectDate,
   selectedDate,
 }: BookingCalendarProps) {
+  const { languageContent, currentLanguage } = useLanguage();
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [calendarDays, setCalendarDays] = useState<CalendarDay[]>([]);
   const [loading, setLoading] = useState(false);
@@ -166,6 +168,20 @@ export default function BookingCalendar({
   }
 
   const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
+  const localeMap: Record<string, string> = {
+    ko: "ko-KR",
+    en: "en-US",
+    ja: "ja-JP",
+    zh: "zh-CN",
+  };
+
+  const formatMonthYear = (date: Date) => {
+    const locale = localeMap[currentLanguage] || "ko-KR";
+    return new Intl.DateTimeFormat(locale, {
+      year: "numeric",
+      month: "long",
+    }).format(date);
+  };
 
   return (
     <div className="w-full max-w-lg mx-auto">
@@ -192,7 +208,7 @@ export default function BookingCalendar({
         </button>
 
         <h3 className="text-lg font-bold text-gray-900">
-          {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
+          {formatMonthYear(currentMonth)}
         </h3>
 
         <button
@@ -233,7 +249,7 @@ export default function BookingCalendar({
       {/* 로딩 상태 */}
       {loading && (
         <div className="text-center py-12 text-gray-500">
-          로딩 중...
+          {languageContent?.loadingText || "로딩 중..."}
         </div>
       )}
 
@@ -286,11 +302,11 @@ export default function BookingCalendar({
       <div className="mt-6 flex items-center justify-center gap-4 text-xs text-gray-600">
         <div className="flex items-center gap-1.5">
           <div className="w-4 h-4 rounded bg-white border-2 border-gray-200"></div>
-          <span>예약 가능</span>
+          <span>{languageContent?.availableLegendLabel || "예약 가능"}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="w-4 h-4 rounded bg-purple-600"></div>
-          <span>마감</span>
+          <span>{languageContent?.fullLabel || "마감"}</span>
         </div>
       </div>
     </div>

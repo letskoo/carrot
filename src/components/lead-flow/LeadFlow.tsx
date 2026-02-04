@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import { useLeadFlow } from "./leadFlowContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import StepHeader from "./StepHeader";
 import BottomSheetConsent from "./BottomSheetConsent";
 import CompleteScreen from "./CompleteScreen";
@@ -17,6 +18,7 @@ interface LeadFlowProps {
 export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
   // Context에서 refreshStats 가져오기
   const { refreshStats } = useLeadFlow();
+  const { languageContent } = useLanguage();
 
   // ========================================
   // 규칙 A: 모든 hooks를 최상단에 선언 (항상 같은 순서)
@@ -263,13 +265,13 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
           {step === 1 && (
             <div className="max-w-[640px] mx-auto">
               <h1 className="text-[28px] md:text-[26px] font-bold text-gray-900 mb-6 md:mb-5">
-                포토부스 렌탈 신청
+                {languageContent?.formPageTitle || "포토부스 렌탈 신청"}
               </h1>
 
               {/* 이름 */}
               <div className="mb-5">
                 <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                  이름 <span className="text-[#7c3aed]">*</span>
+                  {languageContent?.nameInputLabel || "이름"} <span className="text-[#7c3aed]">*</span>
                 </label>
                 <input
                   type="text"
@@ -284,7 +286,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
               {/* 연락처 */}
               <div className="mb-5">
                 <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                  연락처 <span className="text-[#7c3aed]">*</span>
+                  {languageContent?.phoneInputLabel || "연락처"} <span className="text-[#7c3aed]">*</span>
                 </label>
                 <input
                   type="tel"
@@ -310,10 +312,10 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
           {step === 2 && (
             <div className="max-w-[640px] mx-auto">
               <h1 className="text-[28px] md:text-[26px] font-bold text-gray-900 mb-2">
-                예약 날짜 선택
+                {languageContent?.bookingPageTitle || "예약 날짜 선택"}
               </h1>
               <p className="text-gray-600 mb-6">
-                원하시는 날짜를 선택하고 시간을 정해주세요
+                {languageContent?.bookingPageSubtitle || "원하시는 날짜를 선택하고 시간을 정해주세요"}
               </p>
 
               <BookingCalendar
@@ -324,7 +326,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
               {/* 선택된 예약 정보 */}
               {formData.bookingDate && formData.bookingTime && (
                 <div className="mt-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                  <div className="text-sm text-gray-700 mb-1">선택한 예약</div>
+                  <div className="text-sm text-gray-700 mb-1">{languageContent?.selectedBookingLabel || "선택한 예약"}</div>
                   <div className="text-lg font-bold text-purple-700">
                     {formData.bookingDate} {formData.bookingTime}
                   </div>
@@ -332,7 +334,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
                     onClick={() => setFormData(prev => ({ ...prev, bookingDate: "", bookingTime: "" }))}
                     className="mt-2 text-sm text-purple-600 hover:text-purple-700 underline"
                   >
-                    다시 선택하기
+                    {languageContent?.deselectButton || "다시 선택하기"}
                   </button>
                 </div>
               )}
@@ -423,7 +425,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
                       : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  다음
+                  {languageContent?.formSubmitButtonText || "다음"}
                 </button>
               )}
 
@@ -437,7 +439,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
                       : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  다음
+                  {languageContent?.formSubmitButtonText || "다음"}
                 </button>
               )}
 

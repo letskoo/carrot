@@ -16,6 +16,7 @@ interface ContentSettings {
   applicationItem: string;
   companyName: string;
   ctaButtonText: string;
+  formPageTitle: string;
   formTitle: string;
   heroImageUrls: string[];
   profileImageUrl: string;
@@ -32,8 +33,7 @@ export default function ContentManagePage() {
     mainSubtitle: "뜨거운 반응, 네컷사진 포토부스 실비렌탈",
     applicationItem: "포토부스 렌탈",
     companyName: "포토그루브",
-    ctaButtonText: "지금 신청하기",
-    formTitle: "신청이 완료 되었어요",
+    ctaButtonText: "지금 신청하기",    formPageTitle: "포토부스 렌탈 신청",    formTitle: "신청이 완료 되었어요",
     heroImageUrls: [],
     profileImageUrl: "",
     smsCustomMessage: "예약일에 만나요! :)",
@@ -72,6 +72,7 @@ export default function ContentManagePage() {
           applicationItem: data.settings.applicationItem || settings.applicationItem,
           companyName: data.settings.companyName || settings.companyName,
           ctaButtonText: data.settings.ctaButtonText || settings.ctaButtonText,
+          formPageTitle: data.settings.formPageTitle || settings.formPageTitle,
           formTitle: data.settings.formTitle || settings.formTitle,
           heroImageUrls: Array.isArray(data.settings.heroImageUrls)
             ? data.settings.heroImageUrls
@@ -145,6 +146,7 @@ export default function ContentManagePage() {
         applicationItem: settings.applicationItem,
         companyName: settings.companyName,
         ctaButtonText: settings.ctaButtonText,
+        formPageTitle: settings.formPageTitle,
         formTitle: settings.formTitle,
         benefits: settings.benefits.map(b => ({ title: b.title, description: b.description })),
         statsLoadingText: settings.statsLoadingText,
@@ -158,6 +160,7 @@ export default function ContentManagePage() {
         settings.applicationItem,
         settings.companyName,
         settings.ctaButtonText,
+        settings.formPageTitle,
         settings.formTitle,
         settings.statsLoadingText,
         settings.statsTemplate,
@@ -187,7 +190,7 @@ export default function ContentManagePage() {
       ]);
 
       // 5. 번역된 텍스트로 콘텐츠 객체 생성
-      const benefitsStartIndex = 8; // mainTitle ~ statsTemplate까지 8개
+      const benefitsStartIndex = 9; // mainTitle ~ statsTemplate까지 9개
       
       const createLanguageContent = (texts: string[]) => {
         const benefits = settings.benefits.map((_, i) => ({
@@ -201,9 +204,10 @@ export default function ContentManagePage() {
           applicationItem: texts[2],
           companyName: texts[3],
           ctaButtonText: texts[4],
-          formTitle: texts[5],
-          statsLoadingText: texts[6],
-          statsTemplate: texts[7],
+          formPageTitle: texts[5],
+          formTitle: texts[6],
+          statsLoadingText: texts[7],
+          statsTemplate: texts[8],
           benefits,
         };
       };
@@ -422,6 +426,18 @@ export default function ContentManagePage() {
                 type="text"
                 value={settings.ctaButtonText}
                 onChange={(e) => handleChange("ctaButtonText", e.target.value)}
+                className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-900 mb-2">
+                폼 페이지 제목
+              </label>
+              <input
+                type="text"
+                value={settings.formPageTitle}
+                onChange={(e) => handleChange("formPageTitle", e.target.value)}
                 className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
               />
             </div>

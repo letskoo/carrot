@@ -1,12 +1,14 @@
 "use client";
 
 import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CompleteScreenProps {
   onConfirm: () => void;
 }
 
 export default function CompleteScreen({ onConfirm }: CompleteScreenProps) {
+  const { languageContent } = useLanguage();
   return (
     <div className="complete-screen fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-[640px] flex flex-col items-center">
@@ -31,10 +33,10 @@ export default function CompleteScreen({ onConfirm }: CompleteScreenProps) {
 
         {/* 텍스트 */}
         <h1 className="text-[20px] font-bold text-gray-900 text-center mb-1">
-          신청이 완료 되었어요
+          {languageContent?.completionTitle || "신청이 완료 되었어요"}
         </h1>
         <p className="text-[15px] text-gray-500 text-center mb-12">
-          빠른 시간 내에 연락을 드리겠습니다
+          {languageContent?.completionMessage || "빠른 시간 내에 연락을 드리겠습니다"}
         </p>
 
         {/* 확인 버튼 - 50% 너비 */}
@@ -43,7 +45,7 @@ export default function CompleteScreen({ onConfirm }: CompleteScreenProps) {
             onClick={onConfirm}
             className="w-full h-12 rounded-xl bg-[#7c3aed] text-white font-bold text-[15px] hover:bg-[#6d28d9] transition-colors active:scale-[0.98]"
           >
-            확인
+            {languageContent?.confirmButton || "확인"}
           </button>
         </div>
       </div>
