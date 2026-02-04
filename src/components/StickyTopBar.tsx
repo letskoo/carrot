@@ -13,7 +13,7 @@ export default function StickyTopBar({ maxWidthClass = "lg:max-w-[1100px]", isAd
   const router = useRouter();
   const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
-  const { currentLanguage, setLanguage, availableLanguages } = useLanguage();
+  const { currentLanguage, setLanguage, availableLanguages, languageContent } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,29 +58,17 @@ export default function StickyTopBar({ maxWidthClass = "lg:max-w-[1100px]", isAd
       <div className={`flex items-center h-14 w-full ${maxWidthClass}`}>
         <div className="px-4 w-full">
           <div className="max-w-[640px] mx-auto h-full flex items-center justify-between">
-            {/* 왼쪽: 뒤로가기 또는 관리자 로그인 */}
-            {isAdminPage ? (
-              <button
-                onClick={handleAdminLogin}
-                className="flex items-center gap-1.5 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer"
-                aria-label="관리자 로그인"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                <span className="text-sm font-semibold">관리자 로그인</span>
-              </button>
-            ) : (
-              <button
-                onClick={handleBack}
-                className="flex items-center justify-center w-8 h-8 cursor-pointer"
-                aria-label="뒤로가기"
-              >
-                <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-            )}
+            {/* 왼쪽: 관리자 로그인 또는 뒤로가기 */}
+            <button
+              onClick={isAdminPage ? handleBack : handleAdminLogin}
+              className="flex items-center gap-1.5 text-gray-700 hover:text-gray-900 transition-colors cursor-pointer"
+              aria-label={isAdminPage ? "뒤로가기" : "관리자 로그인"}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              {!isAdminPage && <span className="text-sm font-semibold">{languageContent?.adminLogin || "관리자 로그인"}</span>}
+            </button>
 
             {/* 오른쪽: 언어 선택 드롭다운 (항상 표시) */}
             <select

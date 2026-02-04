@@ -2,9 +2,29 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function BrandHeader() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [profileImageUrl, setProfileImageUrl] = useState("/images/icons/logo.jpg");
+  const { languageContent } = useLanguage();
+
+  useEffect(() => {
+    async function loadProfileImage() {
+      try {
+        const response = await fetch("/api/admin/settings");
+        const data = await response.json();
+        
+        if (data.ok && data.settings?.profileImageUrl) {
+          setProfileImageUrl(data.settings.profileImageUrl);
+        }
+      } catch (error) {
+        console.error("Failed to load profile image:", error);
+      }
+    }
+    
+    loadProfileImage();
+  }, []);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -27,13 +47,13 @@ export default function BrandHeader() {
               className="relative w-6 h-6 rounded-full overflow-hidden flex-shrink-0 lg:w-8 lg:h-8 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <Image
-                src="/images/icons/logo.jpg"
-                alt="바나타이거 로고"
+                src={profileImageUrl}
+                alt="프로필 로고"
                 fill
                 className="object-cover"
               />
             </button>
-            <span className="text-[13px] font-medium text-gray-900 lg:text-base">포토그루브</span>
+            <span className="text-[13px] font-medium text-gray-900 lg:text-base">{languageContent?.companyName || "포토그루브"}</span>
           </div>
         </div>
       </div>
@@ -60,8 +80,8 @@ export default function BrandHeader() {
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src="/images/icons/logo.jpg"
-              alt="포토그루브 로고"
+              src={profileImageUrl}
+              alt="프로필 로고"
               className="max-w-full max-h-full w-auto h-auto object-contain"
               style={{ maxWidth: '100vw', maxHeight: '100vh' }}
             />

@@ -10,7 +10,7 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-white pb-12">
       <div id="hero-sentinel" className="absolute top-0 left-0 w-full h-px pointer-events-none" />
-      <StickyTopBar maxWidthClass="max-w-[640px]" isAdminPage={true} />
+      <StickyTopBar maxWidthClass="max-w-[640px]" isAdminPage={false} />
       <HeroSlider />
       <div className="px-4">
         <div className="max-w-[640px] mx-auto w-full">

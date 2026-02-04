@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSheetsClient } from "@/lib/googleSheets";
+import { google } from "googleapis";
+
+async function getSheetsClient() {
+  const auth = new google.auth.GoogleAuth({
+    keyFile: "./secrets/service-account.json",
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+
+  return google.sheets({ version: "v4", auth });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,7 +29,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const sheets = getSheetsClient();
+    const sheets = await getSheetsClient();
 
     // 예약가능시간 시트에서 해당 날짜+시간 행 찾기
     const response = await sheets.spreadsheets.values.get({

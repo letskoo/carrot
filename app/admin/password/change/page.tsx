@@ -11,6 +11,9 @@ interface LanguageContent {
   companyName: string;
   ctaButtonText: string;
   formTitle: string;
+  benefits?: Array<{ title: string; description: string }>;
+  statsLoadingText?: string;
+  statsTemplate?: string;
 }
 
 interface LanguageSettings {
@@ -46,6 +49,13 @@ export default function SettingsPage() {
         companyName: "포토그루브",
         ctaButtonText: "지금 신청하기",
         formTitle: "신청이 완료 되었어요",
+        benefits: [
+          { title: "가맹비 0원! 24시간 운영 무인카페", description: "초기 비용 최소화 · 자판기 렌탈만으로도 창업 가능!" },
+          { title: "렌탈/최장 48개월 분납 지원", description: "일시불 · 분납 · 월 렌탈 선택 가능" },
+          { title: "정품 캡슐 사용 / 고수익", description: "브랜드 커피를 24시간 제공" },
+        ],
+        statsLoadingText: "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)",
+        statsTemplate: "최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )",
       },
     },
     en: {
@@ -57,6 +67,13 @@ export default function SettingsPage() {
         companyName: "PhotoGroove",
         ctaButtonText: "Apply Now",
         formTitle: "Application Complete",
+        benefits: [
+          { title: "No franchise fee! 24/7 unmanned cafe", description: "Minimize initial costs · Start with vending machine rental!" },
+          { title: "Rental/Up to 48 months installment", description: "Lump sum · Installment · Monthly rental available" },
+          { title: "Authentic capsules / High profit", description: "Provide branded coffee 24 hours" },
+        ],
+        statsLoadingText: "Loading applicant count... (Please wait if many users online)",
+        statsTemplate: "{count1} applicants in the last month ( Total {count2} )",
       },
     },
     ja: {
@@ -68,6 +85,13 @@ export default function SettingsPage() {
         companyName: "フォトグルーブ",
         ctaButtonText: "今すぐ申し込む",
         formTitle: "申請完了",
+        benefits: [
+          { title: "加盟費0円！24時間営業無人カフェ", description: "初期費用最小化・自販機レンタルだけで創業可能！" },
+          { title: "レンタル/最長48ヶ月分納支援", description: "一括払い・分納・月レンタル選択可能" },
+          { title: "正規カプセル使用 / 高収益", description: "ブランドコーヒーを24時間提供" },
+        ],
+        statsLoadingText: "申請者数を読み込み中... (同時接続者が多い場合は時間がかかります)",
+        statsTemplate: "最近1ヶ月間{count1}名申請中 ( 累計{count2}名 )",
       },
     },
     zh: {
@@ -79,6 +103,13 @@ export default function SettingsPage() {
         companyName: "PhotoGroove",
         ctaButtonText: "立即申请",
         formTitle: "申请完成",
+        benefits: [
+          { title: "加盟费0元！24小时营业无人咖啡馆", description: "最小化初始成本·仅租赁自动售货机即可创业！" },
+          { title: "租赁/最长48个月分期支付", description: "一次性付款·分期·月租赁可选" },
+          { title: "正品胶囊使用 / 高收益", description: "24小时提供品牌咖啡" },
+        ],
+        statsLoadingText: "正在加载申请人数... (同时在线用户较多时可能需要一些时间)",
+        statsTemplate: "最近一个月{count1}人申请中 ( 累计{count2}人 )",
       },
     },
   });

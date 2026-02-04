@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-const slides = [
+const DEFAULT_SLIDES = [
   { src: "/images/hero/001.jpg", alt: "커피 음료와 케이크" },
   { src: "/images/hero/002.jpg", alt: "커피 음료와 케이크" },
   { src: "/images/hero/003.jpg", alt: "커피 음료와 케이크" },
@@ -14,6 +14,7 @@ const TRANSITION_MS = 380;
 const DRAG_THRESHOLD_RATIO = 0.14; // 14% drag needed to trigger slide
 
 export default function HeroSlider() {
+  const [slides, setSlides] = useState(DEFAULT_SLIDES);
   const [index, setIndex] = useState(1); // using extended slides, start at first real slide
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -27,6 +28,31 @@ export default function HeroSlider() {
 
   // ✅ iOS 메인 슬라이더 touch 이벤트 직접 바인딩용
   const isTouchDraggingRef = useRef(false);
+
+  // Google Sheets에서 이미지 URLs 로드
+  useEffect(() => {
+    async function loadSlides() {
+      try {
+        const response = await fetch("/api/admin/settings");
+        const data = await response.json();
+        
+        if (data.ok && data.settings?.heroImageUrls && Array.isArray(data.settings.heroImageUrls)) {
+          const urls = data.settings.heroImageUrls.map((url: string) => ({
+            src: url,
+            alt: "상품 이미지",
+          }));
+          if (urls.length > 0) {
+            setSlides(urls);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load hero images:", error);
+        // 기본값 유지
+      }
+    }
+    
+    loadSlides();
+  }, []);
 
   const total = slides.length;
   const renderSlides = [slides[total - 1], ...slides, slides[0]];

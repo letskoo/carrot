@@ -21,6 +21,8 @@ interface ContentSettings {
   profileImageUrl: string;
   benefits: Benefit[];
   smsCustomMessage: string;
+  statsLoadingText: string;
+  statsTemplate: string;
 }
 
 export default function ContentManagePage() {
@@ -35,6 +37,8 @@ export default function ContentManagePage() {
     heroImageUrls: [],
     profileImageUrl: "",
     smsCustomMessage: "예약일에 만나요! :)",
+    statsLoadingText: "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)",
+    statsTemplate: "최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )",
     benefits: [
       {
         number: 1,
@@ -76,6 +80,9 @@ export default function ContentManagePage() {
           benefits: Array.isArray(data.settings.benefits)
             ? data.settings.benefits
             : settings.benefits,
+          smsCustomMessage: data.settings.smsCustomMessage || settings.smsCustomMessage,
+          statsLoadingText: data.settings.statsLoadingText || settings.statsLoadingText,
+          statsTemplate: data.settings.statsTemplate || settings.statsTemplate,
         };
         setSettings(newSettings);
       }
@@ -128,38 +135,113 @@ export default function ContentManagePage() {
 
   const handleSubmit = async () => {
     setLoading(true);
-    setMessage("");
+    setMessage("번역 중...");
 
     try {
-      const keys = [
-        "mainTitle",
-        "mainSubtitle",
-        "applicationItem",
-        "companyName",
-        "ctaButtonText",
-        "formTitle",
-        "heroImageUrls",
-        "profileImageUrl",
-        "benefits",
-        "smsCustomMessage",
+      // 1. 한국어 콘텐츠 객체 만들기
+      const koContent = {
+        mainTitle: settings.mainTitle,
+        mainSubtitle: settings.mainSubtitle,
+        applicationItem: settings.applicationItem,
+        companyName: settings.companyName,
+        ctaButtonText: settings.ctaButtonText,
+        formTitle: settings.formTitle,
+        benefits: settings.benefits.map(b => ({ title: b.title, description: b.description })),
+        statsLoadingText: settings.statsLoadingText,
+        statsTemplate: settings.statsTemplate,
+      };
+
+      // 2. 번역할 텍스트 배열 (순서대로)
+      const textsToTranslate = [
+        settings.mainTitle,
+        settings.mainSubtitle,
+        settings.applicationItem,
+        settings.companyName,
+        settings.ctaButtonText,
+        settings.formTitle,
+        settings.statsLoadingText,
+        settings.statsTemplate,
+        // benefits 시작
+        ...settings.benefits.flatMap(b => [b.title, b.description]),
       ];
 
-      for (const key of keys) {
-        const response = await fetch("/api/admin/settings", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            key,
-            value: settings[key as keyof ContentSettings],
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to update ${key}`);
+      // 3. MyMemory API로 번역 (한국어 → 영어, 일본어, 중국어)
+      const translateText = async (text: string, targetLang: string) => {
+        try {
+          const response = await fetch(
+            `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ko|${targetLang}`
+          );
+          const data = await response.json();
+          return data.responseData.translatedText || text;
+        } catch (err) {
+          console.error(`Translation failed for "${text}" to ${targetLang}:`, err);
+          return text;
         }
+      };
+
+      // 4. 병렬로 3개 언어 번역
+      const [enTexts, jaTexts, zhTexts] = await Promise.all([
+        Promise.all(textsToTranslate.map(t => translateText(t, "en"))),
+        Promise.all(textsToTranslate.map(t => translateText(t, "ja"))),
+        Promise.all(textsToTranslate.map(t => translateText(t, "zh"))),
+      ]);
+
+      // 5. 번역된 텍스트로 콘텐츠 객체 생성
+      const benefitsStartIndex = 8; // mainTitle ~ statsTemplate까지 8개
+      
+      const createLanguageContent = (texts: string[]) => {
+        const benefits = settings.benefits.map((_, i) => ({
+          title: texts[benefitsStartIndex + i * 2],
+          description: texts[benefitsStartIndex + i * 2 + 1],
+        }));
+        
+        return {
+          mainTitle: texts[0],
+          mainSubtitle: texts[1],
+          applicationItem: texts[2],
+          companyName: texts[3],
+          ctaButtonText: texts[4],
+          formTitle: texts[5],
+          statsLoadingText: texts[6],
+          statsTemplate: texts[7],
+          benefits,
+        };
+      };
+
+      const enContent = createLanguageContent(enTexts);
+      const jaContent = createLanguageContent(jaTexts);
+      const zhContent = createLanguageContent(zhTexts);
+
+      // 6. Google Sheets에 저장할 languages 구조
+      const languages = {
+        ko: { enabled: true, content: koContent },
+        en: { enabled: false, content: enContent },
+        ja: { enabled: false, content: jaContent },
+        zh: { enabled: false, content: zhContent },
+      };
+
+      setMessage("저장 중...");
+
+      // 7. 이미지와 languages를 한 번에 저장
+      const response = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: "languagesAndImages",
+          value: {
+            languages,
+            heroImageUrls: settings.heroImageUrls,
+            profileImageUrl: settings.profileImageUrl,
+            smsCustomMessage: settings.smsCustomMessage,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save settings");
       }
 
-      setMessage("✅ 설정이 저장되었습니다");
+      setMessage("✅ 설정이 저장되었습니다 (번역 완료)");
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
       setMessage("❌ 저장 중 오류가 발생했습니다");
@@ -230,7 +312,47 @@ export default function ContentManagePage() {
             </div>
           </div>
 
-          {/* 이미지 관리 섹션 */}
+          {/* 고정 콘텐츠 섹션 (관리자 수정 불가) */}
+          <div className="space-y-5 pt-6 border-t border-gray-200 bg-gray-50 p-4 rounded-lg">
+            <div className="flex items-center gap-2">
+              <h3 className="text-[18px] font-semibold text-gray-900">고정 콘텐츠 (수정 불가 - 자동 번역됨)</h3>
+              <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">읽기전용</span>
+            </div>
+            <p className="text-[13px] text-gray-600">아래의 콘텐츠는 모든 언어로 자동 번역되지만 관리자가 수정할 수 없습니다.</p>
+
+            <div className="bg-white p-3 rounded border border-gray-200">
+              <label className="block text-[12px] font-semibold text-gray-700 mb-1">관리자 로그인 텍스트</label>
+              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">관리자 로그인</div>
+            </div>
+
+            <div className="bg-white p-3 rounded border border-gray-200">
+              <label className="block text-[12px] font-semibold text-gray-700 mb-1">신청자 수 로딩 텍스트</label>
+              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)</div>
+            </div>
+
+            <div className="bg-white p-3 rounded border border-gray-200">
+              <label className="block text-[12px] font-semibold text-gray-700 mb-1">신청자 수 템플릿</label>
+              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">최근 한달간 {'{count1}'}명 신청 중 ( 누적 {'{count2}'}명 )</div>
+            </div>
+
+            <div className="bg-white p-3 rounded border border-gray-200">
+              <label className="block text-[12px] font-semibold text-gray-700 mb-1">사업자등록증 보기 텍스트</label>
+              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">사업자등록증 보기</div>
+            </div>
+
+            <div className="bg-white p-3 rounded border border-gray-200">
+              <label className="block text-[12px] font-semibold text-gray-700 mb-1">폼 페이지 텍스트들</label>
+              <div className="text-[13px] text-gray-600 space-y-1 p-2 bg-gray-100 rounded">
+                <div>신청 정보 입력 페이지</div>
+                <div>이름, 연락처 입력 필드</div>
+                <div>예약 날짜/시간 선택 페이지</div>
+                <div>개인정보 동의 모달</div>
+                <div>신청 완료 페이지</div>
+              </div>
+            </div>
+          </div>
+
+          {/* 메인 섹션 */}
           <div className="space-y-5 pt-6 border-t border-gray-200">
             <h3 className="text-[18px] font-semibold text-gray-900">이미지 관리</h3>
 
@@ -329,6 +451,35 @@ export default function ContentManagePage() {
               />
               <p className="mt-1 text-xs text-gray-500">
                 예약자, 날짜, 시간 정보 아래에 표시됩니다. 연락처, 주소 등 추가 정보를 입력하세요.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-900 mb-2">
+                통계 로딩 텍스트
+              </label>
+              <input
+                type="text"
+                value={settings.statsLoadingText}
+                onChange={(e) => handleChange("statsLoadingText", e.target.value)}
+                placeholder="신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)"
+                className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[14px] font-semibold text-gray-900 mb-2">
+                통계 텍스트 템플릿
+              </label>
+              <input
+                type="text"
+                value={settings.statsTemplate}
+                onChange={(e) => handleChange("statsTemplate", e.target.value)}
+                placeholder="최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )"
+                className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {"{count1}"}과 {"{count2}"}는 실제 숫자로 자동 대체됩니다.
               </p>
             </div>
           </div>

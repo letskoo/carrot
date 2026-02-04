@@ -1,34 +1,13 @@
 "use client";
 
 import { useLeadFlow } from "@/components/lead-flow/leadFlowContext";
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-
-interface AdminSettings {
-  ctaButtonText?: string;
-}
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function FixedCtaButton() {
   const { openLeadFlow } = useLeadFlow();
-  const [buttonText, setButtonText] = useState("지금 신청하기");
+  const { languageContent } = useLanguage();
   const pathname = usePathname();
-
-  useEffect(() => {
-    async function fetchSettings() {
-      try {
-        const response = await fetch("/api/admin/settings");
-        const data = await response.json();
-        
-        if (data.ok && data.settings?.ctaButtonText) {
-          setButtonText(data.settings.ctaButtonText);
-        }
-      } catch (error) {
-        console.error("Failed to fetch button text:", error);
-      }
-    }
-
-    fetchSettings();
-  }, []);
 
   const handleClick = () => {
     console.log("CTA click - opening lead flow");
@@ -52,7 +31,7 @@ export default function FixedCtaButton() {
             onClick={handleClick}
             className="w-full h-14 flex items-center justify-center rounded-[12px] bg-[#7c3aed] text-base font-bold text-white hover:bg-[#6d28d9] transition-colors active:scale-[0.98] cursor-pointer"
           >
-            {buttonText}
+            {languageContent?.ctaButtonText || "지금 신청하기"}
           </button>
         </div>
       </div>

@@ -1,39 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-interface AdminSettings {
-  applicationItem?: string;
-  companyName?: string;
-}
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function InfoCard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [settings, setSettings] = useState<AdminSettings>({
-    applicationItem: "포토부스 렌탈",
-    companyName: "포토그루브",
-  });
-
-  useEffect(() => {
-    async function fetchSettings() {
-      try {
-        const response = await fetch("/api/admin/settings");
-        const data = await response.json();
-        
-        if (data.ok && data.settings) {
-          setSettings((prev) => ({
-            ...prev,
-            applicationItem: data.settings.applicationItem || prev.applicationItem,
-            companyName: data.settings.companyName || prev.companyName,
-          }));
-        }
-      } catch (error) {
-        console.error("Failed to fetch settings:", error);
-      }
-    }
-
-    fetchSettings();
-  }, []);
+  const { languageContent } = useLanguage();
 
   useEffect(() => {
     if (isModalOpen) {
@@ -53,11 +25,11 @@ export default function InfoCard() {
         <div className="grid gap-y-2.5 gap-x-3" style={{ gridTemplateColumns: '70px 1fr' }}>
           {/* Row 1: 신청항목 */}
           <span className="text-[12px] text-gray-500 lg:text-sm">신청항목</span>
-          <span className="text-[13px] font-semibold text-gray-900 lg:text-base">{settings.applicationItem}</span>
+          <span className="text-[13px] font-semibold text-gray-900 lg:text-base">{languageContent?.applicationItem || "포토부스 렌탈"}</span>
 
           {/* Row 2: 상호명 */}
           <span className="text-[12px] text-gray-500 lg:text-sm">상호명</span>
-          <span className="text-[13px] font-semibold text-gray-900 lg:text-base">{settings.companyName}</span>
+          <span className="text-[13px] font-semibold text-gray-900 lg:text-base">{languageContent?.companyName || "포토그루브"}</span>
 
           {/* Row 3: 사업자등록증 보기 (라벨 컬럼 비움, 간격 50% 축소) */}
           <span className="-mt-1.5"></span>
