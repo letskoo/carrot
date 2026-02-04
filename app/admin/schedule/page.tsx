@@ -129,42 +129,42 @@ export default function AdminSchedulePage() {
           {/* 1. 예약 일정 설정 */}
           <div className="flex flex-col py-6 border-b border-gray-200">
             <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">예약 일정 설정</h2>
-              <p className="text-sm text-gray-500">대량으로 예약 가능 일정을 생성합니다</p>
+              <h2 className="text-lg font-bold text-gray-900 mb-1">{languageContent?.scheduleSettingsTitle || "예약 일정 설정"}</h2>
+              <p className="text-sm text-gray-500">{languageContent?.scheduleSettingsDesc || "대량으로 예약 가능 일정을 생성합니다"}</p>
             </div>
             <button 
               onClick={() => router.push("/admin/schedule/manage")}
               className="mt-4 text-purple-600 text-sm font-semibold hover:text-purple-700 transition-colors text-left cursor-pointer"
             >
-              일정 설정하기 →
+              {languageContent?.scheduleSettingsButton || "일정 설정하기 →"}
             </button>
           </div>
 
           {/* 2. 메인 콘텐츠 */}
           <div className="flex flex-col py-6 border-b border-gray-200">
             <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">메인 콘텐츠 수정</h2>
-              <p className="text-sm text-gray-500">제목, 소제목, 혜택 항목 등을 수정합니다</p>
+              <h2 className="text-lg font-bold text-gray-900 mb-1">{languageContent?.mainContentTitle || "메인 콘텐츠 수정"}</h2>
+              <p className="text-sm text-gray-500">{languageContent?.mainContentDesc || "제목, 소제목, 혜택 항목 등을 수정합니다"}</p>
             </div>
             <button 
               onClick={() => router.push("/admin/content/manage")}
               className="mt-4 text-purple-600 text-sm font-semibold hover:text-purple-700 transition-colors text-left cursor-pointer"
             >
-              콘텐츠 수정하기 →
+              {languageContent?.mainContentButton || "콘텐츠 수정하기 →"}
             </button>
           </div>
 
           {/* 3. 비밀번호 변경 및 기타 설정 */}
           <div className="flex flex-col py-6 border-b border-gray-200">
             <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-1">비밀번호 변경 및 기타 설정</h2>
-              <p className="text-sm text-gray-500">비밀번호, 다국어, SMS 안내사항을 설정합니다</p>
+              <h2 className="text-lg font-bold text-gray-900 mb-1">{languageContent?.passwordSettingsTitle || "비밀번호 변경 및 기타 설정"}</h2>
+              <p className="text-sm text-gray-500">{languageContent?.passwordSettingsDesc || "비밀번호, 다국어, SMS 안내사항을 설정합니다"}</p>
             </div>
             <button 
               onClick={() => router.push("/admin/password/change")}
               className="mt-4 text-purple-600 text-sm font-semibold hover:text-purple-700 transition-colors text-left cursor-pointer"
             >
-              설정하기 →
+              {languageContent?.passwordSettingsButton || "설정하기 →"}
             </button>
           </div>
         </div>

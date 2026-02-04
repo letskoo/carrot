@@ -68,6 +68,7 @@ type LanguageContent = {
   // 동의 모달 - 버튼
   agreeAndCompleteButton?: string;
   processingText?: string;
+  consentRequiredLabel?: string;
   // 관리자 로그인 페이지
   adminPasswordPlaceholder?: string;
   adminLoginButton?: string;
@@ -75,6 +76,16 @@ type LanguageContent = {
   adminBackButton?: string;
   adminDashboard?: string;
   adminLogout?: string;
+  // 관리자 메뉴
+  scheduleSettingsTitle?: string;
+  scheduleSettingsDesc?: string;
+  scheduleSettingsButton?: string;
+  mainContentTitle?: string;
+  mainContentDesc?: string;
+  mainContentButton?: string;
+  passwordSettingsTitle?: string;
+  passwordSettingsDesc?: string;
+  passwordSettingsButton?: string;
 };
 
 type LanguageSettings = {
@@ -139,6 +150,16 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       adminBackButton: "돌아가기 →",
       adminDashboard: "관리자 대시보드",
       adminLogout: "로그아웃",
+      // 관리자 메뉴
+      scheduleSettingsTitle: "예약 일정 설정",
+      scheduleSettingsDesc: "대량으로 예약 가능 일정을 생성합니다",
+      scheduleSettingsButton: "일정 설정하기 →",
+      mainContentTitle: "메인 콘텐츠 수정",
+      mainContentDesc: "제목, 소제목, 혜택 항목 등을 수정합니다",
+      mainContentButton: "콘텐츠 수정하기 →",
+      passwordSettingsTitle: "비밀번호 변경 및 기타 설정",
+      passwordSettingsDesc: "비밀번호, 다국어, SMS 안내사항을 설정합니다",
+      passwordSettingsButton: "설정하기 →",
       statsLoadingText: "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)",
       statsTemplate: "최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )",
       businessRegistrationText: "사업자등록증 보기",
@@ -182,6 +203,7 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       // 동의 모달 - 버튼
       agreeAndCompleteButton: "동의하고 신청 완료하기",
       processingText: "처리 중…",
+      consentRequiredLabel: "(필수)",
     },
   },
   en: {
@@ -222,8 +244,16 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       adminLoggingInButton: "Logging in...",
       adminBackButton: "Back \u2192",
       adminDashboard: "Admin Dashboard",
-      adminLogout: "Logout",
-      statsLoadingText: "Loading applicant count... (Please wait if many users online)",
+      adminLogout: "Logout",      // Admin Menu
+      scheduleSettingsTitle: "Schedule Settings",
+      scheduleSettingsDesc: "Create bulk booking availability schedules",
+      scheduleSettingsButton: "Configure Schedule →",
+      mainContentTitle: "Edit Main Content",
+      mainContentDesc: "Edit titles, subtitles, benefits, and more",
+      mainContentButton: "Edit Content →",
+      passwordSettingsTitle: "Password & Settings",
+      passwordSettingsDesc: "Configure password, languages, SMS messages",
+      passwordSettingsButton: "Settings →",      statsLoadingText: "Loading applicant count... (Please wait if many users online)",
       statsTemplate: "{count1} applicants in the last month ( Total {count2} )",
       businessRegistrationText: "View Business Registration",
         applicationItemLabel: "Application Item",
@@ -266,6 +296,7 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       // 동의 모달 - 버튼
       agreeAndCompleteButton: "Agree and Complete Application",
       processingText: "Processing…",
+      consentRequiredLabel: "(Required)",
     },
   },
   ja: {
@@ -288,7 +319,18 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       adminLoggingInButton: "ログイン中...",
       adminBackButton: "戻る →",
       adminDashboard: "管理者ダッシュボード",
-      adminLogout: "ログアウト",      statsLoadingText: "申請者数を読み込み中... (同時接続者が多い場合は時間がかかります)",
+      adminLogout: "ログアウト",
+      // 管理メニュー
+      scheduleSettingsTitle: "スケジュール設定",
+      scheduleSettingsDesc: "一括で予約可能なスケジュールを作成します",
+      scheduleSettingsButton: "スケジュール設定 →",
+      mainContentTitle: "メインコンテンツ編集",
+      mainContentDesc: "タイトル、サブタイトル、特典項目などを編集します",
+      mainContentButton: "コンテンツ編集 →",
+      passwordSettingsTitle: "パスワードと設定",
+      passwordSettingsDesc: "パスワード、言語、SMS案内を設定します",
+      passwordSettingsButton: "設定 →",
+      statsLoadingText: "申請者数を読み込み中... (同時接続者が多い場合は時間がかかります)",
       statsTemplate: "最近1ヶ月間{count1}名申請中 ( 累計{count2}名 )",
       businessRegistrationText: "事業者登録証を見る",
         applicationItemLabel: "申請項目",
@@ -330,6 +372,7 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       submitApplicationButton: "申請を完了する",
       agreeAndCompleteButton: "同意して申請を完了する",
       processingText: "処理中...",
+      consentRequiredLabel: "(必須)",
       consentDetails: [
         {
           title: "個人情報の収集および利用案内",
@@ -364,12 +407,24 @@ const DEFAULT_LANGUAGES: AllLanguages = {
         { title: "无运费等追加费用X", description: "提供500张照片纸，现场配置专业人员" },
       ],
       // 管理员不可编辑 (固定值)
-      adminLogin: "管理员登录",      adminPasswordPlaceholder: "请输入密码",
+      adminLogin: "管理员登录",
+      adminPasswordPlaceholder: "请输入密码",
       adminLoginButton: "登录",
       adminLoggingInButton: "登录中...",
       adminBackButton: "返回 →",
       adminDashboard: "管理员仓库",
-      adminLogout: "退出登录",      statsLoadingText: "正在加载申请人数... (同时在线用户较多时可能需要一些时间)",
+      adminLogout: "退出登录",
+      // 管理菜单
+      scheduleSettingsTitle: "日程设置",
+      scheduleSettingsDesc: "批量创建可预约日程",
+      scheduleSettingsButton: "设置日程 →",
+      mainContentTitle: "编辑主要内容",
+      mainContentDesc: "编辑标题、副标题、优惠项目等",
+      mainContentButton: "编辑内容 →",
+      passwordSettingsTitle: "密码和设置",
+      passwordSettingsDesc: "配置密码、语言、短信通知",
+      passwordSettingsButton: "设置 →",
+      statsLoadingText: "正在加载申请人数... (同时在线用户较多时可能需要一些时间)",
       statsTemplate: "最近一个月{count1}人申请中 ( 累计{count2}人 )",
       businessRegistrationText: "查看营业执照",
         applicationItemLabel: "申请项目",
@@ -411,6 +466,7 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       submitApplicationButton: "完成申请",
       agreeAndCompleteButton: "同意并完成申请",
       processingText: "处理中...",
+      consentRequiredLabel: "(必需)",
       consentDetails: [
         {
           title: "个人信息收集及使用说明",

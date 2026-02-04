@@ -165,7 +165,7 @@ export default function BottomSheetConsent({
                   className="text-left flex-1 hover:opacity-70 transition-opacity cursor-pointer"
                 >
                   <span className="text-[14px] text-gray-700 leading-relaxed block">
-                    <span className="font-semibold">(필수)</span>{" "}
+                    <span className="font-semibold">{languageContent?.consentRequiredLabel || "(필수)"}</span>{" "}
                     {consentDetails?.[0]?.title || "개인정보 수집 및 이용 동의"}
                     <br />
                     <span className="text-[12px] text-gray-500">
@@ -206,7 +206,7 @@ export default function BottomSheetConsent({
                   className="text-left flex-1 hover:opacity-70 transition-opacity cursor-pointer"
                 >
                   <span className="text-[14px] text-gray-700 leading-relaxed block">
-                    <span className="font-semibold">(필수)</span>{" "}
+                    <span className="font-semibold">{languageContent?.consentRequiredLabel || "(필수)"}</span>{" "}
                     {consentDetails?.[1]?.title || "개인정보 제3자 제공 없음 확인"}
                     <br />
                     <span className="text-[12px] text-gray-500">
@@ -245,7 +245,7 @@ export default function BottomSheetConsent({
                   className="text-left flex-1 hover:opacity-70 transition-opacity cursor-pointer"
                 >
                   <span className="text-[14px] text-gray-700 leading-relaxed block">
-                    <span className="font-semibold">(필수)</span>{" "}
+                    <span className="font-semibold">{languageContent?.consentRequiredLabel || "(필수)"}</span>{" "}
                     {consentDetails?.[2]?.title || "개인정보 처리방침 확인"}
                     <br />
                     <span className="text-[12px] text-gray-500">
