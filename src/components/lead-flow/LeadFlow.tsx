@@ -352,23 +352,23 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
           {step === 3 && (
             <div className="max-w-[640px] mx-auto">
               <h1 className="text-[28px] md:text-[26px] font-bold text-gray-900 mb-2">
-                추가 정보
+                {languageContent?.additionalInfoTitle || "추가 정보"}
               </h1>
               <p className="text-gray-600 mb-6">
-                선택사항입니다. 원하시면 작성해주세요.
+                {languageContent?.additionalInfoSubtitle || "선택사항입니다. 원하시면 작성해주세요."}
               </p>
 
               {/* 지역 */}
               <div className="mb-5">
                 <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                  지역
+                  {languageContent?.regionLabel || "지역"}
                 </label>
                 <input
                   type="text"
                   name="region"
                   value={formData.region}
                   onChange={handleFormChange}
-                  placeholder="예: 강남구, 서초구"
+                  placeholder={languageContent?.regionPlaceholder || "예: 강남구, 서초구"}
                   className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed] transition-colors bg-white"
                 />
               </div>
@@ -376,11 +376,11 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
               {/* 문의 내용 */}
               <div className="mb-5">
                 <label className="block text-[14px] font-semibold text-gray-900 mb-2">
-                  문의 내용
+                  {languageContent?.inquiryLabel || "문의 내용"}
                 </label>
                 <textarea
                   name="memo"
-                  placeholder="행사 종류, 요청사항 등을 자유롭게 작성해주세요"
+                  placeholder={languageContent?.inquiryPlaceholder || "행사 종류, 요청사항 등을 자유롭게 작성해주세요"}
                   rows={5}
                   value={formData.memo}
                   onChange={handleFormChange}
@@ -390,11 +390,13 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
 
               {/* 예약 정보 확인 */}
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="text-sm text-gray-600 mb-2">신청 정보 확인</div>
+                <div className="text-sm text-gray-600 mb-2">
+                  {languageContent?.applicationSummaryTitle || "신청 정보 확인"}
+                </div>
                 <div className="space-y-1 text-sm">
-                  <div><span className="text-gray-600">이름:</span> <span className="font-medium">{formData.name}</span></div>
-                  <div><span className="text-gray-600">연락처:</span> <span className="font-medium">{formData.phone}</span></div>
-                  <div><span className="text-gray-600">예약:</span> <span className="font-medium text-purple-600">{formData.bookingDate} {formData.bookingTime}</span></div>
+                  <div><span className="text-gray-600">{languageContent?.summaryNameLabel || "이름"}:</span> <span className="font-medium">{formData.name}</span></div>
+                  <div><span className="text-gray-600">{languageContent?.summaryPhoneLabel || "연락처"}:</span> <span className="font-medium">{formData.phone}</span></div>
+                  <div><span className="text-gray-600">{languageContent?.summaryBookingLabel || "예약"}:</span> <span className="font-medium text-purple-600">{formData.bookingDate} {formData.bookingTime}</span></div>
                 </div>
               </div>
 
@@ -448,7 +450,7 @@ export default function LeadFlow({ isOpen, onClose }: LeadFlowProps) {
                   onClick={handleSubmitClick}
                   className="w-full h-14 flex items-center justify-center rounded-[12px] font-bold text-base bg-[#7c3aed] text-white hover:bg-[#6d28d9] active:scale-[0.98] cursor-pointer transition-colors"
                 >
-                  신청 완료하기
+                  {languageContent?.submitApplicationButton || "신청 완료하기"}
                 </button>
               )}
             </div>

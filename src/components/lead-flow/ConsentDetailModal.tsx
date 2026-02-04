@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import styles from "./ConsentSheet.module.css";
 
 interface ConsentDetailModalProps {
@@ -46,6 +47,7 @@ export default function ConsentDetailModal({
   onClose,
   detailType,
 }: ConsentDetailModalProps) {
+  const { languageContent } = useLanguage();
   const [isMounted, setIsMounted] = React.useState(false);
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -78,7 +80,21 @@ export default function ConsentDetailModal({
 
   if (!isMounted || !detailType) return null;
 
-  const content = detailContent[detailType];
+  const detailTypeToIndex = {
+    personalDataCollection: 0,
+    personalDataThirdParty: 1,
+    personalDataCompany: 2,
+  } as const;
+
+  const fallbackContent = detailContent[detailType];
+  const consentDetails = languageContent?.consentDetails;
+  const mappedContent = consentDetails?.[detailTypeToIndex[detailType]];
+
+  const content = {
+    title: mappedContent?.title || fallbackContent.title,
+    subtitle: mappedContent?.subtitle || fallbackContent.subtitle,
+    body: mappedContent?.body || fallbackContent.body,
+  };
 
   return (
     <>

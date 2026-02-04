@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import styles from "./ConsentSheet.module.css";
-import { FormDataType, ConsentCheckboxes } from "./types";
+import { ConsentCheckboxes } from "./types";
 import ConsentDetailModal from "./ConsentDetailModal";
 
 interface BottomSheetConsentProps {
@@ -27,6 +27,7 @@ export default function BottomSheetConsent({
   const [isMounted, setIsMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [detailModal, setDetailModal] = useState<"personalDataCollection" | "personalDataThirdParty" | "personalDataCompany" | null>(null);
+  const consentDetails = languageContent?.consentDetails;
 
   // 애니메이션 시간(ms)
   const transitionDuration = 300;
@@ -164,10 +165,12 @@ export default function BottomSheetConsent({
                   className="text-left flex-1 hover:opacity-70 transition-opacity cursor-pointer"
                 >
                   <span className="text-[14px] text-gray-700 leading-relaxed block">
-                    <span className="font-semibold">(필수)</span> 개인정보 수집 및
-                    이용 동의
+                    <span className="font-semibold">(필수)</span>{" "}
+                    {consentDetails?.[0]?.title || "개인정보 수집 및 이용 동의"}
                     <br />
-                    <span className="text-[12px] text-gray-500">(상담 안내를 위해 사용됩니다. 마케팅에 사용되지 않습니다)</span>
+                    <span className="text-[12px] text-gray-500">
+                      {consentDetails?.[0]?.subtitle || "(상담 안내를 위해 사용됩니다. 마케팅에 사용되지 않습니다)"}
+                    </span>
                   </span>
                 </button>
               </label>
@@ -203,10 +206,11 @@ export default function BottomSheetConsent({
                   className="text-left flex-1 hover:opacity-70 transition-opacity cursor-pointer"
                 >
                   <span className="text-[14px] text-gray-700 leading-relaxed block">
-                    <span className="font-semibold">(필수)</span> 개인정보 제3자 제공 없음 확인
+                    <span className="font-semibold">(필수)</span>{" "}
+                    {consentDetails?.[1]?.title || "개인정보 제3자 제공 없음 확인"}
                     <br />
                     <span className="text-[12px] text-gray-500">
-                      (수집된 개인정보는 제3자에게 제공하지 않습니다)
+                      {consentDetails?.[1]?.subtitle || "(수집된 개인정보는 제3자에게 제공하지 않습니다)"}
                     </span>
                   </span>
                 </button>
@@ -241,10 +245,11 @@ export default function BottomSheetConsent({
                   className="text-left flex-1 hover:opacity-70 transition-opacity cursor-pointer"
                 >
                   <span className="text-[14px] text-gray-700 leading-relaxed block">
-                    <span className="font-semibold">(필수)</span> 개인정보 처리방침 확인
+                    <span className="font-semibold">(필수)</span>{" "}
+                    {consentDetails?.[2]?.title || "개인정보 처리방침 확인"}
                     <br />
                     <span className="text-[12px] text-gray-500">
-                      (개인정보 처리방침을 확인하였습니다)
+                      {consentDetails?.[2]?.subtitle || "(개인정보 처리방침을 확인하였습니다)"}
                     </span>
                   </span>
                 </button>
@@ -268,7 +273,9 @@ export default function BottomSheetConsent({
                       : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  {isLoading ? "처리 중…" : "동의하고 신청 완료하기"}
+                  {isLoading
+                    ? languageContent?.processingText || "처리 중…"
+                    : languageContent?.agreeAndCompleteButton || "동의하고 신청 완료하기"}
                 </button>
               </div>
             </div>

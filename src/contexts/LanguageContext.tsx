@@ -13,6 +13,11 @@ type LanguageContent = {
   ctaButtonText: string;
   formTitle: string;
   benefits?: Array<{ title: string; description: string }>;
+  consentDetails?: Array<{
+    title: string;
+    subtitle: string;
+    body: string;
+  }>;
   // 관리자가 수정 불가능한 콘텐츠 (비활성화 - 고정값)
   adminLogin?: string;
   statsLoadingText?: string;
@@ -48,6 +53,18 @@ type LanguageContent = {
   // 완료 페이지
   completionTitle?: string;
   completionMessage?: string;
+  // 추가 정보 페이지 (Step 3)
+  additionalInfoTitle?: string;
+  additionalInfoSubtitle?: string;
+  regionLabel?: string;
+  regionPlaceholder?: string;
+  inquiryLabel?: string;
+  inquiryPlaceholder?: string;
+  applicationSummaryTitle?: string;
+  summaryNameLabel?: string;
+  summaryPhoneLabel?: string;
+  summaryBookingLabel?: string;
+  submitApplicationButton?: string;
 };
 
 type LanguageSettings = {
@@ -87,6 +104,23 @@ const DEFAULT_LANGUAGES: AllLanguages = {
         { title: "렌탈 실비 20만원 (4H)", description: "선입금 금지, 행사 종료 후 정산" },
         { title: "운송비 등 추가비용 X", description: "인화지 500장 지원, 전문 인력 현장 배치" },
       ],
+      consentDetails: [
+        {
+          title: "개인정보 수집 및 이용 안내",
+          subtitle: "개인정보 수집 및 이용 안내",
+          body: "1. 수집 항목\n- 이름, 연락처(전화번호), 지역, 문의 내용\n\n2. 수집·이용 목적\n- 포토그루브 프로그램 설치 및 렌탈 상담\n- 문의 내용 확인 및 상담 안내 연락\n\n3. 보유 및 이용 기간\n- 문의 접수일로부터 1년 이내 (목적 달성 시 즉시 파기)\n\n4. 동의 거부 권리 및 불이익\n- 동의를 거부할 수 있으나, 거부 시 상담/문의 접수가 제한될 수 있습니다."
+        },
+        {
+          title: "개인정보 제3자 제공 안내",
+          subtitle: "개인정보 제3자 제공 안내",
+          body: "- 메타페이는 이용자의 개인정보를 제3자에게 제공하지 않습니다.\n- 단, 법령에 따라 제출 의무가 발생하는 경우에는 예외적으로 제공될 수 있습니다."
+        },
+        {
+          title: "개인정보 처리방침 요약",
+          subtitle: "개인정보 처리방침 요약",
+          body: "- 개인정보는 상담 목적을 위해서만 이용됩니다.\n- 보관 기간 경과 또는 목적 달성 시 지체 없이 파기합니다.\n- 개인정보 보호 관련 문의: kiwankoo@gmail.com"
+        }
+      ],
       // 관리자 수정 불가 (고정값)
       adminLogin: "관리자 로그인",
       statsLoadingText: "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)",
@@ -107,7 +141,7 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       cancelButton: "취소",
       confirmButton: "확인",
       selectedBookingLabel: "선택한 예약",
-      deselectButton: "디선택하기",
+      deselectButton: "다시 선택하기",
       loadingText: "로딩 중...",
       noAvailableSlots: "예약 가능한 시간이 없습니다.",
       availableLegendLabel: "예약 가능",
@@ -118,6 +152,20 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       consentDisagree: "동의하지 않습니다",
       completionTitle: "신청이 완료 되었어요",
       completionMessage: "감사합니다!",
+      additionalInfoTitle: "추가 정보",
+      additionalInfoSubtitle: "선택사항입니다. 원하시면 작성해주세요.",
+      regionLabel: "지역",
+      regionPlaceholder: "예: 강남구, 서초구",
+      inquiryLabel: "문의 내용",
+      inquiryPlaceholder: "행사 종류, 요청사항 등을 자유롭게 작성해주세요",
+      applicationSummaryTitle: "신청 정보 확인",
+      summaryNameLabel: "이름",
+      summaryPhoneLabel: "연락처",
+      summaryBookingLabel: "예약",
+      submitApplicationButton: "신청 완료하기",
+      // 동의 모달 - 버튼
+      agreeAndCompleteButton: "동의하고 신청 완료하기",
+      processingText: "처리 중…",
     },
   },
   en: {
@@ -133,6 +181,23 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       benefits: [
         { title: "Rental fee $200 (4H)", description: "No prepayment, settlement after event" },
         { title: "No additional costs like shipping", description: "500 sheets of photo paper provided, professional staff on site" },
+      ],
+      consentDetails: [
+        {
+          title: "Personal Information Collection and Use Guide",
+          subtitle: "Personal Information Collection and Use Guide",
+          body: "1. Collection Items\n- Name, contact (phone number), region, inquiry content\n\n2. Purpose of Collection and Use\n- Photo Groove program installation and rental consultation\n- Confirmation of inquiry content and consultation guidance contact\n\n3. Retention and Use Period\n- Within 1 year from the date of inquiry receipt (immediately destroyed upon purpose achievement)\n\n4. Right to Refuse Consent and Disadvantages\n- You may refuse consent, but if you refuse, consultation/inquiry submission may be limited."
+        },
+        {
+          title: "Guide to Third-Party Personal Information Disclosure",
+          subtitle: "Guide to Third-Party Personal Information Disclosure",
+          body: "- Meta Pay does not provide users' personal information to third parties.\n- However, exceptions may apply if disclosure obligations arise under applicable laws."
+        },
+        {
+          title: "Personal Information Protection Policy Summary",
+          subtitle: "Personal Information Protection Policy Summary",
+          body: "- Personal information is used solely for consultation purposes.\n- Personal information will be destroyed without delay upon expiration of the retention period or achievement of the purpose.\n- For inquiries regarding personal information protection: kiwankoo@gmail.com"
+        }
       ],
       // 관리자 수정 불가 (고정값)
       adminLogin: "Admin Login",
@@ -165,6 +230,20 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       consentDisagree: "I Disagree",
       completionTitle: "Application Complete",
       completionMessage: "Thank you!",
+      additionalInfoTitle: "Additional Information",
+      additionalInfoSubtitle: "Optional. Please fill in if you'd like.",
+      regionLabel: "Region",
+      regionPlaceholder: "e.g., Gangnam-gu, Seocho-gu",
+      inquiryLabel: "Inquiry",
+      inquiryPlaceholder: "Please describe your event or requests",
+      applicationSummaryTitle: "Application Summary",
+      summaryNameLabel: "Name",
+      summaryPhoneLabel: "Phone",
+      summaryBookingLabel: "Booking",
+      submitApplicationButton: "Submit Application",
+      // 동의 모달 - 버튼
+      agreeAndCompleteButton: "Agree and Complete Application",
+      processingText: "Processing…",
     },
   },
   ja: {
@@ -212,6 +291,36 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       consentDisagree: "同意しません",
       completionTitle: "申請完了",
       completionMessage: "ありがとうございました!",
+      additionalInfoTitle: "追加情報",
+      additionalInfoSubtitle: "任意です。必要であればご記入ください。",
+      regionLabel: "地域",
+      regionPlaceholder: "例: 江南区、瑞草区",
+      inquiryLabel: "お問い合わせ内容",
+      inquiryPlaceholder: "イベント内容やご要望をご記入ください",
+      applicationSummaryTitle: "申請情報の確認",
+      summaryNameLabel: "お名前",
+      summaryPhoneLabel: "連絡先",
+      summaryBookingLabel: "予約",
+      submitApplicationButton: "申請を完了する",
+      agreeAndCompleteButton: "同意して申請を完了する",
+      processingText: "処理中...",
+      consentDetails: [
+        {
+          title: "個人情報の収集および利用案内",
+          subtitle: "個人情報処理の目的と範囲",
+          body: "1. 収集項目\n- 名前、電話番号\n- 地域、問い合わせ内容\n\n2. 収集目的\n- フォトブース予約確認\n- イベント告知\n- サービス改善\n\n3. 保有期間\n- 1年間保有後削除"
+        },
+        {
+          title: "個人情報の第三者提供案内",
+          subtitle: "個人情報共有範囲",
+          body: "個人情報は以下の場合のみ第三者に共有されます：\n1. 法的要求による場合\n2. ユーザーの明示的な同意がある場合\n\nその他の目的では共有されません。"
+        },
+        {
+          title: "個人情報処理方針の概要",
+          subtitle: "データ保護方針",
+          body: "当社は個人情報を安全に管理し、ユーザーの権利を保護します：\n\n1. 暗号化によるデータ保護\n2. 定期的なセキュリティ監査\n3. ユーザーの要求に応じた削除\n\n詳細は個人情報処理方針をご覧ください。"
+        }
+      ],
     },
   },
   zh: {
@@ -259,6 +368,36 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       consentDisagree: "我不同意",
       completionTitle: "申请完成",
       completionMessage: "谢谢!",
+      additionalInfoTitle: "追加信息",
+      additionalInfoSubtitle: "可选项。如需填写请填写。",
+      regionLabel: "地区",
+      regionPlaceholder: "例如：江南区、瑞草区",
+      inquiryLabel: "咨询内容",
+      inquiryPlaceholder: "请填写活动类型或需求",
+      applicationSummaryTitle: "申请信息确认",
+      summaryNameLabel: "姓名",
+      summaryPhoneLabel: "联系电话",
+      summaryBookingLabel: "预约",
+      submitApplicationButton: "完成申请",
+      agreeAndCompleteButton: "同意并完成申请",
+      processingText: "处理中...",
+      consentDetails: [
+        {
+          title: "个人信息收集及使用说明",
+          subtitle: "个人信息处理目的与范围",
+          body: "1. 收集项目\n- 姓名、联系电话\n- 地区、咨询内容\n\n2. 收集目的\n- 确认照相亭预约\n- 活动通知\n- 服务改善\n\n3. 保留期限\n- 保留1年后删除"
+        },
+        {
+          title: "个人信息向第三方提供说明",
+          subtitle: "个人信息共享范围",
+          body: "个人信息仅在以下情况下向第三方共享：\n1. 法律要求时\n2. 用户明确同意时\n\n除此之外不会共享。"
+        },
+        {
+          title: "个人信息处理方针摘要",
+          subtitle: "数据保护方针",
+          body: "我们会安全管理个人信息并保护用户权利：\n\n1. 通过加密保护数据\n2. 定期安全审计\n3. 根据用户请求删除\n\n详情请参阅个人信息处理方针。"
+        }
+      ],
     },
   },
 };
