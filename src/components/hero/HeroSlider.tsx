@@ -52,6 +52,35 @@ export default function HeroSlider() {
     }
     
     loadSlides();
+
+    // BroadcastChannel로 다른 탭에서 변경사항 감지
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel("language-settings-channel");
+      const handleBroadcast = (event: MessageEvent) => {
+        if (event.data.type === "language-updated") {
+          console.log("[HeroSlider] Settings updated, reloading images");
+          loadSlides();
+        }
+      };
+      channel.onmessage = handleBroadcast;
+    } catch (error) {
+      console.warn("[HeroSlider] BroadcastChannel not supported:", error);
+    }
+
+    // localStorage 폴백
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "admin-settings-updated") {
+        console.log("[HeroSlider] Storage event detected, reloading images");
+        loadSlides();
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      if (channel) channel.close();
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   const total = slides.length;

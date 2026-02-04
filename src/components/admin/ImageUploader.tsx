@@ -83,7 +83,7 @@ export default function ImageUploader({
       }
     } catch (err) {
       setError("업로드 중 오류가 발생했습니다");
-      console.error(err);
+      console.error("[ImageUploader] Exception:", err);
     } finally {
       setUploading(false);
     }
@@ -98,64 +98,35 @@ export default function ImageUploader({
       <h3 className="font-semibold text-gray-900">{title}</h3>
 
       {/* 파일 선택 */}
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-        <input
-          type="file"
-          id={`file-input-${title}`}
-          multiple
-          accept="image/*"
-          onChange={handleFileSelect}
-          className="hidden"
-        />
-        <label
-          htmlFor={`file-input-${title}`}
-          className="cursor-pointer flex flex-col items-center"
-        >
-          <svg
-            className="w-8 h-8 text-gray-400 mb-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          <span className="text-sm font-medium text-gray-600">
-            클릭하여 파일 선택
-          </span>
-          <span className="text-xs text-gray-500 mt-1">
-            최대 {maxSizePerFile}MB
-          </span>
-        </label>
-      </div>
+      <input
+        type="file"
+        id={`file-input-${title}`}
+        multiple
+        accept="image/*"
+        onChange={handleFileSelect}
+        disabled={uploading}
+        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 disabled:opacity-50"
+      />
 
       {/* 선택된 파일 목록 */}
       {files.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-sm font-medium text-blue-900 mb-2">
             선택된 파일: {files.length}개
           </p>
           <ul className="text-sm text-blue-800 space-y-1">
-            {files.map((file, i) => (
-              <li key={i}>• {file.name}</li>
+            {files.map((file, index) => (
+              <li key={index}>• {file.name} ({(file.size / 1024).toFixed(2)}KB)</li>
             ))}
           </ul>
+          <button
+            onClick={handleUpload}
+            disabled={uploading}
+            className="mt-3 w-full py-2 px-4 bg-purple-600 text-white rounded font-semibold hover:bg-purple-700 transition disabled:bg-gray-400"
+          >
+            {uploading ? "업로드 중..." : "업로드"}
+          </button>
         </div>
-      )}
-
-      {/* 업로드 버튼 */}
-      {files.length > 0 && (
-        <button
-          onClick={handleUpload}
-          disabled={uploading}
-          className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 font-semibold"
-        >
-          {uploading ? "업로드 중..." : "업로드"}
-        </button>
       )}
 
       {/* 업로드된 이미지 목록 */}

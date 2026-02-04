@@ -24,6 +24,35 @@ export default function BrandHeader() {
     }
     
     loadProfileImage();
+
+    // BroadcastChannel로 다른 탭에서 변경사항 감지
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel("language-settings-channel");
+      const handleBroadcast = (event: MessageEvent) => {
+        if (event.data.type === "language-updated") {
+          console.log("[BrandHeader] Settings updated, reloading profile image");
+          loadProfileImage();
+        }
+      };
+      channel.onmessage = handleBroadcast;
+    } catch (error) {
+      console.warn("[BrandHeader] BroadcastChannel not supported:", error);
+    }
+
+    // localStorage 폴백
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "admin-settings-updated") {
+        console.log("[BrandHeader] Storage event detected, reloading profile image");
+        loadProfileImage();
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      if (channel) channel.close();
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   useEffect(() => {

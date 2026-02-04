@@ -668,8 +668,8 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       disabledSlotMessage: "✅ タイムスロットが無効になりました",
       disableSlotErrorMessage: "❌ タイムスロット無効化中にエラーが発生しました",
       disableAllSlotsConfirmMessage: "{date}のすべてのタイムスロットを無効にしますか？\n\n確定/待機予約があるタイムスロットはスキップされます。",
-      disallSlotMessage: "✅ {count}個のタイムスロットが無効になりました",
-      disabledCountMessage: "⚠️ {count}個のタイムスロットはスキップされました（予約があります）",
+      disabledAllSlotMessage: "✅ {count}個のタイムスロットが無効になりました",
+      skippedCountMessage: "⚠️ {count}個のタイムスロットはスキップされました（予約があります）",
       errorCountMessage: "❌ {count}個のタイムスロット処理中にエラーが発生しました",
       cancelledLabel: "キャンセル済み",
       bookingStatusTitle: "{time}の予約",
@@ -858,8 +858,8 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       disabledSlotMessage: "✅ 时间段已禁用",
       disableSlotErrorMessage: "❌ 禁用时间段时出错",
       disableAllSlotsConfirmMessage: "禁用{date}的所有时间段？\n\n具有确认/待查预订的时间段将被跳过。",
-      disallSlotMessage: "✅ {count}个时间段已禁用",
-      disabledCountMessage: "⚠️ {count}个时间段被跳过（有预订）",
+      disabledAllSlotMessage: "✅ {count}个时间段已禁用",
+      skippedCountMessage: "⚠️ {count}个时间段被跳过（有预订）",
       errorCountMessage: "❌ 处理{count}个时间段时出错",
       cancelledLabel: "已取消",
       bookingStatusTitle: "{time}的预订",
@@ -1012,12 +1012,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
                   content: {
                     ...DEFAULT_LANGUAGES[lang]?.content,  // 기본값 먼저
                     ...savedLanguages[lang]?.content,      // Google Sheets 값으로 덮어쓰기
-                  },
+                  } as LanguageContent,
                 };
               }
               
               languagesToUse = mergedLanguages;
-              console.log("[LanguageContext] ✅ Merged with defaults, ko.content keys:", Object.keys(mergedLanguages.ko.content));
+              console.log("[LanguageContext] ✅ Merged with defaults, ko.content keys:", Object.keys(mergedLanguages.ko.content || {}));
             }
           } catch (parseError) {
             console.error("[LanguageContext] Failed to parse languages, using defaults:", parseError);

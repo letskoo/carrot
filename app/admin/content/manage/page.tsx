@@ -81,10 +81,17 @@ export default function ContentManagePage() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     fetchSettings();
   }, []);
+
+  useEffect(() => {
+    if (languageContent && !isReady) {
+      setIsReady(true);
+    }
+  }, [languageContent, isReady]);
 
   const fetchSettings = async () => {
     try {
@@ -92,29 +99,33 @@ export default function ContentManagePage() {
       const data = await response.json();
 
       if (data.ok && data.settings) {
+        // languages 객체에서 한국어 콘텐츠 추출
+        const koContent = data.settings.languages?.ko?.content || {};
+        
         const newSettings: ContentSettings = {
-          mainTitle: data.settings.mainTitle || settings.mainTitle,
-          mainSubtitle: data.settings.mainSubtitle || settings.mainSubtitle,
-          applicationItem: data.settings.applicationItem || settings.applicationItem,
-          companyName: data.settings.companyName || settings.companyName,
-          ctaButtonText: data.settings.ctaButtonText || settings.ctaButtonText,
-          formPageTitle: data.settings.formPageTitle || settings.formPageTitle,
-          formTitle: data.settings.formTitle || settings.formTitle,
+          mainTitle: koContent.mainTitle || settings.mainTitle,
+          mainSubtitle: koContent.mainSubtitle || settings.mainSubtitle,
+          applicationItem: koContent.applicationItem || settings.applicationItem,
+          companyName: koContent.companyName || settings.companyName,
+          ctaButtonText: koContent.ctaButtonText || settings.ctaButtonText,
+          formPageTitle: koContent.formPageTitle || settings.formPageTitle,
+          formTitle: koContent.formTitle || settings.formTitle,
           heroImageUrls: Array.isArray(data.settings.heroImageUrls)
             ? data.settings.heroImageUrls
             : [],
           profileImageUrl: data.settings.profileImageUrl || "",
-          benefits: Array.isArray(data.settings.benefits)
-            ? data.settings.benefits
+          benefits: Array.isArray(koContent.benefits)
+            ? koContent.benefits
             : settings.benefits,
-          consentDetails: Array.isArray(data.settings.consentDetails)
-            ? data.settings.consentDetails
+          consentDetails: Array.isArray(koContent.consentDetails)
+            ? koContent.consentDetails
             : settings.consentDetails,
           smsCustomMessage: data.settings.smsCustomMessage || settings.smsCustomMessage,
-          statsLoadingText: data.settings.statsLoadingText || settings.statsLoadingText,
-          statsTemplate: data.settings.statsTemplate || settings.statsTemplate,
+          statsLoadingText: koContent.statsLoadingText || settings.statsLoadingText,
+          statsTemplate: koContent.statsTemplate || settings.statsTemplate,
         };
         setSettings(newSettings);
+        console.log("[ContentManage] Loaded settings from languages:", koContent);
       }
     } catch (err) {
       console.error("Failed to fetch settings:", err);
@@ -302,6 +313,18 @@ export default function ContentManagePage() {
         throw new Error("Failed to save settings");
       }
 
+      // BroadcastChannel로 다른 탭(사용자 페이지)에 알림
+      try {
+        const channel = new BroadcastChannel("language-settings-channel");
+        channel.postMessage({ type: "language-updated" });
+        channel.close();
+        console.log("[ContentManage] BroadcastChannel message sent");
+      } catch (broadcastError) {
+        console.warn("[ContentManage] BroadcastChannel not supported:", broadcastError);
+        // 폴백: localStorage 이벤트
+        localStorage.setItem("admin-settings-updated", Date.now().toString());
+      }
+
       setMessage("✅ 설정이 저장되었습니다 (번역 완료)");
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
@@ -343,10 +366,15 @@ export default function ContentManagePage() {
 
       {/* 메인 콘텐츠 */}
       <div className="admin-page-content">
-        <div className="max-w-[640px] mx-auto space-y-6">
-          {/* 메인 섹션 */}
-          <div className="space-y-5">
-            <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.mainPageSection || "메인 페이지"}</h3>
+        {!isReady ? (
+          <div className="max-w-[640px] mx-auto p-4 text-center">
+            <p className="text-gray-600">로딩 중...</p>
+          </div>
+        ) : (
+          <div className="max-w-[640px] mx-auto space-y-6">
+            {/* 메인 섹션 */}
+            <div className="space-y-5">
+              <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.mainPageSection || "메인 페이지"}</h3>
 
             <div>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
@@ -669,7 +697,8 @@ export default function ContentManagePage() {
               {message}
             </div>
           )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* 하단 고정 버튼 */}
