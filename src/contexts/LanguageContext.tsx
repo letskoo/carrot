@@ -114,6 +114,23 @@ type LanguageContent = {
   confirmPasswordLabel?: string;
   confirmPasswordPlaceholder?: string;
   changePasswordButton?: string;
+  defaultLanguageTitle?: string;
+  defaultLanguageDesc?: string;
+  languageSettingsSection?: string;
+  languageSettingsDesc?: string;
+  smsSettingsSection?: string;
+  passwordMinLengthMessage?: string;
+  smsMessageLabel?: string;
+  smsMessagePlaceholder?: string;
+  smsMessageHint?: string;
+  saveSmsButton?: string;
+  savingSmsButton?: string;
+  passwordChangeSection?: string;
+  newPasswordLabel?: string;
+  newPasswordPlaceholder?: string;
+  confirmPasswordLabel?: string;
+  confirmPasswordPlaceholder?: string;
+  changePasswordButton?: string;
   languageSettingsSection?: string;
   languageSettingsDesc?: string;
   smsSettingsSection?: string;
@@ -199,6 +216,7 @@ interface LanguageContextType {
   availableLanguages: Language[];
   languageContent: LanguageContent | null;
   isLoading: boolean;
+  defaultLanguage: Language;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
@@ -284,6 +302,9 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       confirmPasswordLabel: "비밀번호 확인",
       confirmPasswordPlaceholder: "비밀번호를 다시 입력하세요",
       changePasswordButton: "비밀번호 변경",
+      defaultLanguageTitle: "기본 언어 설정",
+      defaultLanguageDesc: "사용자가 처음 페이지에 접속할 때 표시할 기본 언어를 선택하세요",
+      defaultLabel: "(기본)",
       languageSettingsSection: "다국어 설정",
       languageSettingsDesc: "활성화할 언어를 선택하세요",
       smsSettingsSection: "확정문자 추가 안내사항",
@@ -474,6 +495,9 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       confirmPasswordLabel: "Confirm Password",
       confirmPasswordPlaceholder: "Re-enter password",
       changePasswordButton: "Change Password",
+      defaultLanguageTitle: "Default Language Settings",
+      defaultLanguageDesc: "Select the default language to display when users first visit the page",
+      defaultLabel: "(Default)",
       languageSettingsSection: "Language Settings",
       languageSettingsDesc: "Select languages to enable",
       smsSettingsSection: "Additional SMS Instructions",
@@ -647,6 +671,9 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       confirmPasswordLabel: "パスワード確認",
       confirmPasswordPlaceholder: "パスワードを再入力",
       changePasswordButton: "パスワード変更",
+      defaultLanguageTitle: "デフォルト言語設定",
+      defaultLanguageDesc: "ユーザーが最初にページにアクセスしたときに表示するデフォルト言語を選択してください",
+      defaultLabel: "(デフォルト)",
       languageSettingsSection: "言語設定",
       languageSettingsDesc: "有効にする言語を選択",
       smsSettingsSection: "追加SMS案内",
@@ -837,6 +864,9 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       confirmPasswordLabel: "确认密码",
       confirmPasswordPlaceholder: "再次输入密码",
       changePasswordButton: "更改密码",
+      defaultLanguageTitle: "默认语言设置",
+      defaultLanguageDesc: "选择用户首次访问页面时要显示的默认语言",
+      defaultLabel: "(默认)",
       languageSettingsSection: "语言设置",
       languageSettingsDesc: "选择要启用的语言",
       smsSettingsSection: "附加短信说明",
@@ -971,6 +1001,7 @@ const DEFAULT_LANGUAGES: AllLanguages = {
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState<Language>("ko");
+  const [defaultLanguage, setDefaultLanguage] = useState<Language>("ko");
   const [availableLanguages, setAvailableLanguages] = useState<Language[]>([
     "ko",
   ]);
@@ -1041,12 +1072,19 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
             ["ko", "en", "ja", "zh"].includes(key)
           );
 
-        // 항상 'ko' 포함, 중복 제거
+        // 기본 언어 설정 (Google Sheets에서 가져오거나 기본값)
+        const savedDefaultLang = (data.settings?.defaultLanguage || "ko") as Language;
+        if (["ko", "en", "ja", "zh"].includes(savedDefaultLang)) {
+          setDefaultLanguage(savedDefaultLang);
+        }
+
+        // 활성화된 언어가 없으면 기본 언어만 포함
         const unique = Array.from(
-          new Set<Language>(["ko", ...enabled])
+          new Set<Language>(enabled.length > 0 ? enabled : [savedDefaultLang])
         );
 
         console.log("[LanguageContext] Available languages:", unique);
+        console.log("[LanguageContext] Default language:", savedDefaultLang);
         setAvailableLanguages(unique);
       } catch (error) {
         console.error("[LanguageContext] Failed to load languages:", error);
@@ -1097,13 +1135,23 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // 저장된 언어 설정 복원
   useEffect(() => {
+    // 기본 언어를 항상 우선으로 설정
+    // 사용자가 드롭다운에서 명시적으로 다른 언어를 선택한 경우만 localStorage 값 사용
     const savedLang = localStorage.getItem("user_language") as Language;
-    if (savedLang && availableLanguages.includes(savedLang)) {
+    
+    // 저장된 언어가 있고, 그것이 기본 언어가 아니고, 추가 언어(availableLanguages)에 포함되어 있으면 사용
+    const additionalLanguages = availableLanguages.filter(lang => lang !== defaultLanguage);
+    if (savedLang && additionalLanguages.includes(savedLang)) {
       setCurrentLanguage(savedLang);
     } else {
-      setCurrentLanguage("ko");
+      // 기본 언어 우선
+      setCurrentLanguage(defaultLanguage);
+      // localStorage에서 기본 언어가 아닌 언어가 저장되어 있으면 제거
+      if (savedLang && savedLang !== defaultLanguage) {
+        localStorage.removeItem("user_language");
+      }
     }
-  }, [availableLanguages]);
+  }, [availableLanguages, defaultLanguage]);
 
   const setLanguage = (lang: Language) => {
     setCurrentLanguage(lang);
@@ -1121,6 +1169,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         availableLanguages,
         languageContent,
         isLoading,
+        defaultLanguage,
       }}
     >
       {children}

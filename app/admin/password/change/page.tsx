@@ -37,13 +37,16 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   
+  // 기본 언어 상태
+  const [defaultLanguage, setDefaultLanguage] = useState<"ko" | "en" | "ja" | "zh">("ko");
+  
   // SMS 커스텀 메시지 상태
   const [smsCustomMessage, setSmsCustomMessage] = useState("예약일에 만나요! :)");
   
   // 다국어 설정 상태
   const [languages, setLanguages] = useState<AllLanguages>({
     ko: {
-      enabled: true,
+      enabled: false,
       content: {
         mainTitle: "포토부스 체험단 모집",
         mainSubtitle: "뜨거운 반응, 네컷사진 포토부스 실비렌탈",
@@ -129,6 +132,13 @@ export default function SettingsPage() {
       const data = await response.json();
 
       if (data.ok && data.settings) {
+        // 기본 언어 로드
+        let currentDefaultLanguage: "ko" | "en" | "ja" | "zh" = "ko";
+        if (data.settings.defaultLanguage) {
+          currentDefaultLanguage = data.settings.defaultLanguage as "ko" | "en" | "ja" | "zh";
+          setDefaultLanguage(currentDefaultLanguage);
+        }
+        
         // SMS 커스텀 메시지 로드
         if (data.settings.smsCustomMessage) {
           setSmsCustomMessage(data.settings.smsCustomMessage);
@@ -140,7 +150,35 @@ export default function SettingsPage() {
             typeof data.settings.languages === "string"
               ? JSON.parse(data.settings.languages)
               : data.settings.languages;
+          
+          // 기본 언어는 항상 enabled: true로 설정, 나머지는 false
+          let needsUpdate = false;
+          (Object.keys(savedLanguages) as Array<"ko" | "en" | "ja" | "zh">).forEach((lang) => {
+            const shouldBeEnabled = lang === currentDefaultLanguage;
+            if (savedLanguages[lang].enabled !== shouldBeEnabled) {
+              savedLanguages[lang].enabled = shouldBeEnabled;
+              needsUpdate = true;
+            }
+          });
+          
           setLanguages(savedLanguages);
+
+          // 변경사항이 있으면 Google Sheets에 저장
+          if (needsUpdate) {
+            try {
+              await fetch("/api/admin/settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  key: "languages",
+                  value: savedLanguages,
+                }),
+              });
+              console.log("[Admin] Languages synchronized with default language");
+            } catch (error) {
+              console.error("[Admin] Failed to sync languages:", error);
+            }
+          }
         }
       }
     } catch (error) {
@@ -293,6 +331,57 @@ export default function SettingsPage() {
     zh: "🇨🇳 中文",
   };
 
+  const handleDefaultLanguageChange = async (lang: "ko" | "en" | "ja" | "zh") => {
+    setDefaultLanguage(lang);
+
+    // 기본 언어 변경 시 선택한 언어만 활성화, 나머지는 비활성화
+    const updatedLanguages = {
+      ko: { ...languages.ko, enabled: lang === "ko" },
+      en: { ...languages.en, enabled: lang === "en" },
+      ja: { ...languages.ja, enabled: lang === "ja" },
+      zh: { ...languages.zh, enabled: lang === "zh" },
+    };
+    setLanguages(updatedLanguages);
+
+    // 즉시 API 저장 - defaultLanguage와 languages 모두 저장
+    try {
+      // 1. defaultLanguage 저장
+      const defaultLangResponse = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: "defaultLanguage",
+          value: lang,
+        }),
+      });
+
+      // 2. languages 저장
+      const languagesResponse = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: "languages",
+          value: updatedLanguages,
+        }),
+      });
+
+      if (defaultLangResponse.ok && languagesResponse.ok) {
+        console.log(`[Admin] Default language set to ${lang} and languages synchronized`);
+        
+        // BroadcastChannel로 모든 탭에 즉시 알림
+        try {
+          const channel = new BroadcastChannel("language-settings-channel");
+          channel.postMessage({ type: "language-updated" });
+          channel.close();
+        } catch (error) {
+          localStorage.setItem("admin-settings-updated", Date.now().toString());
+        }
+      }
+    } catch (error) {
+      console.error("[Admin] Failed to save default language:", error);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
       {/* 헤더 */}
@@ -371,7 +460,28 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* 2. 다국어 설정 섹션 */}
+          {/* 2. 기본 언어 설정 섹션 */}
+          <div className="border-b border-gray-200 pb-8">
+            <h2 className="text-[18px] font-semibold text-gray-900 mb-6">{languageContent?.defaultLanguageTitle || "기본 언어 설정"}</h2>
+            <p className="text-sm text-gray-500 mb-6">{languageContent?.defaultLanguageDesc || "사용자가 처음 페이지에 접속할 때 표시할 기본 언어를 선택하세요"}</p>
+            <div className="grid grid-cols-2 gap-3">
+              {(["ko", "en", "ja", "zh"] as const).map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => handleDefaultLanguageChange(lang)}
+                  className={`py-3 px-4 rounded-lg font-semibold transition-all ${
+                    defaultLanguage === lang
+                      ? "bg-[#7c3aed] text-white ring-2 ring-[#7c3aed]"
+                      : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                  }`}
+                >
+                  {languageNames[lang]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. 다국어 설정 섹션 */}
           <div className="border-b border-gray-200 pb-8">
             <h2 className="text-[18px] font-semibold text-gray-900 mb-6">{languageContent?.languageSettingsSection || "다국어 설정"}</h2>
             <p className="text-sm text-gray-500 mb-6">{languageContent?.languageSettingsDesc || "활성화할 언어를 선택하세요"}</p>
@@ -406,14 +516,14 @@ export default function SettingsPage() {
                   </span>
                   <span className="text-[15px] font-medium text-gray-900">
                     {languageNames[lang]}
-                    {lang === "ko" && <span className="text-xs text-gray-500 ml-2">(기본)</span>}
+                    {lang === defaultLanguage && <span className="text-xs text-gray-500 ml-2">{languageContent?.defaultLabel || "(기본)"}</span>}
                   </span>
                 </label>
               ))}
             </div>
           </div>
 
-          {/* 3. 확정문자 추가 안내사항 섹션 */}
+          {/* 4. 확정문자 추가 안내사항 섹션 */}
           <div>
             <h2 className="text-[18px] font-semibold text-gray-900 mb-6">{languageContent?.smsSettingsSection || "확정문자 추가 안내사항"}</h2>
             <div className="space-y-5">

@@ -284,17 +284,39 @@ export default function ContentManagePage() {
       const jaContent = createLanguageContent(jaTexts);
       const zhContent = createLanguageContent(zhTexts);
 
-      // 6. Google Sheets에 저장할 languages 구조
+      // 6. 기존 languages 설정 불러오기 (활성화 상태 유지)
+      let existingLanguages = null;
+      try {
+        const existingResponse = await fetch("/api/admin/settings");
+        const existingData = await existingResponse.json();
+        existingLanguages = existingData.settings?.languages;
+      } catch (err) {
+        console.warn("[ContentManage] Failed to load existing languages:", err);
+      }
+
+      // 7. 기존의 enabled 상태를 유지하면서 content만 업데이트
       const languages = {
-        ko: { enabled: true, content: koContent },
-        en: { enabled: false, content: enContent },
-        ja: { enabled: false, content: jaContent },
-        zh: { enabled: false, content: zhContent },
+        ko: { 
+          enabled: existingLanguages?.ko?.enabled ?? true, 
+          content: koContent 
+        },
+        en: { 
+          enabled: existingLanguages?.en?.enabled ?? false, 
+          content: enContent 
+        },
+        ja: { 
+          enabled: existingLanguages?.ja?.enabled ?? false, 
+          content: jaContent 
+        },
+        zh: { 
+          enabled: existingLanguages?.zh?.enabled ?? false, 
+          content: zhContent 
+        },
       };
 
       setMessage("저장 중...");
 
-      // 7. 이미지와 languages를 한 번에 저장
+      // 8. 이미지와 languages를 한 번에 저장
       const response = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
