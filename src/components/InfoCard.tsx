@@ -37,7 +37,7 @@ export default function InfoCard() {
             onClick={() => setIsModalOpen(true)}
             className="text-[13px] text-gray-500 underline text-left -mt-1.5 lg:text-base cursor-pointer"
           >
-            사업자등록증 보기
+            {languageContent?.businessRegistrationText || "사업자등록증 보기"}
           </button>
         </div>        </div>      </div>
 

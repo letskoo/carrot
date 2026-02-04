@@ -230,9 +230,23 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
             console.log("[LanguageContext] Parsed languages from Sheets:", savedLanguages);
             
-            // Google Sheets에서 로드한 데이터가 유효하면 사용
+            // Google Sheets 데이터와 DEFAULT_LANGUAGES 병합
+            // Google Sheets에 없는 필드는 DEFAULT_LANGUAGES에서 가져옴
             if (savedLanguages && typeof savedLanguages === "object") {
-              languagesToUse = savedLanguages;
+              const mergedLanguages: AllLanguages = {} as AllLanguages;
+              
+              for (const lang of ["ko", "en", "ja", "zh"] as Language[]) {
+                mergedLanguages[lang] = {
+                  enabled: savedLanguages[lang]?.enabled ?? DEFAULT_LANGUAGES[lang]?.enabled ?? false,
+                  content: {
+                    ...DEFAULT_LANGUAGES[lang]?.content,  // 기본값 먼저
+                    ...savedLanguages[lang]?.content,      // Google Sheets 값으로 덮어쓰기
+                  },
+                };
+              }
+              
+              languagesToUse = mergedLanguages;
+              console.log("[LanguageContext] ✅ Merged with defaults, ko.content keys:", Object.keys(mergedLanguages.ko.content));
             }
           } catch (parseError) {
             console.error("[LanguageContext] Failed to parse languages, using defaults:", parseError);
@@ -245,6 +259,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
         // 전체 언어 데이터 저장
         setAllLanguageContent(languagesToUse);
+        console.log("[LanguageContext] ✅ setAllLanguageContent called with:", Object.keys(languagesToUse));
+        console.log("[LanguageContext] ✅ languagesToUse.ko.content:", languagesToUse.ko?.content);
 
         // 활성화된 언어만 추출
         const enabled = Object.entries(languagesToUse || {})
