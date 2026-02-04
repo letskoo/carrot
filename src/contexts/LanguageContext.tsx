@@ -137,6 +137,7 @@ type LanguageContent = {
   disableAllSlotsConfirmMessage?: string;
   disabledAllSlotMessage?: string;
   skippedCountMessage?: string;
+  errorCountMessage?: string;
   cancelledLabel?: string;
   bookingStatusTitle?: string;
   noBookingsLabel?: string;
