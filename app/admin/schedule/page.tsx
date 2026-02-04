@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function AdminSchedulePage() {
   const router = useRouter();
+  const { languageContent } = useLanguage();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -59,7 +61,7 @@ export default function AdminSchedulePage() {
         <div className="w-full max-w-[400px] space-y-16">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              관리자 로그인
+              {languageContent?.adminLogin || "관리자 로그인"}
             </h1>
             <p className="text-sm text-gray-600">
             </p>
@@ -73,7 +75,7 @@ export default function AdminSchedulePage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
+                placeholder={languageContent?.adminPasswordPlaceholder || "비밀번호를 입력하세요"}
                 className="w-full px-4 py-3 bg-transparent border-b border-gray-300 rounded-none text-center placeholder:text-center focus:outline-none focus:border-purple-600 transition-colors"
                 disabled={loading}
               />
@@ -90,7 +92,7 @@ export default function AdminSchedulePage() {
                 disabled={loading || !password.trim()}
                 className="w-full py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed cursor-pointer"
               >
-                {loading ? "로그인 중..." : "로그인"}
+                {loading ? (languageContent?.adminLoggingInButton || "로그인 중...") : (languageContent?.adminLoginButton || "로그인")}
               </button>
 
               <button
@@ -98,7 +100,7 @@ export default function AdminSchedulePage() {
                 onClick={() => router.push("/")}
                 className="block mx-auto text-xs text-gray-400 font-medium hover:text-gray-500 transition-colors cursor-pointer mt-2"
               >
-                돌아가기 →
+                {languageContent?.adminBackButton || "돌아가기 →"}
               </button>
             </form>
         </div>
@@ -111,12 +113,12 @@ export default function AdminSchedulePage() {
       {/* 헤더 */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-[640px] mx-auto px-6 py-5 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">관리자 대시보드</h1>
+          <h1 className="text-xl font-bold text-gray-900">{languageContent?.adminDashboard || "관리자 대시보드"}</h1>
           <button
             onClick={handleLogout}
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
-            로그아웃
+            {languageContent?.adminLogout || "로그아웃"}
           </button>
         </div>
       </div>

@@ -65,6 +65,16 @@ type LanguageContent = {
   summaryPhoneLabel?: string;
   summaryBookingLabel?: string;
   submitApplicationButton?: string;
+  // 동의 모달 - 버튼
+  agreeAndCompleteButton?: string;
+  processingText?: string;
+  // 관리자 로그인 페이지
+  adminPasswordPlaceholder?: string;
+  adminLoginButton?: string;
+  adminLoggingInButton?: string;
+  adminBackButton?: string;
+  adminDashboard?: string;
+  adminLogout?: string;
 };
 
 type LanguageSettings = {
@@ -123,6 +133,12 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       ],
       // 관리자 수정 불가 (고정값)
       adminLogin: "관리자 로그인",
+      adminPasswordPlaceholder: "비밀번호를 입력하세요",
+      adminLoginButton: "로그인",
+      adminLoggingInButton: "로그인 중...",
+      adminBackButton: "돌아가기 →",
+      adminDashboard: "관리자 대시보드",
+      adminLogout: "로그아웃",
       statsLoadingText: "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)",
       statsTemplate: "최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )",
       businessRegistrationText: "사업자등록증 보기",
@@ -201,6 +217,12 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       ],
       // 관리자 수정 불가 (고정값)
       adminLogin: "Admin Login",
+      adminPasswordPlaceholder: "Enter password",
+      adminLoginButton: "Login",
+      adminLoggingInButton: "Logging in...",
+      adminBackButton: "Back \u2192",
+      adminDashboard: "Admin Dashboard",
+      adminLogout: "Logout",
       statsLoadingText: "Loading applicant count... (Please wait if many users online)",
       statsTemplate: "{count1} applicants in the last month ( Total {count2} )",
       businessRegistrationText: "View Business Registration",
@@ -261,8 +283,12 @@ const DEFAULT_LANGUAGES: AllLanguages = {
         { title: "運送費など追加費用X", description: "写真紙500枚提供、専門スタッフ現場配置" },
       ],
       // 管理者編集不可 (固定値)
-      adminLogin: "管理者ログイン",
-      statsLoadingText: "申請者数を読み込み中... (同時接続者が多い場合は時間がかかります)",
+      adminLogin: "管理者ログイン",      adminPasswordPlaceholder: "パスワードを入力してください",
+      adminLoginButton: "ログイン",
+      adminLoggingInButton: "ログイン中...",
+      adminBackButton: "戻る →",
+      adminDashboard: "管理者ダッシュボード",
+      adminLogout: "ログアウト",      statsLoadingText: "申請者数を読み込み中... (同時接続者が多い場合は時間がかかります)",
       statsTemplate: "最近1ヶ月間{count1}名申請中 ( 累計{count2}名 )",
       businessRegistrationText: "事業者登録証を見る",
         applicationItemLabel: "申請項目",
@@ -338,8 +364,12 @@ const DEFAULT_LANGUAGES: AllLanguages = {
         { title: "无运费等追加费用X", description: "提供500张照片纸，现场配置专业人员" },
       ],
       // 管理员不可编辑 (固定值)
-      adminLogin: "管理员登录",
-      statsLoadingText: "正在加载申请人数... (同时在线用户较多时可能需要一些时间)",
+      adminLogin: "管理员登录",      adminPasswordPlaceholder: "请输入密码",
+      adminLoginButton: "登录",
+      adminLoggingInButton: "登录中...",
+      adminBackButton: "返回 →",
+      adminDashboard: "管理员仓库",
+      adminLogout: "退出登录",      statsLoadingText: "正在加载申请人数... (同时在线用户较多时可能需要一些时间)",
       statsTemplate: "最近一个月{count1}人申请中 ( 累计{count2}人 )",
       businessRegistrationText: "查看营业执照",
         applicationItemLabel: "申请项目",

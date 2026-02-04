@@ -6,16 +6,16 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function HeroContent() {
   const { statsVersion } = useLeadFlow();
-  const { languageContent } = useLanguage();
+  const { languageContent, isLoading: isLanguageLoading } = useLanguage();
   const [stats, setStats] = useState<{
     totalCount: number;
     last30DaysCount: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // languageContent에서 값 추출 (기본값 설정)
-  const mainTitle = languageContent?.mainTitle || "포토부스 체험단 모집";
-  const mainSubtitle = languageContent?.mainSubtitle || "뜨거운 반응, 네컷사진 포토부스 실비렌탈";
+  // languageContent에서 값 추출 (언어 로드될 때까지 공백)
+  const mainTitle = isLanguageLoading ? "" : (languageContent?.mainTitle || "포토부스 체험단 모집");
+  const mainSubtitle = isLanguageLoading ? "" : (languageContent?.mainSubtitle || "뜨거운 반응, 네컷사진 포토부스 실비렌탈");
 
   useEffect(() => {
     async function fetchData() {
@@ -41,16 +41,19 @@ export default function HeroContent() {
   }, [statsVersion]);
 
   // 통계 텍스트 템플릿 처리
-  const statsLoadingText = languageContent?.statsLoadingText || "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)";
-  const statsTemplate = languageContent?.statsTemplate || "최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )";
+  // 언어가 로드되지 않았으면 텍스트를 표시하지 않음
+  const statsLoadingText = isLanguageLoading ? "" : (languageContent?.statsLoadingText || "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)");
+  const statsTemplate = isLanguageLoading ? "" : (languageContent?.statsTemplate || "최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )");
   
-  const statsText = loading
+  const statsText = isLanguageLoading
+    ? ""
+    : loading
     ? statsLoadingText
     : stats
     ? statsTemplate.replace("{count1}", stats.last30DaysCount.toString()).replace("{count2}", stats.totalCount.toString())
     : "전국 가맹점이 신청 중입니다";
 
-  const statsClassName = loading ? "blink-animation" : "";
+  const statsClassName = (loading && !isLanguageLoading) ? "blink-animation" : "";
 
   return (
     <div className="py-6 space-y-4">
