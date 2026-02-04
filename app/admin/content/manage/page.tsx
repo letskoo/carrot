@@ -210,7 +210,7 @@ export default function ContentManagePage() {
         statsTemplate: settings.statsTemplate,
       };
 
-      // 2. 번역할 텍스트 배열 (순서대로)
+      // 2. 번역할 텍스트 배열 (순서대로) - statsTemplate과 statsLoadingText는 제외 (플레이스홀더 보존 필요)
       const baseTexts = [
         settings.mainTitle,
         settings.mainSubtitle,
@@ -219,8 +219,6 @@ export default function ContentManagePage() {
         settings.ctaButtonText,
         settings.formPageTitle,
         settings.formTitle,
-        settings.statsLoadingText,
-        settings.statsTemplate,
       ];
 
       const benefitTexts = settings.benefits.flatMap(b => [b.title, b.description]);
@@ -250,10 +248,25 @@ export default function ContentManagePage() {
       ]);
 
       // 5. 번역된 텍스트로 콘텐츠 객체 생성
-      const benefitsStartIndex = baseTexts.length; // mainTitle ~ statsTemplate까지
+      const benefitsStartIndex = baseTexts.length; // mainTitle ~ formTitle까지
       const consentStartIndex = benefitsStartIndex + settings.benefits.length * 2;
       
-      const createLanguageContent = (texts: string[]) => {
+      // statsTemplate과 statsLoadingText의 기본값 (번역하지 않음)
+      const defaultStatsTemplates = {
+        ko: "최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )",
+        en: "{count1} applicants in the last month ( Total {count2} )",
+        ja: "最近1ヶ月間{count1}名申請中 ( 累計{count2}名 )",
+        zh: "最近一个月{count1}人申请中 ( 累计{count2}人 )",
+      };
+      
+      const defaultStatsLoadingTexts = {
+        ko: "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)",
+        en: "Loading applicant count... (Please wait if many users online)",
+        ja: "申請者数を読み込み中... (同時接続者が多い場合は時間がかかります)",
+        zh: "正在加载申请人数... (同时在线用户较多时可能需要一些时间)",
+      };
+      
+      const createLanguageContent = (texts: string[], lang: "ko" | "en" | "ja" | "zh") => {
         const benefits = settings.benefits.map((_, i) => ({
           title: texts[benefitsStartIndex + i * 2],
           description: texts[benefitsStartIndex + i * 2 + 1],
@@ -273,16 +286,16 @@ export default function ContentManagePage() {
           ctaButtonText: texts[4],
           formPageTitle: texts[5],
           formTitle: texts[6],
-          statsLoadingText: texts[7],
-          statsTemplate: texts[8],
+          statsLoadingText: defaultStatsLoadingTexts[lang], // 기본값 사용
+          statsTemplate: defaultStatsTemplates[lang], // 기본값 사용
           benefits,
           consentDetails,
         };
       };
 
-      const enContent = createLanguageContent(enTexts);
-      const jaContent = createLanguageContent(jaTexts);
-      const zhContent = createLanguageContent(zhTexts);
+      const enContent = createLanguageContent(enTexts, "en");
+      const jaContent = createLanguageContent(jaTexts, "ja");
+      const zhContent = createLanguageContent(zhTexts, "zh");
 
       // 6. 기존 languages 설정 불러오기 (활성화 상태 유지)
       let existingLanguages = null;

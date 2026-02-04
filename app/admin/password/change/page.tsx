@@ -151,17 +151,42 @@ export default function SettingsPage() {
               ? JSON.parse(data.settings.languages)
               : data.settings.languages;
           
-          // 기본 언어는 항상 enabled: true로 설정, 나머지는 false
+          // DEFAULT_LANGUAGES와 병합
+          const mergedLanguages = { ...languages }; // 초기값 사용
           let needsUpdate = false;
+          
           (Object.keys(savedLanguages) as Array<"ko" | "en" | "ja" | "zh">).forEach((lang) => {
             const shouldBeEnabled = lang === currentDefaultLanguage;
-            if (savedLanguages[lang].enabled !== shouldBeEnabled) {
-              savedLanguages[lang].enabled = shouldBeEnabled;
+            
+            // enabled 상태 확인
+            if (savedLanguages[lang]?.enabled !== shouldBeEnabled) {
               needsUpdate = true;
             }
+            
+            // statsTemplate 검증: {count1}과 {count2}가 모두 포함되어야 함
+            const savedStatsTemplate = savedLanguages[lang]?.content?.statsTemplate;
+            const isStatsTemplateValid = savedStatsTemplate && 
+              savedStatsTemplate.includes("{count1}") && 
+              savedStatsTemplate.includes("{count2}");
+            
+            if (!isStatsTemplateValid) {
+              console.warn(`[Admin] ${lang} statsTemplate is corrupted, using default`);
+              needsUpdate = true;
+            }
+            
+            // content 병합
+            const mergedContent = {
+              ...mergedLanguages[lang].content, // 기본값 먼저
+              ...(isStatsTemplateValid ? savedLanguages[lang]?.content : {}), // 손상되지 않았으면 Google Sheets 값 사용
+            };
+            
+            mergedLanguages[lang] = {
+              enabled: shouldBeEnabled,
+              content: mergedContent,
+            };
           });
           
-          setLanguages(savedLanguages);
+          setLanguages(mergedLanguages);
 
           // 변경사항이 있으면 Google Sheets에 저장
           if (needsUpdate) {
@@ -171,10 +196,10 @@ export default function SettingsPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   key: "languages",
-                  value: savedLanguages,
+                  value: mergedLanguages,
                 }),
               });
-              console.log("[Admin] Languages synchronized with default language");
+              console.log("[Admin] Languages synchronized and corrupted data fixed");
             } catch (error) {
               console.error("[Admin] Failed to sync languages:", error);
             }
