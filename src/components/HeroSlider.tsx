@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import Image from "next/image";
-import { heroImages } from "@/generated/heroImages";
+// import { heroImages } from "@/generated/heroImages"; // 삭제: 동적 업로드만 사용
 
 const SWIPE_THRESHOLD = 60; // px
 const TRANSITION_MS = 340;
@@ -11,11 +11,10 @@ type Direction = -1 | 0 | 1;
 type TransitionKind = "none" | "commit" | "cancel";
 
 export default function HeroSlider() {
-  const images = heroImages;
-
-  if (images.length === 0) {
-    return null;
-  }
+  // const images = heroImages; // 삭제: 동적 업로드만 사용
+  // if (images.length === 0) {
+  //   return null;
+  // }
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState<number | null>(null);

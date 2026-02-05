@@ -8,7 +8,7 @@ const DEFAULT_SLIDES = [
   { src: "/images/hero/002.jpg", alt: "커피 음료와 케이크" },
   { src: "/images/hero/003.jpg", alt: "커피 음료와 케이크" },
   { src: "/images/hero/004.jpg", alt: "커피 음료와 케이크" },
-];
+]; // 업로드된 이미지가 없을 때만 fallback
 
 const TRANSITION_MS = 380;
 const DRAG_THRESHOLD_RATIO = 0.14; // 14% drag needed to trigger slide
@@ -43,7 +43,11 @@ export default function HeroSlider() {
           }));
           if (urls.length > 0) {
             setSlides(urls);
+          } else {
+            setSlides(DEFAULT_SLIDES);
           }
+        } else {
+          setSlides(DEFAULT_SLIDES);
         }
       } catch (error) {
         console.error("Failed to load hero images:", error);

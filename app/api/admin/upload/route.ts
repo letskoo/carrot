@@ -1,7 +1,17 @@
+
 import { NextRequest, NextResponse } from "next/server";
+import { Storage } from "@google-cloud/storage";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
+import fs from "fs";
 
 const MAX_FILE_SIZE_MB = 5;
 const MAX_FILES = 20;
+const BUCKET_NAME = "carrot-images";
+const KEY_PATH = path.join(process.cwd(), "secrets", "service-account.json");
+
+const storage = new Storage({ keyFilename: KEY_PATH });
+const bucket = storage.bucket(BUCKET_NAME);
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,31 +43,32 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        const uploadFormData = new FormData();
-        uploadFormData.append("file", file);
-        uploadFormData.append("upload_preset", "ml_default");
+        // 파일을 임시로 저장
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const ext = path.extname(file.name) || ".jpg";
+        const gcsFileName = `${uuidv4()}${ext}`;
+        // Windows 호환 임시 디렉토리 사용
+        const os = await import("os");
+        const tempDir = os.tmpdir();
+        const tempPath = path.join(tempDir, gcsFileName);
+        fs.writeFileSync(tempPath, buffer);
 
-        const cloudinaryResponse = await fetch(
-          `https://api.cloudinary.com/v1_1/du8v6pyf/image/upload`,
-          {
-            method: "POST",
-            body: uploadFormData,
-          }
-        );
+        // GCS에 업로드
+        await bucket.upload(tempPath, {
+          destination: gcsFileName,
+          public: false, // 비공개 업로드
+        });
 
-        if (!cloudinaryResponse.ok) {
-          const errorText = await cloudinaryResponse.text();
-          console.error("[upload] Cloudinary error:", errorText);
-          errors.push(`${file.name}: 업로드 실패`);
-          continue;
-        }
+        // 업로드 후 임시 파일 삭제
+        fs.unlinkSync(tempPath);
 
-        const cloudinaryData = await cloudinaryResponse.json();
-        if (cloudinaryData.secure_url) {
-          uploadedUrls.push(cloudinaryData.secure_url);
-        } else {
-          errors.push(`${file.name}: 응답 오류`);
-        }
+        // signed URL 생성 (1시간 유효)
+        const [url] = await bucket.file(gcsFileName).getSignedUrl({
+          action: "read",
+          expires: Date.now() + 60 * 60 * 1000,
+        });
+        uploadedUrls.push(url);
       } catch (error: any) {
         errors.push(`${file.name}: ${error.message}`);
       }

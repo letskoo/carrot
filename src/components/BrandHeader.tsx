@@ -6,7 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function BrandHeader() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [profileImageUrl, setProfileImageUrl] = useState("/images/icons/logo.jpg");
+  const [profileImageUrl, setProfileImageUrl] = useState("/images/icons/logo.jpg"); // 업로드된 이미지 없을 때만 fallback
   const { languageContent } = useLanguage();
 
   useEffect(() => {
@@ -16,7 +16,9 @@ export default function BrandHeader() {
         const data = await response.json();
         
         if (data.ok && data.settings?.profileImageUrl) {
-          setProfileImageUrl(data.settings.profileImageUrl);
+          setProfileImageUrl(data.settings.profileImageUrl || "/images/icons/logo.jpg");
+        } else {
+          setProfileImageUrl("/images/icons/logo.jpg");
         }
       } catch (error) {
         console.error("Failed to load profile image:", error);
