@@ -526,7 +526,6 @@ export default function SettingsPage() {
                     type="checkbox"
                     checked={languages[lang].enabled}
                     onChange={() => handleToggleLanguage(lang)}
-                    disabled={lang === "ko"}
                     className="sr-only"
                   />
                   <span

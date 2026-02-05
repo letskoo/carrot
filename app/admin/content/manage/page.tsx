@@ -191,8 +191,8 @@ export default function ContentManagePage() {
     setMessage("번역 중...");
 
     try {
-      // 1. 한국어 콘텐츠 객체 만들기
-      const koContent = {
+      // Always use auto-detect for source language and translate to all target languages
+      const baseContent = {
         mainTitle: settings.mainTitle,
         mainSubtitle: settings.mainSubtitle,
         applicationItem: settings.applicationItem,
@@ -210,32 +210,30 @@ export default function ContentManagePage() {
         statsTemplate: settings.statsTemplate,
       };
 
-      // 2. 번역할 텍스트 배열 (순서대로) - statsTemplate과 statsLoadingText는 제외 (플레이스홀더 보존 필요)
+      // 2. 번역할 텍스트 배열 (순서대로)
       const baseTexts = [
-        settings.mainTitle,
-        settings.mainSubtitle,
-        settings.applicationItem,
-        settings.companyName,
-        settings.ctaButtonText,
-        settings.formPageTitle,
-        settings.formTitle,
+        baseContent.mainTitle,
+        baseContent.mainSubtitle,
+        baseContent.applicationItem,
+        baseContent.companyName,
+        baseContent.ctaButtonText,
+        baseContent.formPageTitle,
+        baseContent.formTitle,
       ];
-
-      const benefitTexts = settings.benefits.flatMap(b => [b.title, b.description]);
-      const consentTexts = settings.consentDetails.flatMap(d => [d.title, d.subtitle, d.body]);
-
+      const benefitTexts = baseContent.benefits.flatMap(b => [b.title, b.description]);
+      const consentTexts = baseContent.consentDetails.flatMap(d => [d.title, d.subtitle, d.body]);
       const textsToTranslate = [...baseTexts, ...benefitTexts, ...consentTexts];
 
-      // 3. Google Cloud Translation API로 번역 (한국어 → 영어, 일본어, 중국어)
+      // 3. Google Cloud Translation API로 번역 (auto-detect → ko, en, ja, zh)
       const translateText = async (text: string, targetLang: string) => {
         try {
           const apiKey = process.env.NEXT_PUBLIC_GOOGLE_TRANSLATE_API_KEY;
-          
           if (!apiKey) {
-            console.warn("Google Translate API key not found, using original Korean text");
+            console.warn("Google Translate API 키가 없습니다. 원본 텍스트를 반환합니다.");
             return text;
           }
-          
+          // zh-CN만 Google API에 맞게 zh로 변환
+          const lang = targetLang === "zh-CN" ? "zh" : targetLang;
           const response = await fetch(
             `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`,
             {
@@ -243,65 +241,56 @@ export default function ContentManagePage() {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 q: text,
-                source: "ko",
-                target: targetLang,
-                format: "text",
+                target: lang,
+                format: "text"
               }),
             }
           );
-          
           const data = await response.json();
-          
-          if (data.error) {
-            console.error(`Google Translate API error:`, data.error);
-            return text; // 에러시 원본 한국어 반환
+          if (!response.ok || data.error) {
+            console.error("Google Translate API 오류:", data);
+            return text;
           }
-          
           return data.data?.translations?.[0]?.translatedText || text;
         } catch (err) {
-          console.error(`Translation failed for "${text}" to ${targetLang}:`, err);
-          return text; // 에러시 원본 한국어 반환
+          console.error(`번역 실패: [${text}] → ${targetLang}:`, err);
+          return text;
         }
       };
 
-      // 4. 병렬로 3개 언어 번역
-      const [enTexts, jaTexts, zhTexts] = await Promise.all([
-        Promise.all(textsToTranslate.map(t => translateText(t, "en"))),
-        Promise.all(textsToTranslate.map(t => translateText(t, "ja"))),
-        Promise.all(textsToTranslate.map(t => translateText(t, "zh-CN"))), // Google API는 zh-CN 사용
-      ]);
+      // 4. 모든 언어로 번역 (항상 ko, en, ja, zh 모두 번역)
+      const langCodes = ["ko", "en", "ja", "zh-CN"];
+      const langMap = { ko: "ko", en: "en", ja: "ja", zh: "zh-CN" };
+      const translatedTexts: Record<string, string[]> = {};
+      for (const lang of langCodes) {
+        translatedTexts[lang] = await Promise.all(textsToTranslate.map(t => translateText(t, lang)));
+      }
 
       // 5. 번역된 텍스트로 콘텐츠 객체 생성
-      const benefitsStartIndex = baseTexts.length; // mainTitle ~ formTitle까지
-      const consentStartIndex = benefitsStartIndex + settings.benefits.length * 2;
-      
-      // statsTemplate과 statsLoadingText의 기본값 (번역하지 않음)
+      const benefitsStartIndex = baseTexts.length;
+      const consentStartIndex = benefitsStartIndex + baseContent.benefits.length * 2;
       const defaultStatsTemplates = {
         ko: "최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )",
         en: "{count1} applicants in the last month ( Total {count2} )",
         ja: "最近1ヶ月間{count1}名申請中 ( 累計{count2}名 )",
         zh: "最近一个月{count1}人申请中 ( 累计{count2}人 )",
       };
-      
       const defaultStatsLoadingTexts = {
         ko: "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)",
         en: "Loading applicant count... (Please wait if many users online)",
         ja: "申請者数を読み込み中... (同時接続者が多い場合は時間がかかります)",
         zh: "正在加载申请人数... (同时在线用户较多时可能需要一些时间)",
       };
-      
       const createLanguageContent = (texts: string[], lang: "ko" | "en" | "ja" | "zh") => {
-        const benefits = settings.benefits.map((_, i) => ({
+        const benefits = baseContent.benefits.map((_, i) => ({
           title: texts[benefitsStartIndex + i * 2],
           description: texts[benefitsStartIndex + i * 2 + 1],
         }));
-
-        const consentDetails = settings.consentDetails.map((_, i) => ({
+        const consentDetails = baseContent.consentDetails.map((_, i) => ({
           title: texts[consentStartIndex + i * 3],
           subtitle: texts[consentStartIndex + i * 3 + 1],
           body: texts[consentStartIndex + i * 3 + 2],
         }));
-        
         return {
           mainTitle: texts[0],
           mainSubtitle: texts[1],
@@ -310,16 +299,12 @@ export default function ContentManagePage() {
           ctaButtonText: texts[4],
           formPageTitle: texts[5],
           formTitle: texts[6],
-          statsLoadingText: defaultStatsLoadingTexts[lang], // 기본값 사용
-          statsTemplate: defaultStatsTemplates[lang], // 기본값 사용
+          statsLoadingText: defaultStatsLoadingTexts[lang],
+          statsTemplate: defaultStatsTemplates[lang],
           benefits,
           consentDetails,
         };
       };
-
-      const enContent = createLanguageContent(enTexts, "en");
-      const jaContent = createLanguageContent(jaTexts, "ja");
-      const zhContent = createLanguageContent(zhTexts, "zh");
 
       // 6. 기존 languages 설정 불러오기 (활성화 상태 유지)
       let existingLanguages = null;
@@ -333,21 +318,21 @@ export default function ContentManagePage() {
 
       // 7. 기존의 enabled 상태를 유지하면서 content만 업데이트
       const languages = {
-        ko: { 
-          enabled: existingLanguages?.ko?.enabled ?? true, 
-          content: koContent 
+        ko: {
+          enabled: existingLanguages?.ko?.enabled ?? true,
+          content: createLanguageContent(translatedTexts["ko"], "ko"),
         },
-        en: { 
-          enabled: existingLanguages?.en?.enabled ?? false, 
-          content: enContent 
+        en: {
+          enabled: existingLanguages?.en?.enabled ?? false,
+          content: createLanguageContent(translatedTexts["en"], "en"),
         },
-        ja: { 
-          enabled: existingLanguages?.ja?.enabled ?? false, 
-          content: jaContent 
+        ja: {
+          enabled: existingLanguages?.ja?.enabled ?? false,
+          content: createLanguageContent(translatedTexts["ja"], "ja"),
         },
-        zh: { 
-          enabled: existingLanguages?.zh?.enabled ?? false, 
-          content: zhContent 
+        zh: {
+          enabled: existingLanguages?.zh?.enabled ?? false,
+          content: createLanguageContent(translatedTexts["zh-CN"], "zh"),
         },
       };
 
