@@ -493,8 +493,8 @@ export default function SettingsPage() {
 
           {/* 2. 기본 언어 설정 섹션 */}
           <div className="border-b border-gray-200 pb-8">
-            <h2 className="text-[18px] font-semibold text-gray-900 mb-6">{languageContent?.defaultLanguageTitle || "기본 언어 설정"}</h2>
-            <p className="text-sm text-gray-500 mb-6">{languageContent?.defaultLanguageDesc || "사용자가 처음 페이지에 접속할 때 표시할 기본 언어를 선택하세요"}</p>
+            <h2 className="text-[18px] font-semibold text-gray-900 mb-6">기본 언어 설정</h2>
+            <p className="text-sm text-gray-500 mb-6">사용자가 처음 페이지에 접속할 때 표시할 기본 언어를 선택하세요</p>
             <div className="grid grid-cols-2 gap-3">
               {(["ko", "en", "ja", "zh"] as const).map((lang) => (
                 <button

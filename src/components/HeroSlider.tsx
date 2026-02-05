@@ -28,11 +28,13 @@ export default function HeroSlider() {
   const startXRef = useRef<number | null>(null);
   const transitionHandledRef = useRef(false);
 
-  const canSlide = images.length > 1;
+  // slides는 동적으로 받아와야 함. 예시로 DEFAULT_SLIDES 사용
+  const [slides, setSlides] = useState<string[]>(["/images/hero/001.jpg"]); // 실제 코드에서는 props나 API로 받아옴
+  const canSlide = slides.length > 1;
 
   // 이미지 개수가 변하거나 리프레시 이후 상태가 꼬이는 것을 방지하기 위한 안전 초기화
   useEffect(() => {
-    if (images.length === 0) return;
+    if (slides.length === 0) return;
 
     startXRef.current = null;
     transitionHandledRef.current = false;
@@ -43,18 +45,18 @@ export default function HeroSlider() {
     setIsTransitioning(false);
     setNextIndex(null);
 
-    if (currentIndex >= images.length) {
+    if (currentIndex >= slides.length) {
       setCurrentIndex(0);
     }
 
-    if (nextIndex !== null && nextIndex >= images.length) {
+    if (nextIndex !== null && nextIndex >= slides.length) {
       setNextIndex(null);
     }
-  }, [images.length]);
+  }, [slides.length]);
 
   const wrapIndex = (idx: number) => {
-    const mod = idx % images.length;
-    return mod < 0 ? mod + images.length : mod;
+    const mod = idx % slides.length;
+    return mod < 0 ? mod + slides.length : mod;
   };
 
   const beginCommit = (dir: Direction) => {
@@ -150,7 +152,7 @@ export default function HeroSlider() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [currentIndex, images.length, isTransitioning, canSlide, isDragging]);
+  }, [currentIndex, slides.length, isTransitioning, canSlide, isDragging]);
 
   const handleTransitionEnd = () => {
     if (!isTransitioning) return;
@@ -200,7 +202,7 @@ export default function HeroSlider() {
       <section className="mx-auto w-full max-w-md">
         <div className="relative aspect-square w-full overflow-hidden bg-black">
           <Image
-            src={images[0]}
+            src={slides[0]}
             alt="hero-static"
             fill
             className="object-cover"
@@ -241,7 +243,7 @@ export default function HeroSlider() {
           }}
         >
           <Image
-            src={images[currentIndex]}
+            src={slides[currentIndex]}
             alt={`hero-${currentIndex + 1}`}
             fill
             className="object-cover"
@@ -265,7 +267,7 @@ export default function HeroSlider() {
             }}
           >
             <Image
-              src={images[nextIndex]}
+              src={slides[nextIndex]}
               alt={`hero-${nextIndex + 1}`}
               fill
               className="object-cover"
@@ -322,7 +324,7 @@ export default function HeroSlider() {
         )}
 
         <div className="absolute bottom-3 right-3 rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white">
-          {currentIndex + 1} / {images.length}
+          {currentIndex + 1} / {slides.length}
         </div>
       </div>
     </section>

@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 type Language = "ko" | "en" | "ja" | "zh";
 
 type LanguageContent = {
+    defaultLabel?: string;
   // 관리자가 수정 가능한 콘텐츠 (활성화)
   mainTitle: string;
   mainSubtitle: string;
@@ -108,23 +109,6 @@ type LanguageContent = {
   savingButton?: string;
   // 비밀번호 변경 페이지
   passwordPageTitle?: string;
-  passwordChangeSection?: string;
-  newPasswordLabel?: string;
-  newPasswordPlaceholder?: string;
-  confirmPasswordLabel?: string;
-  confirmPasswordPlaceholder?: string;
-  changePasswordButton?: string;
-  defaultLanguageTitle?: string;
-  defaultLanguageDesc?: string;
-  languageSettingsSection?: string;
-  languageSettingsDesc?: string;
-  smsSettingsSection?: string;
-  passwordMinLengthMessage?: string;
-  smsMessageLabel?: string;
-  smsMessagePlaceholder?: string;
-  smsMessageHint?: string;
-  saveSmsButton?: string;
-  savingSmsButton?: string;
   passwordChangeSection?: string;
   newPasswordLabel?: string;
   newPasswordPlaceholder?: string;
@@ -302,18 +286,7 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       confirmPasswordLabel: "비밀번호 확인",
       confirmPasswordPlaceholder: "비밀번호를 다시 입력하세요",
       changePasswordButton: "비밀번호 변경",
-      defaultLanguageTitle: "기본 언어 설정",
-      defaultLanguageDesc: "사용자가 처음 페이지에 접속할 때 표시할 기본 언어를 선택하세요",
       defaultLabel: "(기본)",
-      languageSettingsSection: "다국어 설정",
-      languageSettingsDesc: "활성화할 언어를 선택하세요",
-      smsSettingsSection: "확정문자 추가 안내사항",
-      passwordMinLengthMessage: "비밀번호는 최소 4자 이상이어야 합니다",
-      smsMessageLabel: "SMS 추가 메시지",
-      smsMessagePlaceholder: "예약 확정 문자에 포함될 추가 메시지를 입력하세요\n예) 예약일에 만나요! :)",
-      smsMessageHint: "예약자, 날짜, 시간 정보 아래에 표시됩니다. 연락처, 주소 등 추가 정보를 입력하세요.",
-      saveSmsButton: "SMS 메시지 저장",
-      savingSmsButton: "저장 중...",
       existingSchedulesLabel: "기존 일정",
       selectDeleteButton: "선택 삭제",
       deleteConfirmMessage: "선택한 {count}개의 일정을 삭제하시겠습니까?",
@@ -495,18 +468,7 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       confirmPasswordLabel: "Confirm Password",
       confirmPasswordPlaceholder: "Re-enter password",
       changePasswordButton: "Change Password",
-      defaultLanguageTitle: "Default Language Settings",
-      defaultLanguageDesc: "Select the default language to display when users first visit the page",
       defaultLabel: "(Default)",
-      languageSettingsSection: "Language Settings",
-      languageSettingsDesc: "Select languages to enable",
-      smsSettingsSection: "Additional SMS Instructions",
-      passwordMinLengthMessage: "Password must be at least 4 characters",
-      smsMessageLabel: "SMS Additional Message",
-      smsMessagePlaceholder: "Enter an additional message to include in the booking confirmation text\nExample) See you on booking day! :)",
-      smsMessageHint: "Displayed below the booker, date, and time information. Enter additional information such as contact information and address.",
-      saveSmsButton: "Save SMS Message",
-      savingSmsButton: "Saving...",
       existingSchedulesLabel: "Existing Schedules",
       selectDeleteButton: "Delete Selected",
       deleteConfirmMessage: "Delete {count} selected schedule(s)?",
@@ -671,18 +633,7 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       confirmPasswordLabel: "パスワード確認",
       confirmPasswordPlaceholder: "パスワードを再入力",
       changePasswordButton: "パスワード変更",
-      defaultLanguageTitle: "デフォルト言語設定",
-      defaultLanguageDesc: "ユーザーが最初にページにアクセスしたときに表示するデフォルト言語を選択してください",
       defaultLabel: "(デフォルト)",
-      languageSettingsSection: "言語設定",
-      languageSettingsDesc: "有効にする言語を選択",
-      smsSettingsSection: "追加SMS案内",
-      passwordMinLengthMessage: "パスワードは4文字以上である必要があります",
-      smsMessageLabel: "SMS追加メッセージ",
-      smsMessagePlaceholder: "予約確定メッセージに含める追加メッセージを入力してください\n例）予約日にお会いしましょう！:)",
-      smsMessageHint: "予約者、日付、時間情報の下に表示されます。連絡先、住所など追加情報を入力してください。",
-      saveSmsButton: "SMSメッセージを保存",
-      savingSmsButton: "保存中...",
       existingSchedulesLabel: "既存スケジュール",
       selectDeleteButton: "選択削除",
       deleteConfirmMessage: "選択した{count}個のスケジュールを削除しますか？",
@@ -864,18 +815,7 @@ const DEFAULT_LANGUAGES: AllLanguages = {
       confirmPasswordLabel: "确认密码",
       confirmPasswordPlaceholder: "再次输入密码",
       changePasswordButton: "更改密码",
-      defaultLanguageTitle: "默认语言设置",
-      defaultLanguageDesc: "选择用户首次访问页面时要显示的默认语言",
       defaultLabel: "(默认)",
-      languageSettingsSection: "语言设置",
-      languageSettingsDesc: "选择要启用的语言",
-      smsSettingsSection: "附加短信说明",
-      passwordMinLengthMessage: "密码必须至少4个字符",
-      smsMessageLabel: "短信附加消息",
-      smsMessagePlaceholder: "输入要包含在预约确认短信中的附加消息\n例) 预约日期见！:)",
-      smsMessageHint: "显示在预约人员、日期和时间信息下方。输入额外信息，如联系信息和地址。",
-      saveSmsButton: "保存短信消息",
-      savingSmsButton: "保存中...",
       existingSchedulesLabel: "现有日程",
       selectDeleteButton: "删除选定",
       deleteConfirmMessage: "删除选定的{count}个日程？",
