@@ -27,6 +27,7 @@ interface ContentSettings {
   formTitle: string;
   heroImageUrls: string[];
   profileImageUrl: string;
+  businessRegistrationImageUrl: string;
   benefits: Benefit[];
   consentDetails: ConsentDetail[];
   smsCustomMessage: string;
@@ -46,6 +47,7 @@ export default function ContentManagePage() {
     heroImageUrls: [],
     profileImageUrl: "",
     smsCustomMessage: "예약일에 만나요! :)",
+    businessRegistrationImageUrl: "",
     statsLoadingText: "신청자 수 불러오는 중... (동시접속자 많을땐 좀 걸립니다)",
     statsTemplate: "최근 한달간 {count1}명 신청 중 ( 누적 {count2}명 )",
     benefits: [
@@ -121,6 +123,7 @@ export default function ContentManagePage() {
             ? koContent.consentDetails
             : settings.consentDetails,
           smsCustomMessage: data.settings.smsCustomMessage || settings.smsCustomMessage,
+          businessRegistrationImageUrl: data.settings.businessRegistrationImageUrl || "",
           statsLoadingText: koContent.statsLoadingText || settings.statsLoadingText,
           statsTemplate: koContent.statsTemplate || settings.statsTemplate,
         };
@@ -348,10 +351,31 @@ export default function ContentManagePage() {
             languages,
             heroImageUrls: settings.heroImageUrls,
             profileImageUrl: settings.profileImageUrl,
+            businessRegistrationImageUrl: settings.businessRegistrationImageUrl,
             smsCustomMessage: settings.smsCustomMessage,
           },
         }),
       });
+            <ImageUploader
+              title={languageContent?.businessRegistrationLabel || "사업자등록증 이미지 (1개)"}
+              maxFiles={1}
+              maxSizePerFile={5}
+              onUpload={async (urls) => {
+                setSettings((prev) => ({
+                  ...prev,
+                  businessRegistrationImageUrl: urls[0] || "",
+                }));
+                // 업로드 후 즉시 저장
+                await fetch("/api/admin/settings", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    key: "businessRegistrationImageUrl",
+                    value: urls[0] || "",
+                  }),
+                });
+              }}
+            />
 
       if (!response.ok) {
         throw new Error("Failed to save settings");
@@ -468,10 +492,7 @@ export default function ContentManagePage() {
               <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">최근 한달간 {'{count1}'}명 신청 중 ( 누적 {'{count2}'}명 )</div>
             </div>
 
-            <div className="bg-white p-3 rounded border border-gray-200">
-              <label className="block text-[12px] font-semibold text-gray-700 mb-1">{languageContent?.businessRegistrationLabel || "사업자등록증 보기 텍스트"}</label>
-              <div className="text-[13px] text-gray-600 p-2 bg-gray-100 rounded">{languageContent?.businessRegistrationText || "사업자등록증 보기"}</div>
-            </div>
+            {/* 사업자등록증 텍스트 블록 완전 제거 (업로드 섹션만 남김) */}
 
             <div className="bg-white p-3 rounded border border-gray-200">
               <label className="block text-[12px] font-semibold text-gray-700 mb-1">{languageContent?.formPageTextsLabel || "폰 페이지 텍스트들"}</label>
@@ -530,6 +551,29 @@ export default function ContentManagePage() {
                 });
               }}
             />
+
+            <div className="pt-2">
+              <ImageUploader
+                title={languageContent?.businessRegistrationLabel || "사업자등록증 이미지 (1개)"}
+                maxFiles={1}
+                maxSizePerFile={5}
+                onUpload={async (urls) => {
+                  setSettings((prev) => ({
+                    ...prev,
+                    businessRegistrationImageUrl: urls[0] || "",
+                  }));
+                  // 업로드 후 즉시 저장
+                  await fetch("/api/admin/settings", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      key: "businessRegistrationImageUrl",
+                      value: urls[0] || "",
+                    }),
+                  });
+                }}
+              />
+            </div>
           </div>
 
           {/* 신청 정보 섹션 */}

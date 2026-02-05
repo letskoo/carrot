@@ -1,11 +1,58 @@
 "use client";
 
+
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+
 export default function InfoCard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [businessRegistrationImageUrl, setBusinessRegistrationImageUrl] = useState<string>("");
   const { languageContent } = useLanguage();
+
+  useEffect(() => {
+    async function loadBusinessRegistrationImage() {
+      try {
+        const response = await fetch("/api/admin/settings");
+        const data = await response.json();
+        if (data.ok && data.settings?.businessRegistrationImageUrl) {
+          setBusinessRegistrationImageUrl(data.settings.businessRegistrationImageUrl);
+        } else {
+          setBusinessRegistrationImageUrl("");
+        }
+      } catch (error) {
+        setBusinessRegistrationImageUrl("");
+        console.error("Failed to load business registration image:", error);
+      }
+    }
+    loadBusinessRegistrationImage();
+
+    // BroadcastChannel로 다른 탭에서 변경사항 감지
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel("language-settings-channel");
+      const handleBroadcast = (event: MessageEvent) => {
+        if (event.data.type === "language-updated") {
+          loadBusinessRegistrationImage();
+        }
+      };
+      channel.onmessage = handleBroadcast;
+    } catch (error) {
+      // 폴백: localStorage 이벤트
+      const handleStorageChange = (e: StorageEvent) => {
+        if (e.key === "admin-settings-updated") {
+          loadBusinessRegistrationImage();
+        }
+      };
+      window.addEventListener("storage", handleStorageChange);
+      return () => {
+        window.removeEventListener("storage", handleStorageChange);
+      };
+    }
+    return () => {
+      if (channel) channel.close();
+    };
+  }, []);
 
   useEffect(() => {
     if (isModalOpen) {
@@ -62,12 +109,16 @@ export default function InfoCard() {
             className="w-full h-full flex items-center justify-center" 
             onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src="/images/form/tex.png"
-              alt="사업자등록증"
-              className="max-w-full max-h-full w-auto h-auto object-contain"
-              style={{ maxWidth: '100vw', maxHeight: '100vh' }}
-            />
+            {businessRegistrationImageUrl ? (
+              <img
+                src={businessRegistrationImageUrl}
+                alt="사업자등록증"
+                className="max-w-full max-h-full w-auto h-auto object-contain"
+                style={{ maxWidth: '100vw', maxHeight: '100vh' }}
+              />
+            ) : (
+              <span className="text-white bg-gray-700 px-4 py-2 rounded">사업자등록증 이미지가 없습니다</span>
+            )}
           </div>
         </div>
       )}
