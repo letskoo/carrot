@@ -155,14 +155,8 @@ export default function SettingsPage() {
           const mergedLanguages = { ...languages }; // 초기값 사용
           let needsUpdate = false;
           
+          // 저장된 enabled 상태를 그대로 사용 (덮어쓰지 않음)
           (Object.keys(savedLanguages) as Array<"ko" | "en" | "ja" | "zh">).forEach((lang) => {
-            const shouldBeEnabled = lang === currentDefaultLanguage;
-            
-            // enabled 상태 확인
-            if (savedLanguages[lang]?.enabled !== shouldBeEnabled) {
-              needsUpdate = true;
-            }
-            
             // statsTemplate 검증: {count1}과 {count2}가 모두 포함되어야 함
             const savedStatsTemplate = savedLanguages[lang]?.content?.statsTemplate;
             const isStatsTemplateValid = savedStatsTemplate && 
@@ -187,11 +181,10 @@ export default function SettingsPage() {
             };
             
             mergedLanguages[lang] = {
-              enabled: shouldBeEnabled,
+              enabled: savedLanguages[lang]?.enabled ?? false, // 저장된 enabled 상태를 그대로 사용
               content: mergedContent,
             };
           });
-          
           setLanguages(mergedLanguages);
 
           // 변경사항이 있으면 Google Sheets에 저장
