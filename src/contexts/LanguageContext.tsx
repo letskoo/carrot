@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 
 type Language = "ko" | "en" | "ja" | "zh";
 
@@ -995,11 +995,9 @@ const DEFAULT_LANGUAGES: AllLanguages = {
 };
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>("ko");
-  const [defaultLanguage, setDefaultLanguage] = useState<Language>("ko");
-  const [availableLanguages, setAvailableLanguages] = useState<Language[]>([
-    "ko",
-  ]);
+  const [defaultLanguage, setDefaultLanguage] = useState<Language | undefined>(undefined);
+  const [availableLanguages, setAvailableLanguages] = useState<Language[]>([]);
+  const [currentLanguage, setCurrentLanguage] = useState<Language | undefined>(undefined);
   const [allLanguageContent, setAllLanguageContent] = useState<AllLanguages | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -1067,15 +1065,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
             ["ko", "en", "ja", "zh"].includes(key)
           );
 
-        // 기본 언어 설정 (Google Sheets에서 가져오거나 기본값)
-        const savedDefaultLang = (data.settings?.defaultLanguage || "ko") as Language;
-        if (["ko", "en", "ja", "zh"].includes(savedDefaultLang)) {
+        // 기본 언어 설정 (Google Sheets에서 받아온 값만 사용)
+        const savedDefaultLang = data.settings?.defaultLanguage as Language | undefined;
+        if (savedDefaultLang && ["ko", "en", "ja", "zh"].includes(savedDefaultLang)) {
           setDefaultLanguage(savedDefaultLang);
+        } else {
+          setDefaultLanguage(undefined);
         }
 
-        // 활성화된 언어가 없으면 기본 언어만 포함
+        // 활성화된 언어가 없으면 빈 배열
         const unique = Array.from(
-          new Set<Language>(enabled.length > 0 ? enabled : [savedDefaultLang])
+          new Set<Language>(enabled.length > 0 ? enabled : [])
         );
 
         console.log("[LanguageContext] Available languages:", unique);
@@ -1128,25 +1128,21 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // 저장된 언어 설정 복원
+  // 언어 복원은 언어 데이터가 완전히 로드된 후 1회만!
+  const didRestore = useRef(false);
   useEffect(() => {
-    // 기본 언어를 항상 우선으로 설정
-    // 사용자가 드롭다운에서 명시적으로 다른 언어를 선택한 경우만 localStorage 값 사용
-    const savedLang = localStorage.getItem("user_language") as Language;
-    
-    // 저장된 언어가 있고, 그것이 기본 언어가 아니고, 추가 언어(availableLanguages)에 포함되어 있으면 사용
-    const additionalLanguages = availableLanguages.filter(lang => lang !== defaultLanguage);
-    if (savedLang && additionalLanguages.includes(savedLang)) {
-      setCurrentLanguage(savedLang);
-    } else {
-      // 기본 언어 우선
-      setCurrentLanguage(defaultLanguage);
-      // localStorage에서 기본 언어가 아닌 언어가 저장되어 있으면 제거
-      if (savedLang && savedLang !== defaultLanguage) {
-        localStorage.removeItem("user_language");
+    if (!isLoading && availableLanguages.length > 0 && defaultLanguage && !didRestore.current) {
+      const savedLang = localStorage.getItem("user_language") as Language;
+      if (savedLang && availableLanguages.includes(savedLang)) {
+        setCurrentLanguage(savedLang);
+      } else if (availableLanguages.includes(defaultLanguage)) {
+        setCurrentLanguage(defaultLanguage);
+      } else {
+        setCurrentLanguage(availableLanguages[0]);
       }
+      didRestore.current = true;
     }
-  }, [availableLanguages, defaultLanguage]);
+  }, [isLoading, availableLanguages, defaultLanguage]);
 
   const setLanguage = (lang: Language) => {
     setCurrentLanguage(lang);
