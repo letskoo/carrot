@@ -36,12 +36,14 @@ export default function SettingsPage() {
   // 비밀번호 상태
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [originalPassword, setOriginalPassword] = useState(""); // 실제로는 서버에 저장된 값이 없으므로 변경 감지만 용도
   
   // 기본 언어 상태 (초기값 undefined, 하드코딩 제거)
   const [defaultLanguage, setDefaultLanguage] = useState<"ko" | "en" | "ja" | "zh" | undefined>(undefined);
   
   // SMS 커스텀 메시지 상태
   const [smsCustomMessage, setSmsCustomMessage] = useState("예약일에 만나요! :)");
+  const [originalSmsCustomMessage, setOriginalSmsCustomMessage] = useState("");
   
   // 다국어 설정 상태
   const [languages, setLanguages] = useState<AllLanguages>({
@@ -138,56 +140,43 @@ export default function SettingsPage() {
           currentDefaultLanguage = data.settings.defaultLanguage as "ko" | "en" | "ja" | "zh";
           setDefaultLanguage(currentDefaultLanguage);
         }
-        
         // SMS 커스텀 메시지 로드
         if (data.settings.smsCustomMessage) {
           setSmsCustomMessage(data.settings.smsCustomMessage);
+          setOriginalSmsCustomMessage(data.settings.smsCustomMessage);
         }
-        
-        // 다국어 설정 로드
+        // 비밀번호는 서버에서 받아올 수 없으므로, 변경 감지만 위해 빈 값 유지
+        setOriginalPassword("");
+        // 다국어 설정 로드 (기존과 동일)
         if (data.settings.languages) {
           const savedLanguages =
             typeof data.settings.languages === "string"
               ? JSON.parse(data.settings.languages)
               : data.settings.languages;
-          
-          // DEFAULT_LANGUAGES와 병합
-          const mergedLanguages = { ...languages }; // 초기값 사용
+          const mergedLanguages = { ...languages };
           let needsUpdate = false;
-          
-          // 저장된 enabled 상태를 그대로 사용 (덮어쓰지 않음)
           (Object.keys(savedLanguages) as Array<"ko" | "en" | "ja" | "zh">).forEach((lang) => {
-            // statsTemplate 검증: {count1}과 {count2}가 모두 포함되어야 함
             const savedStatsTemplate = savedLanguages[lang]?.content?.statsTemplate;
             const isStatsTemplateValid = savedStatsTemplate && 
               savedStatsTemplate.includes("{count1}") && 
               savedStatsTemplate.includes("{count2}");
-            
-            // 일반 필드 검증: MYMEMORY WARNING 같은 에러 메시지 감지
             const savedContent = savedLanguages[lang]?.content || {};
             const hasApiError = Object.values(savedContent).some(value => 
               typeof value === 'string' && (value.includes("MYMEMORY") || value.includes("WARNING") || value.includes("LIMIT"))
             );
-            
             if (!isStatsTemplateValid || hasApiError) {
-              console.warn(`[Admin] ${lang} content is corrupted (statsTemplate invalid or API error detected), using default`);
               needsUpdate = true;
             }
-            
-            // content 병합
             const mergedContent = {
-              ...mergedLanguages[lang].content, // 기본값 먼저
-              ...(isStatsTemplateValid && !hasApiError ? savedLanguages[lang]?.content : {}), // 손상되지 않았으면 Google Sheets 값 사용
+              ...mergedLanguages[lang].content,
+              ...(isStatsTemplateValid && !hasApiError ? savedLanguages[lang]?.content : {}),
             };
-            
             mergedLanguages[lang] = {
-              enabled: savedLanguages[lang]?.enabled ?? false, // 저장된 enabled 상태를 그대로 사용
+              enabled: savedLanguages[lang]?.enabled ?? false,
               content: mergedContent,
             };
           });
           setLanguages(mergedLanguages);
-
-          // 변경사항이 있으면 Google Sheets에 저장
           if (needsUpdate) {
             try {
               await fetch("/api/admin/settings", {
@@ -198,9 +187,8 @@ export default function SettingsPage() {
                   value: mergedLanguages,
                 }),
               });
-              console.log("[Admin] Languages synchronized and corrupted data fixed");
             } catch (error) {
-              console.error("[Admin] Failed to sync languages:", error);
+              // ignore
             }
           }
         }
@@ -210,82 +198,74 @@ export default function SettingsPage() {
     }
   };
 
-  const handlePasswordChange = async () => {
-    if (!newPassword || !confirmPassword) {
-      setMessage("❌ 모든 필드를 입력해주세요");
-      setTimeout(() => setMessage(""), 3000);
-      return;
-    }
 
-    if (newPassword !== confirmPassword) {
-      setMessage("❌ 비밀번호가 일치하지 않습니다");
-      setTimeout(() => setMessage(""), 3000);
-      return;
-    }
-
-    if (newPassword.length < 4) {
-      setMessage("❌ 비밀번호는 최소 4자 이상이어야 합니다");
-      setTimeout(() => setMessage(""), 3000);
-      return;
-    }
+  // 하단 고정 저장 버튼용 통합 저장 함수
+  const handleSave = async () => {
+    // 변경 감지
+    const passwordChanged = newPassword && confirmPassword && newPassword === confirmPassword && newPassword.length >= 4;
+    const smsChanged = smsCustomMessage !== originalSmsCustomMessage;
+    if (!passwordChanged && !smsChanged) return;
 
     setLoading(true);
+    let passwordSuccess = true;
+    let smsSuccess = true;
+    let errorMsg = "";
 
-    try {
-      const response = await fetch("/api/admin/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          key: "password",
-          value: newPassword,
-        }),
-      });
-
-      if (response.ok) {
-        setMessage("✅ 비밀번호가 변경되었습니다");
-        setNewPassword("");
-        setConfirmPassword("");
-        setTimeout(() => setMessage(""), 3000);
-      } else {
-        setMessage("❌ 비밀번호 변경에 실패했습니다");
-        setTimeout(() => setMessage(""), 3000);
+    // 비밀번호 변경
+    if (passwordChanged) {
+      try {
+        const response = await fetch("/api/admin/settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            key: "password",
+            value: newPassword,
+          }),
+        });
+        if (!response.ok) {
+          passwordSuccess = false;
+          errorMsg = "❌ 비밀번호 변경에 실패했습니다";
+        } else {
+          setNewPassword("");
+          setConfirmPassword("");
+        }
+      } catch (e) {
+        passwordSuccess = false;
+        errorMsg = "❌ 비밀번호 변경 중 오류가 발생했습니다";
       }
-    } catch (error) {
-      console.error("Failed to change password:", error);
-      setMessage("❌ 비밀번호 변경 중 오류가 발생했습니다");
-      setTimeout(() => setMessage(""), 3000);
-    } finally {
-      setLoading(false);
     }
-  };
 
-  const handleSmsMessageSave = async () => {
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/admin/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          key: "smsCustomMessage",
-          value: smsCustomMessage,
-        }),
-      });
-
-      if (response.ok) {
-        setMessage("✅ SMS 메시지가 저장되었습니다");
-        setTimeout(() => setMessage(""), 3000);
-      } else {
-        setMessage("❌ 저장에 실패했습니다");
-        setTimeout(() => setMessage(""), 3000);
+    // SMS 메시지 변경
+    if (smsChanged) {
+      try {
+        const response = await fetch("/api/admin/settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            key: "smsCustomMessage",
+            value: smsCustomMessage,
+          }),
+        });
+        if (!response.ok) {
+          smsSuccess = false;
+          errorMsg = "❌ SMS 메시지 저장에 실패했습니다";
+        } else {
+          setOriginalSmsCustomMessage(smsCustomMessage);
+        }
+      } catch (e) {
+        smsSuccess = false;
+        errorMsg = "❌ SMS 메시지 저장 중 오류가 발생했습니다";
       }
-    } catch (error) {
-      console.error("Failed to save SMS message:", error);
-      setMessage("❌ 저장 중 오류가 발생했습니다");
-      setTimeout(() => setMessage(""), 3000);
-    } finally {
-      setLoading(false);
     }
+
+    if (passwordSuccess && smsSuccess) {
+      setMessage("✅ 저장되었습니다");
+      setTimeout(() => setMessage(""), 2000);
+    } else if (errorMsg) {
+      setMessage(errorMsg);
+      setTimeout(() => setMessage(""), 3000);
+    }
+    setLoading(false);
   };
 
   const handleToggleLanguage = async (lang: "ko" | "en" | "ja" | "zh") => {
@@ -472,15 +452,7 @@ export default function SettingsPage() {
                 ℹ️ {languageContent?.passwordMinLengthMessage || "비밀번호는 최소 4자 이상이어야 합니다"}
               </div>
 
-              <div className="flex justify-center">
-                <button
-                  onClick={handlePasswordChange}
-                  disabled={loading || !newPassword || !confirmPassword}
-                  className="w-auto px-6 h-8 rounded-lg bg-[#7c3aed] text-xs font-semibold text-white hover:bg-[#6d28d9] transition-colors disabled:bg-gray-300"
-                >
-                  {loading ? (languageContent?.savingButton || "변경 중...") : (languageContent?.changePasswordButton || "비밀번호 변경")}
-                </button>
-              </div>
+              {/* 기존 개별 저장 버튼 제거, 하단 고정 버튼 사용 */}
             </div>
           </div>
 
@@ -566,24 +538,33 @@ export default function SettingsPage() {
                 </p>
               </div>
 
-              <div className="flex justify-center">
-                <button
-                  onClick={handleSmsMessageSave}
-                  disabled={loading}
-                  className="w-auto px-6 h-8 rounded-lg bg-[#7c3aed] text-xs font-semibold text-white hover:bg-[#6d28d9] transition-colors disabled:bg-gray-300"
-                >
-                  {loading ? (languageContent?.savingSmsButton || "저장 중...") : (languageContent?.saveSmsButton || "SMS 메시지 저장")}
-                </button>
-              </div>
+              {/* 기존 개별 저장 버튼 제거, 하단 고정 버튼 사용 */}
             </div>
           </div>
 
           {/* 메시지 */}
           {message && (
             <div className="mt-6 p-4 bg-purple-50 rounded-lg text-center text-sm">
-              {message === "✅ SMS 메시지가 저장되었습니다" ? (languageContent?.smsSavedMessage || message) : message}
+              {message}
             </div>
           )}
+        </div>
+      </div>
+      {/* 하단 고정 저장 버튼 */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-black/10">
+        <div className="px-4 py-3">
+          <div className="max-w-[640px] mx-auto">
+            <button
+              onClick={handleSave}
+              disabled={loading ||
+                // 둘 다 변경 없으면 비활성화
+                (!((newPassword && confirmPassword && newPassword === confirmPassword && newPassword.length >= 4) || smsCustomMessage !== originalSmsCustomMessage))
+              }
+              className="w-full h-14 rounded-[12px] bg-[#7c3aed] text-base font-bold text-white hover:bg-[#6d28d9] transition-colors active:scale-[0.98] disabled:bg-gray-300"
+            >
+              {loading ? (languageContent?.savingButton || "저장 중...") : (languageContent?.saveButton || "저장")}
+            </button>
+          </div>
         </div>
       </div>
     </div>
