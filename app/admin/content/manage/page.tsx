@@ -534,6 +534,7 @@ export default function ContentManagePage() {
             </div>
           </div>
 
+
           {/* 메인 섹션 */}
           <div className="space-y-5 pt-6 border-t border-gray-200">
             <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.imageManagementLabel || "이미지 관리"}</h3>
@@ -601,6 +602,62 @@ export default function ContentManagePage() {
                   });
                 }}
               />
+            </div>
+          </div>
+
+          {/* 혜택 항목 섹션 (이동) */}
+          <div className="space-y-5 pt-6 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.benefitsLabel || "협쿇 항목"}</h3>
+              <button
+                type="button"
+                onClick={addBenefit}
+                className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-semibold hover:bg-purple-200 cursor-pointer"
+              >
+                {languageContent?.addBenefitButton || "+ 추가"}
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {settings.benefits.map((benefit, index) => (
+                <div key={index} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[14px] font-semibold text-gray-900">
+                      {languageContent?.benefitItemLabel || "항목"} {benefit.number}
+                    </span>
+                    {settings.benefits.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeBenefit(index)}
+                        className="text-red-600 hover:text-red-700 text-sm font-semibold cursor-pointer"
+                      >
+                        {languageContent?.deleteBenefitButton || "삭제"}
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      value={benefit.title}
+                      onChange={(e) =>
+                        handleBenefitChange(index, "title", e.target.value)
+                      }
+                      placeholder={languageContent?.benefitTitlePlaceholder || "제목"}
+                      className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
+                    />
+                    <textarea
+                      value={benefit.description}
+                      onChange={(e) =>
+                        handleBenefitChange(index, "description", e.target.value)
+                      }
+                      placeholder={languageContent?.benefitDescriptionPlaceholder || "설명"}
+                      rows={2}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -769,60 +826,9 @@ export default function ContentManagePage() {
             </div>
           </div>
 
-          {/* 혜택 섹션 */}
-          <div className="space-y-5 pt-6 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.benefitsLabel || "협쿇 항목"}</h3>
-              <button
-                type="button"
-                onClick={addBenefit}
-                className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-semibold hover:bg-purple-200 cursor-pointer"
-              >
-                {languageContent?.addBenefitButton || "+ 추가"}
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {settings.benefits.map((benefit, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[14px] font-semibold text-gray-900">
-                      {languageContent?.benefitItemLabel || "항목"} {benefit.number}
-                    </span>
-                    {settings.benefits.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeBenefit(index)}
-                        className="text-red-600 hover:text-red-700 text-sm font-semibold cursor-pointer"
-                      >
-                        {languageContent?.deleteBenefitButton || "삭제"}
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="space-y-3">
-                    <input
-                      type="text"
-                      value={benefit.title}
-                      onChange={(e) =>
-                        handleBenefitChange(index, "title", e.target.value)
-                      }
-                      placeholder={languageContent?.benefitTitlePlaceholder || "제목"}
-                      className="w-full h-12 px-4 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
-                    />
-                    <textarea
-                      value={benefit.description}
-                      onChange={(e) =>
-                        handleBenefitChange(index, "description", e.target.value)
-                      }
-                      placeholder={languageContent?.benefitDescriptionPlaceholder || "설명"}
-                      rows={2}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 text-[15px] placeholder:text-gray-400 focus:outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* 혜택 섹션 (하단, 숨김 처리) */}
+          <div className="space-y-5 pt-6 border-t border-gray-200" style={{ display: 'none' }}>
+            {/* ...기존 혜택 항목 코드 (숨김) ... */}
           </div>
 
           {/* 메시지 */}
