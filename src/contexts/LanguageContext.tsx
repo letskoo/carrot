@@ -1150,7 +1150,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   // 현재 언어의 content 추출
-  const languageContent = (allLanguageContent || DEFAULT_LANGUAGES)?.[currentLanguage]?.content || null;
+    const languageContent =
+      currentLanguage !== undefined
+        ? (allLanguageContent || DEFAULT_LANGUAGES)[currentLanguage]?.content || null
+        : null;
 
   return (
     <LanguageContext.Provider
