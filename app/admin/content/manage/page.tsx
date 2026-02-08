@@ -95,6 +95,34 @@ export default function ContentManagePage() {
     }
   }, [languageContent, isReady]);
 
+  // 언어가 바뀔 때마다 settings를 해당 언어 값으로 동기화
+  useEffect(() => {
+    if (languageContent) {
+      setSettings((prev) => ({
+        ...prev,
+        mainTitle: languageContent.mainTitle || prev.mainTitle,
+        mainSubtitle: languageContent.mainSubtitle || prev.mainSubtitle,
+        applicationItem: languageContent.applicationItem || prev.applicationItem,
+        companyName: languageContent.companyName || prev.companyName,
+        ctaButtonText: languageContent.ctaButtonText || prev.ctaButtonText,
+        formPageTitle: languageContent.formPageTitle || prev.formPageTitle,
+        formTitle: languageContent.formTitle || prev.formTitle,
+        benefits: Array.isArray(languageContent.benefits)
+          ? languageContent.benefits.map((b, i) => ({
+              number: prev.benefits[i]?.number ?? i + 1,
+              title: b.title,
+              description: b.description,
+            }))
+          : prev.benefits,
+        consentDetails: Array.isArray(languageContent.consentDetails)
+          ? languageContent.consentDetails
+          : prev.consentDetails,
+        statsLoadingText: languageContent.statsLoadingText || prev.statsLoadingText,
+        statsTemplate: languageContent.statsTemplate || prev.statsTemplate,
+      }));
+    }
+  }, [languageContent]);
+
   const fetchSettings = async () => {
     try {
       const response = await fetch("/api/admin/settings");

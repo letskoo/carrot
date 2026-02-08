@@ -335,8 +335,10 @@ export default function SettingsPage() {
     zh: "🇨🇳 中文",
   };
 
+  const { setLanguage } = useLanguage();
   const handleDefaultLanguageChange = async (lang: "ko" | "en" | "ja" | "zh") => {
     setDefaultLanguage(lang);
+    setLanguage(lang); // 기본언어 변경 시 현재 언어도 즉시 변경
 
     // 기본 언어 변경 시 선택한 언어만 활성화, 나머지는 비활성화
     const updatedLanguages = {
