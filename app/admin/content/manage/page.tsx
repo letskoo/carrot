@@ -498,7 +498,7 @@ export default function ContentManagePage() {
           </div>
 
           {/* 고정 콘텐츠 섹션 (관리자 수정 불가) */}
-          <div className="space-y-5 pt-6 border-t border-gray-200 bg-gray-50 p-4 rounded-lg">
+          <div className="space-y-5 pt-6 border-t border-gray-200 bg-gray-50 p-4 rounded-lg" style={{ display: 'none' }}>
             <div className="flex items-center gap-2">
               <h3 className="text-[18px] font-semibold text-gray-900">{languageContent?.fixedContentLabel || "기정 콘테냈 (수정 불가 - 자동 번역됨)"}</h3>
               <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">{languageContent?.readOnlyBadge || "읽기전용"}</span>
@@ -673,7 +673,7 @@ export default function ContentManagePage() {
               />
             </div>
 
-            <div>
+            <div style={{ display: 'none' }}>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
                 {languageContent?.smsAdditionalLabel || "SMS 추가 메시지"}
               </label>
@@ -689,7 +689,7 @@ export default function ContentManagePage() {
               </p>
             </div>
 
-            <div>
+            <div style={{ display: 'none' }}>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
                 {languageContent?.statsLoadingLabel || "통계 로딩 텍스트"}
               </label>
@@ -702,7 +702,7 @@ export default function ContentManagePage() {
               />
             </div>
 
-            <div>
+            <div style={{ display: 'none' }}>
               <label className="block text-[14px] font-semibold text-gray-900 mb-2">
                 {languageContent?.statsTemplateLabel || "통계 텍스트 템플릿"}
               </label>
