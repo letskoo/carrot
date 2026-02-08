@@ -198,12 +198,12 @@ type AllLanguages = {
 };
 
 interface LanguageContextType {
-  currentLanguage: Language;
+  currentLanguage: Language | undefined;
   setLanguage: (lang: Language) => void;
   availableLanguages: Language[];
   languageContent: LanguageContent | null;
   isLoading: boolean;
-  defaultLanguage: Language;
+  defaultLanguage: Language | undefined;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(
