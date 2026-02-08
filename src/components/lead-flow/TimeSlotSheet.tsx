@@ -103,7 +103,7 @@ export default function TimeSlotSheet({
       ja: "ja-JP",
       zh: "zh-CN",
     };
-    const locale = localeMap[currentLanguage] || "ko-KR";
+    const locale = currentLanguage ? localeMap[currentLanguage] ?? "ko-KR" : "ko-KR";
     return new Intl.DateTimeFormat(locale, {
       month: "long",
       day: "numeric",
